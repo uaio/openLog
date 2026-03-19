@@ -1,1 +1,1 @@
-console.log('AIConsole MCP Server');
+export { startMCPServer } from './server.js';

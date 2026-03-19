@@ -4,6 +4,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "aiconsole-mcp": "./bin/aiconsole-mcp"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
