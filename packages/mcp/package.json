@@ -4,9 +4,16 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
+    "clean": "rm -rf dist",
     "dev": "tsc --watch",
-    "build": "tsc"
+    "build": "npm run clean && tsc"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0"
