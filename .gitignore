@@ -8,6 +8,10 @@ dist
 
 # TypeScript
 *.tsbuildinfo
+*.d.ts
+*.d.ts.map
+*.js
+!**/node_modules/**/*.js
 
 # IDE
 .idea/
