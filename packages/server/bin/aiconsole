@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+import { start } from '../dist/cli/index.js';
+import { parseArgs } from 'util';
+
+const args = parseArgs({
+  options: {
+    port: {
+      type: 'string',
+      short: 'p'
+    }
+  }
+});
+
+await start({
+  port: args.values.port ? parseInt(args.values.port) : undefined
+});
