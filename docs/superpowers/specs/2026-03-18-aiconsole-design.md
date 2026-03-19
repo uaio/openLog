@@ -239,7 +239,15 @@ AI 调用 get_network_logs({ deviceId: 'abc123', limit: 20 })
 
 ## 数据存储策略
 
-### 日志存储
+### 实时性要求
+
+| 查看方式 | 实时性 | 数据来源 | 说明 |
+|----------|--------|----------|------|
+| PC 查看页面 | **实时** | WebSocket 推送 | 毫秒级同步，无需刷新 |
+| 移动端 SDK 面板 | **实时** | 本地直接访问 | 无网络延迟 |
+| AI 查询 (MCP) | **非实时** | 服务器缓存 | 查询历史数据，包含时间戳 |
+
+### 日志存储（供 AI 查询）
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
@@ -247,6 +255,25 @@ AI 调用 get_network_logs({ deviceId: 'abc123', limit: 20 })
 | 网络请求上限 | 500 条 | 超出后删除最旧的请求 |
 | 日志保留时长 | 30 分钟 | 设备断开后 30 分钟清理 |
 | 存储方式 | 内存 | 不持久化到磁盘，重启服务清空 |
+
+### 数据时间戳
+
+所有数据都包含精确的时间戳，供 AI 分析时了解事件发生的时间顺序：
+
+```typescript
+interface LogEntry {
+  timestamp: number;      // 毫秒级时间戳
+  level: 'log' | 'warn' | 'error' | 'info';
+  message: string;
+  stack?: string;
+}
+
+interface NetworkEntry {
+  timestamp: number;      // 请求发起时间
+  duration: number;       // 请求耗时（毫秒）
+  // ... 其他字段
+}
+```
 
 ### 设备管理
 
