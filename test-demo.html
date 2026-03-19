@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIConsole 功能测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 30px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .status {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .status h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    #status-content {
+      font-family: monospace;
+      font-size: 12px;
+      color: #666;
+    }
+    .logs {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .logs h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .log-item {
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      border-left: 3px solid #ddd;
+    }
+    .log-log { border-left-color: #28a745; background: #e8f5e9; }
+    .log-warn { border-left-color: #ffc107; background: #fff3cd; }
+    .log-error { border-left-color: #dc3545; background: #ffebeb; }
+    .log-info { border-left-color: #17a2b8; background: #d1ecf1; }
+    .remote-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .remote-controls button {
+      padding: 10px;
+      font-size: 12px;
+      background: #6c757d;
+      box-shadow: none;
+    }
+    .remote-controls button:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 AIConsole 功能测试</h1>
+    <p class="subtitle">测试页面 - 验证所有核心功能</p>
+
+    <div class="status">
+      <h3>📊 状态</h3>
+      <div id="status-content">正在初始化...</div>
+    </div>
+
+    <div class="button-group">
+      <button onclick="testLog()">📝 测试 Log</button>
+      <button onclick="testWarn()">⚠️ 测试 Warn</button>
+      <button onclick="testError()">🔴 测试 Error</button>
+      <button onclick="testInfo()">ℹ️ 测试 Info</button>
+      <button onclick="testObject()">📦 测试对象</button>
+      <button onclick="testArray()">📋 测试数组</button>
+      <button onclick="testMany()">🔄 批量测试(10条)</button>
+    </div>
+
+    <div class="remote-controls">
+      <button onclick="testDisableRemote()">🔴 禁用远程</button>
+      <button onclick="testEnableRemote()">✅ 启用远程</button>
+      <button onclick="testStatus()">🔍 查询状态</button>
+    </div>
+
+    <div class="logs">
+      <h3>📝 最近日志</h3>
+      <div id="logs-content"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // 动态导入 SDK
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './packages/vconsole/dist/index.js';
+    script.onload = () => {
+      initAIConsole();
+    };
+    script.onerror = () => {
+      updateStatus('❌ SDK 加载失败，请确认已运行 pnpm build');
+    };
+    document.head.appendChild(script);
+
+    function updateStatus(message) {
+      const statusEl = document.getElementById('status-content');
+      statusEl.textContent = message;
+    }
+
+    function addLog(level, message) {
+      const logsEl = document.getElementById('logs-content');
+      const item = document.createElement('div');
+      item.className = `log-item log-${level}`;
+      const time = new Date().toLocaleTimeString();
+      item.textContent = `[${time}] ${message}`;
+      logsEl.insertBefore(item, logsEl.firstChild);
+
+      // 保留最近 30 条
+      while (logsEl.children.length > 30) {
+        logsEl.removeChild(logsEl.lastChild);
+      }
+    }
+
+    function initAIConsole() {
+      try {
+        const AIConsole = window.AIConsole;
+        const aiconsole = new AIConsole({
+          projectId: 'test-demo',
+          server: 'ws://localhost:3000'
+        });
+
+        window.aiconsole = aiconsole;
+        updateStatus('✅ AIConsole 已初始化，等待连接到服务器...');
+
+        // 监听连接状态（如果需要的话）
+        setTimeout(() => {
+          updateStatus('✅ AIConsole 运行中，点击下方按钮测试功能');
+        }, 1000);
+      } catch (error) {
+        updateStatus(`❌ 初始化失败: ${error.message}`);
+        console.error('初始化错误:', error);
+      }
+    }
+
+    // 测试函数
+    window.testLog = () => {
+      console.log('这是一条普通日志 - ' + new Date().toLocaleTimeString());
+      addLog('info', '发送: console.log("这是一条普通日志...")');
+    };
+
+    window.testWarn = () => {
+      console.warn('这是一条警告信息 - ' + new Date().toLocaleTimeString());
+      addLog('info', '发送: console.warn("这是一条警告信息...")');
+    };
+
+    window.testError = () => {
+      console.error('这是一条错误信息 - ' + new Date().toLocaleTimeString());
+      addLog('info', '发送: console.error("这是一条错误信息...")');
+    };
+
+    window.testInfo = () => {
+      console.info('这是一条信息 - ' + new Date().toLocaleTimeString());
+      addLog('info', '发送: console.info("这是一条信息...")');
+    };
+
+    window.testObject = () => {
+      const obj = {
+        user: 'test-user',
+        data: { id: 1, name: '测试数据', value: Math.random() },
+        timestamp: Date.now()
+      };
+      console.log('对象:', obj);
+      addLog('info', '发送: console.log({...})');
+    };
+
+    window.testArray = () => {
+      const arr = [1, 2, 3, { key: 'value', nested: { x: 1, y: 2 } }];
+      console.log('数组:', arr);
+      addLog('info', '发送: console.log([...])');
+    };
+
+    window.testMany = () => {
+      updateStatus('🔄 正在发送 10 条日志...');
+      let count = 0;
+      const interval = setInterval(() => {
+        console.log(`批量测试日志 #${count + 1}`);
+        addLog('info', `发送: console.log("批量测试日志 #${count + 1}")`);
+        count++;
+        if (count >= 10) {
+          clearInterval(interval);
+          updateStatus('✅ 已发送 10 条日志');
+        }
+      }, 100);
+    };
+
+    // 远程控制函数
+    window.testDisableRemote = () => {
+      if (window.aiconsole) {
+        window.aiconsole.disableRemote();
+        updateStatus('🔴 远程监控已禁用 - 日志将不会上报到服务器');
+        addLog('warn', '远程监控已禁用');
+      } else {
+        addLog('error', 'AIConsole 未初始化');
+      }
+    };
+
+    window.testEnableRemote = () => {
+      if (window.aiconsole) {
+        window.aiconsole.enableRemote();
+        updateStatus('✅ 远程监控已启用 - 日志将正常上报');
+        addLog('info', '远程监控已启用');
+      } else {
+        addLog('error', 'AIConsole 未初始化');
+      }
+    };
+
+    window.testStatus = () => {
+      if (window.aiconsole) {
+        const enabled = window.aiconsole.isRemoteEnabled();
+        updateStatus(`🔍 远程监控状态: ${enabled ? '✅ 启用' : '❌ 禁用'}`);
+        addLog('info', `查询远程监控状态: ${enabled ? '启用' : '禁用'}`);
+      } else {
+        addLog('error', 'AIConsole 未初始化');
+      }
+    };
+
+    // 页面加载时的初始提示
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (!window.AIConsole) {
+          addLog('warn', 'SDK 正在加载中...');
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
