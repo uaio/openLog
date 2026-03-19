@@ -11,6 +11,26 @@ const args = parseArgs({
   }
 });
 
+function validatePort(portStr: string | undefined): number | undefined {
+  if (portStr === undefined) {
+    return undefined;
+  }
+
+  const port = parseInt(portStr, 10);
+
+  if (isNaN(port)) {
+    console.error(`错误: 端口号必须是数字，收到 "${portStr}"`);
+    process.exit(1);
+  }
+
+  if (port < 1 || port > 65535) {
+    console.error(`错误: 端口号必须在 1-65535 范围内，收到 ${port}`);
+    process.exit(1);
+  }
+
+  return port;
+}
+
 await start({
-  port: args.values.port ? parseInt(args.values.port) : undefined
+  port: validatePort(args.values.port)
 });
