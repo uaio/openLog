@@ -20,12 +20,22 @@ export const handlers: Record<string, MessageHandler> = {
       return;
     }
 
+    // 输入验证
+    if (!deviceInfo || typeof deviceInfo !== 'object') {
+      console.error('Missing or invalid deviceInfo in register message');
+      return;
+    }
+
+    const validatedDeviceInfo = {
+      ua: String(deviceInfo.ua || ''),
+      screen: String(deviceInfo.screen || ''),
+      pixelRatio: Number(deviceInfo.pixelRatio) || 1,
+      language: String(deviceInfo.language || '')
+    };
+
     deviceStore.register(deviceId, {
       projectId,
-      ua: deviceInfo.ua,
-      screen: deviceInfo.screen,
-      pixelRatio: deviceInfo.pixelRatio,
-      language: deviceInfo.language,
+      ...validatedDeviceInfo,
       connectTime: Date.now(),
       lastActiveTime: Date.now()
     });
@@ -76,3 +86,12 @@ export function registerPCClient(ws: WebSocket): void {
   pcClients.add(ws);
   ws.on('close', () => pcClients.delete(ws));
 }
+
+// 定期清理无效的 PC 客户端连接（每 5 分钟）
+setInterval(() => {
+  for (const client of pcClients) {
+    if (client.readyState !== WebSocket.OPEN) {
+      pcClients.delete(client);
+    }
+  }
+}, 5 * 60 * 1000);
