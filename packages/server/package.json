@@ -1,0 +1,19 @@
+{
+  "name": "@aiconsole/server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.0",
+    "@types/express": "^4.17.0"
+  }
+}
