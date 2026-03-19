@@ -18,6 +18,7 @@ export class WebSocketTransport {
   private events: TransportEvents;
   private messageQueue: string[] = [];
   private readonly maxQueueSize = 100;
+  private shouldReconnect = true;
 
   constructor(config: RemoteConfig, events: TransportEvents = {}) {
     this.serverUrl = config.server || this.getDefaultServerUrl();
@@ -30,6 +31,8 @@ export class WebSocketTransport {
   }
 
   connect(): void {
+    if (!this.shouldReconnect) return;
+
     if (this.state === 'connecting' || this.state === 'connected') {
       return;
     }
@@ -55,7 +58,7 @@ export class WebSocketTransport {
         this.state = 'disconnected';
         this.events.onDisconnect?.();
 
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        if (this.shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
           setTimeout(() => this.connect(), this.reconnectDelay);
         }
       };
@@ -72,7 +75,13 @@ export class WebSocketTransport {
 
   send(data: string): void {
     if (this.state === 'connected' && this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(data);
+      try {
+        this.ws.send(data);
+      } catch (error) {
+        console.error('[WebSocket] Failed to send:', error);
+        this.state = 'error';
+        this.events.onError?.(error as Error);
+      }
     } else {
       if (this.messageQueue.length < this.maxQueueSize) {
         this.messageQueue.push(data);
@@ -81,6 +90,7 @@ export class WebSocketTransport {
   }
 
   disconnect(): void {
+    this.shouldReconnect = false;
     if (this.ws) {
       this.ws.close();
       this.ws = null;
