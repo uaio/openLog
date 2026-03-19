@@ -13,6 +13,14 @@ export interface Device {
 
 export class DeviceStore {
   private devices: Map<string, Device> = new Map();
+  private cleanupTimer?: NodeJS.Timeout;
+
+  constructor() {
+    // 每 5 分钟清理一次不活跃的设备
+    this.cleanupTimer = setInterval(() => {
+      this.cleanup();
+    }, 5 * 60 * 1000);
+  }
 
   register(deviceId: string, info: Omit<Device, 'deviceId' | 'online' | 'activeTabs'>): void {
     const existing = this.devices.get(deviceId);
@@ -62,6 +70,13 @@ export class DeviceStore {
       if (!device.online && device.lastActiveTime < threshold) {
         this.devices.delete(id);
       }
+    }
+  }
+
+  destroy(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
     }
   }
 }
