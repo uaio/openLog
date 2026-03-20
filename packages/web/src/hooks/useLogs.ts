@@ -36,8 +36,11 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
 
     console.log('[useLogs] 刷新缓冲区，日志数量:', logBufferRef.current.length);
 
+    // 先捕获当前缓冲区内容，避免在 setLogs 回调中读取时被清空
+    const logsToAdd = [...logBufferRef.current];
+
     setLogs(prevLogs => {
-      const newLogs = [...prevLogs, ...logBufferRef.current];
+      const newLogs = [...prevLogs, ...logsToAdd];
       // 限制日志数量，避免内存溢出
       const result = newLogs.slice(-maxLogs);
       console.log('[useLogs] 更新 logs 状态，从', prevLogs.length, '条变为', result.length, '条');
