@@ -186,7 +186,7 @@ vconsole.isRemoteEnabled();  // true / false
 #### 启动方式
 
 ```bash
-npx aiconsole              # 默认端口 3000
+pnpm start            # 默认端口 3000
 npx aiconsole --port 3001  # 指定端口
 ```
 

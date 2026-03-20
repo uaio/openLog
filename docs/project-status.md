@@ -170,7 +170,7 @@ pnpm test
 npx aiconsole
 
 # 指定端口启动
-npx aiconsole -p 3001
+pnpm start
 ```
 
 ---

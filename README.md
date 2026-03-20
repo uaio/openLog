@@ -30,10 +30,12 @@ pnpm build
 ### 2️⃣ 启动服务器
 
 ```bash
-npx aiconsole
+pnpm start
 ```
 
 服务器将在 `http://localhost:3000` 启动。
+
+**指定端口**：`PORT=3001 pnpm start`
 
 ### 3️⃣ 在移动设备中使用
 
@@ -93,7 +95,10 @@ pnpm test
 pnpm dev
 
 # 启动服务器
-npx aiconsole [-p 3001]
+pnpm start
+
+# 指定端口
+PORT=3001 pnpm start
 ```
 
 ---

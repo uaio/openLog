@@ -23,7 +23,7 @@ ls packages/*/dist
 npx aiconsole
 
 # 方式 2: 指定端口
-npx aiconsole -p 3001
+pnpm start
 
 # 方式 3: 直接运行
 node packages/server/dist/index.js

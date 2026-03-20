@@ -47,7 +47,7 @@ pnpm build
 ### Step 3: 启动服务器（30 秒）
 
 ```bash
-npx aiconsole
+pnpm start
 ```
 
 **预期输出：**
@@ -56,6 +56,8 @@ AIConsole server running!
 
   Local:    http://localhost:3000
   Network:  http://192.168.x.x:3000
+
+  按 Ctrl+C 停止服务器
 ```
 
 ### Step 4: 验证功能（2 分钟）
@@ -110,8 +112,8 @@ pnpm test         # 运行测试
 pnpm dev          # 开发模式
 
 # 服务器命令
-npx aiconsole    # 启动服务器（默认端口 3000）
-npx aiconsole -p 3001  # 指定端口
+pnpm start          # 启动服务器（默认端口 3000）
+PORT=3001 pnpm start # 指定端口
 
 # 包管理
 pnpm --filter <package> build   # 构建单个包

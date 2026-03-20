@@ -170,7 +170,7 @@ AIConsole 的日志存储目前是内存存储，服务器重启会丢失。
 pnpm install    # 安装依赖
 pnpm build      # 构建所有包
 pnpm test       # 运行测试
-npx aiconsole   # 启动服务器
+pnpm start # 启动服务器
 pnpm dev        # 开发模式
 ```
 
@@ -220,7 +220,7 @@ pnpm test
 ### 4. 服务器检查
 ```bash
 # 确认服务器可以启动
-npx aiconsole -p 3001 &
+pnpm start &
 # 应该显示 "AIConsole server running!"
 ```
 

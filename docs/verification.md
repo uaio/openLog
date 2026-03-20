@@ -26,7 +26,7 @@
 ### 1.1 启动 AIConsole 服务器
 
 ```bash
-npx aiconsole
+pnpm start
 ```
 
 **预期输出：**
@@ -37,6 +37,8 @@ AIConsole server running!
   Network:  http://192.168.x.x:3000
 
   Open http://localhost:3000 in browser to view devices
+
+  按 Ctrl+C 停止服务器
 ```
 
 **✅ 验证点：**
@@ -46,7 +48,7 @@ AIConsole server running!
 
 **❌ 如果失败：**
 - 检查端口 3000 是否被占用：`lsof -i :3000`
-- 尝试其他端口：`npx aiconsole -p 3001`
+- 尝试其他端口：`PORT=3001 pnpm start`
 - 查看错误信息并排查
 
 **保持服务器运行，继续下一步。**
