@@ -214,6 +214,11 @@ export class FloatingBall {
     // 移除旧的吸附类（只保留左右）
     this.element.classList.remove('snapped-left', 'snapped-right');
 
+    // 清除内联位置样式，让 CSS 类完全控制位置
+    this.element.style.left = '';
+    this.element.style.top = '';
+    this.element.style.right = '';
+
     // 添加新的吸附类
     this.element.classList.add(`snapped-${side}`);
   }
