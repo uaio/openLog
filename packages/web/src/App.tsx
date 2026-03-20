@@ -77,14 +77,16 @@ const styles = {
     overflow: 'hidden'
   },
   sidebar: {
-    width: '320px',
+    width: '280px',
     borderRight: '1px solid #e0e0e0',
     overflow: 'auto'
   },
   main: {
     flex: 1,
-    padding: '16px',
-    overflow: 'auto'
+    padding: '8px',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column' as const
   },
   placeholder: {
     display: 'flex',

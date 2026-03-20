@@ -4,10 +4,9 @@ import { LogEntry } from './LogEntry.js';
 
 interface LogPanelProps {
   deviceId?: string;
-  maxHeight?: number;
 }
 
-export function LogPanel({ deviceId, maxHeight = 400 }: LogPanelProps) {
+export function LogPanel({ deviceId }: LogPanelProps) {
   const { logs, clearLogs } = useLogs(deviceId);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevLogsLengthRef = useRef(0);
@@ -53,10 +52,7 @@ export function LogPanel({ deviceId, maxHeight = 400 }: LogPanelProps) {
 
       <div
         ref={containerRef}
-        style={{
-          ...styles.logContainer,
-          maxHeight: `${maxHeight}px`
-        }}
+        style={styles.logContainer}
       >
         {logs.length === 0 ? (
           <div style={styles.empty}>
