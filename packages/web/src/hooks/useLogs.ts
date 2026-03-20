@@ -25,7 +25,8 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
       try {
         const historicalLogs = await api.getLogs(deviceId, maxLogs);
         console.log('[useLogs] 历史日志加载完成，数量:', historicalLogs.length);
-        setLogs(historicalLogs);
+        // 反转顺序，让最新的日志在最上面
+        setLogs(historicalLogs.reverse());
         setHasMore(historicalLogs.length >= maxLogs);
         lastFetchCountRef.current = historicalLogs.length;
       } catch (error) {
@@ -72,9 +73,10 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
     const logsToAdd = [...logBufferRef.current];
 
     setLogs(prevLogs => {
-      const newLogs = [...prevLogs, ...logsToAdd];
+      // 把新日志添加到前面，最新的在最上面
+      const newLogs = [...logsToAdd, ...prevLogs];
       // 限制日志数量，避免内存溢出
-      const result = newLogs.slice(-maxLogs);
+      const result = newLogs.slice(0, maxLogs);
       console.log('[useLogs] 更新 logs 状态，从', prevLogs.length, '条变为', result.length, '条');
       return result;
     });
