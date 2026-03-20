@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useWebSocket } from './useWebSocket.js';
 import type { ConsoleLog } from '../types/index.js';
 
@@ -42,10 +42,10 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
   useWebSocket(handleWebSocketMessage);
 
   // 定期刷新缓冲区
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(flushLogs, 100);
     return () => clearInterval(interval);
-  });
+  }, [flushLogs]);
 
   const clearLogs = useCallback(() => {
     setLogs([]);
