@@ -4,6 +4,8 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { networkInterfaces } from 'os';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 export interface CLIOptions {
   port?: number;
@@ -19,7 +21,15 @@ export async function start(options: CLIOptions = {}) {
 
   const { deviceStore, logStore } = createWebSocketServer(server);
   app.use(createRoutes(deviceStore, logStore));
-  app.use(express.static('public'));
+
+  // 获取当前文件的目录路径
+  const currentFilename = fileURLToPath(import.meta.url);
+  const currentDirname = dirname(currentFilename);
+
+  // 提供静态文件：指向 web 包的 dist 目录
+  // 从 packages/server/dist/cli/ 向上三级到 packages/，然后进入 web/dist
+  const webDistPath = join(currentDirname, '../../../web/dist');
+  app.use(express.static(webDistPath));
 
   // 全局异常处理
   const handleError = (error: Error, context: string) => {
