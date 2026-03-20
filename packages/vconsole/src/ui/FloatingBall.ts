@@ -33,8 +33,12 @@ export class FloatingBall {
   private dragHandler: DragHandler;
   private position = { x: 0, y: 0 };
   private hasMoved = false; // 追踪是否真的发生了拖动
+  private initialPosition = { x: 0, y: 0 }; // 记录初始位置
+  private readonly size: number; // 悬浮球大小
 
   constructor(private readonly options: FloatingBallOptions = {}) {
+    this.size = options.size ?? 44;
+
     // 创建 DOM 元素
     this.element = this.createBallElement();
 
@@ -57,10 +61,12 @@ export class FloatingBall {
 
     // 设置默认位置（右下角）
     const defaultPos = options.defaultPosition ?? { x: 20, y: 100 };
-    this.setPosition(
-      window.innerWidth - defaultPos.x - (options.size ?? 44),
-      window.innerHeight - defaultPos.y - (options.size ?? 44)
-    );
+    const x = window.innerWidth - defaultPos.x - this.size;
+    const y = window.innerHeight - defaultPos.y - this.size;
+    this.setPosition(x, y);
+
+    // 记录初始位置
+    this.initialPosition = { x, y };
   }
 
   /**
@@ -106,8 +112,7 @@ export class FloatingBall {
   private handleDragMove(x: number, y: number): void {
     this.hasMoved = true; // 标记已移动
     // 更新位置，使球心跟随鼠标/手指
-    const size = this.options.size ?? 44;
-    this.setPosition(x - size / 2, y - size / 2);
+    this.setPosition(x - this.size / 2, y - this.size / 2);
   }
 
   /**
@@ -116,7 +121,15 @@ export class FloatingBall {
   private handleDragEnd(edge: Edge | null): void {
     this.element.classList.remove('dragging');
 
-    if (edge) {
+    // 检查中心点是否超出边界
+    const centerX = this.position.x + this.size / 2;
+    const centerY = this.position.y + this.size / 2;
+
+    if (this.isOutOfBounds(centerX, centerY)) {
+      // 超出边界，重置到初始位置
+      this.resetToInitialPosition();
+      console.log('[FloatingBall] 位置超出边界，重置到初始位置');
+    } else if (edge) {
       // 吸附到边缘
       this.snapTo(edge);
     } else {
@@ -154,6 +167,20 @@ export class FloatingBall {
     this.position = { x, y };
     this.element.style.left = `${x}px`;
     this.element.style.top = `${y}px`;
+  }
+
+  /**
+   * 检查中心点是否超出边界
+   */
+  private isOutOfBounds(centerX: number, centerY: number): boolean {
+    return centerX < 0 || centerX > window.innerWidth || centerY < 0 || centerY > window.innerHeight;
+  }
+
+  /**
+   * 重置到初始位置
+   */
+  private resetToInitialPosition(): void {
+    this.setPosition(this.initialPosition.x, this.initialPosition.y);
   }
 
   /**
