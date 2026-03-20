@@ -11,7 +11,7 @@ const args = parseArgs({
   }
 });
 
-function validatePort(portStr: string | undefined): number | undefined {
+function validatePort(portStr) {
   if (portStr === undefined) {
     return undefined;
   }
