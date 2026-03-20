@@ -53,24 +53,6 @@
   opacity: 0.3;
 }
 
-/* 吸附到顶部 - 球体在顶部，裁掉上半边显示下半边 */
-.floating-ball.snapped-top {
-  top: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%);
-  clip-path: inset(0 0 50% 0);
-  opacity: 0.3;
-}
-
-/* 吸附到底部 - 球体在底部，裁掉下半边显示上半边 */
-.floating-ball.snapped-bottom {
-  bottom: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%);
-  clip-path: inset(50% 0 0 0);
-  opacity: 0.3;
-}
-
 /* 激活动画 */
 @keyframes activate-pulse {
   0% { transform: scale(1); }

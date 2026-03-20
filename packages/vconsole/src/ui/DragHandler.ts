@@ -3,7 +3,7 @@
  * 处理鼠标和触摸事件的拖拽逻辑
  */
 
-export type Edge = 'left' | 'right' | 'top' | 'bottom';
+export type Edge = 'left' | 'right';
 
 export interface DragHandlerOptions {
   onDragStart?: () => void;
@@ -98,17 +98,14 @@ export class DragHandler {
   }
 
   /**
-   * 获取最近的边缘
+   * 获取最近的边缘（仅支持左右吸附）
    * @returns 如果距离边缘 < snapThreshold 返回边缘，否则返回 null
    */
   getNearestEdge(x: number, y: number): Edge | null {
     const width = window.innerWidth;
-    const height = window.innerHeight;
 
     if (x < this.snapThreshold) return 'left';
     if (x > width - this.snapThreshold) return 'right';
-    if (y < this.snapThreshold) return 'top';
-    if (y > height - this.snapThreshold) return 'bottom';
 
     return null;
   }

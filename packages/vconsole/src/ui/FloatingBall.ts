@@ -178,14 +178,14 @@ export class FloatingBall {
   }
 
   /**
-   * 吸附到指定边缘
+   * 吸附到指定边缘（仅支持左右）
    */
   snapTo(side: Edge): void {
     this.state = 'snapped';
     this.snappedSide = side;
 
-    // 移除旧的吸附类
-    this.element.classList.remove('snapped-left', 'snapped-right', 'snapped-top', 'snapped-bottom');
+    // 移除旧的吸附类（只保留左右）
+    this.element.classList.remove('snapped-left', 'snapped-right');
 
     // 添加新的吸附类
     this.element.classList.add(`snapped-${side}`);
