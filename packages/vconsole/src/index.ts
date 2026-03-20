@@ -1,6 +1,11 @@
 import { getDeviceInfo, generateTabId, updateDeviceActiveTime } from './core/device.js';
 import { Reporter } from './transport/reporter.js';
 import type { RemoteConfig } from './types/index.js';
+import { FloatingBall } from './ui/index.js';
+
+// 导出 FloatingBall 供外部使用
+export { FloatingBall };
+export type { FloatingBallOptions, BallState } from './ui/index.js';
 
 export const version = '0.1.0';
 
