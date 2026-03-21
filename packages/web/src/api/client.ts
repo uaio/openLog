@@ -1,6 +1,6 @@
 import type { Device, ConsoleLog } from '../types/index.js';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:38291/api';
 
 interface ApiError {
   message: string;

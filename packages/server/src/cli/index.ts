@@ -12,7 +12,7 @@ export interface CLIOptions {
 }
 
 export async function start(options: CLIOptions = {}) {
-  const port = options.port || 3000;
+  const port = options.port || 38291;
 
   const app = express();
   const server = http.createServer(app);

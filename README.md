@@ -33,7 +33,7 @@ pnpm build
 pnpm start
 ```
 
-服务器将在 `http://localhost:3000` 启动。
+服务器将在 `http://localhost:38291` 启动。
 
 **指定端口**：`PORT=3001 pnpm start`
 
@@ -45,14 +45,14 @@ pnpm start
 
   new AIConsole({
     projectId: 'my-app',
-    server: 'ws://localhost:3000'
+    server: 'ws://localhost:38291'
   });
 </script>
 ```
 
 ### 4️⃣ 访问控制台
 
-打开浏览器访问 `http://localhost:3000` 查看实时日志。
+打开浏览器访问 `http://localhost:38291` 查看实时日志。
 
 ---
 
@@ -116,7 +116,7 @@ PORT=3001 pnpm start
 ## 🤖 MCP 集成
 
 ```bash
-export AICONSOLE_API_BASE_URL=http://localhost:3000/api
+export AICONSOLE_API_BASE_URL=http://localhost:38291/api
 node packages/mcp/dist/index.js
 ```
 

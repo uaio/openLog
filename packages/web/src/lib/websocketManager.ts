@@ -11,7 +11,7 @@ class WebSocketManager {
   private handlers = new Set<MessageHandler>();
   private connectionState: 'connecting' | 'connected' | 'disconnected' = 'disconnected';
 
-  constructor(url = 'ws://localhost:3000') {
+  constructor(url = 'ws://localhost:38291') {
     this.url = url;
   }
 
