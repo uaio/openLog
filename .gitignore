@@ -12,6 +12,7 @@ dist
 *.d.ts.map
 *.js
 !**/node_modules/**/*.js
+!packages/eruda/src/**/*.js
 
 # IDE
 .idea/
