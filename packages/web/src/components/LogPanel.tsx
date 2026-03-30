@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useLogs } from '../hooks/useLogs.js';
 import { LogEntry } from './LogEntry.js';
 import { api } from '../api/client.js';
+import type { ConsoleLog } from '../types/index.js';
 
 interface LogPanelProps {
   deviceId?: string;
@@ -12,11 +13,19 @@ export function LogPanel({ deviceId }: LogPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevLogsLengthRef = useRef(0);
   const [clearingHistory, setClearingHistory] = useState(false);
+  const [filterLevel, setFilterLevel] = useState<ConsoleLog['level'] | 'all'>('all');
+  const [searchText, setSearchText] = useState('');
 
   // 调试：监控 logs 变化
   useEffect(() => {
     console.log('[LogPanel] logs 数量变化:', logs.length, 'deviceId:', deviceId);
   }, [logs, deviceId]);
+
+  // 切换设备时重置筛选
+  useEffect(() => {
+    setFilterLevel('all');
+    setSearchText('');
+  }, [deviceId]);
 
   // 自动滚动到底部
   useEffect(() => {
@@ -50,6 +59,12 @@ export function LogPanel({ deviceId }: LogPanelProps) {
       setClearingHistory(false);
     }
   };
+
+  const filteredLogs = logs.filter(log => {
+    const levelMatch = filterLevel === 'all' || log.level === filterLevel;
+    const textMatch = !searchText || log.message.toLowerCase().includes(searchText.toLowerCase());
+    return levelMatch && textMatch;
+  });
 
   return (
     <div style={styles.container}>
@@ -111,7 +126,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             <div style={styles.loadingIcon}>⏳</div>
             <div>正在加载历史日志...</div>
           </div>
-        ) : logs.length === 0 ? (
+        ) : filteredLogs.length === 0 ? (
           <div style={styles.empty}>
             <div style={styles.emptyIcon}>📝</div>
             <div style={styles.emptyText}>
@@ -122,7 +137,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             </div>
           </div>
         ) : (
-          logs.map((log, index) => (
+          filteredLogs.map((log, index) => (
             <LogEntry key={`${log.timestamp}-${index}`} log={log} />
           ))
         )}
