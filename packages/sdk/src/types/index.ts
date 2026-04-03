@@ -31,6 +31,8 @@ export interface ErudaConfig {
   tool?: string[];
   /** 自动缩放，默认 true */
   autoScale?: boolean;
+  /** 使用 Shadow DOM，默认 true */
+  useShadowDom?: boolean;
   /** 默认配置 */
   defaults?: {
     transparency?: number;

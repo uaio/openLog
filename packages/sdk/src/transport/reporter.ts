@@ -1,46 +1,42 @@
 import type { DeviceInfo, ConsoleLogEntry, NetworkRequestEntry, StorageSnapshot } from '../types/index.js';
+import type { PlatformAdapter } from '../platform/types.js';
 import { WebSocketTransport } from './websocket.js';
-import type { ConnectionState } from './websocket.js';
+import { RateLimiter } from '../core/rate-limiter.js';
 
 export class Reporter {
   private transport: WebSocketTransport | null = null;
   private deviceInfo: DeviceInfo;
   private tabId: string;
+  private platform: PlatformAdapter;
   private remoteEnabled = true;
   private onRefreshStorageCallback: (() => void) | null = null;
-  private rateLimiter: {
-    count: number;
-    resetTime: number;
-  } = {
-    count: 0,
-    resetTime: 0
-  };
-  private readonly maxRatePerSecond = 100;
+  private rateLimiter = new RateLimiter(100);
+  private serverUrl: string | undefined;
 
-  constructor(deviceInfo: DeviceInfo, tabId: string) {
+  constructor(deviceInfo: DeviceInfo, tabId: string, platform: PlatformAdapter) {
     this.deviceInfo = deviceInfo;
     this.tabId = tabId;
+    this.platform = platform;
   }
 
   connect(serverUrl?: string): void {
     if (!this.remoteEnabled) return;
 
+    this.serverUrl = serverUrl ?? this.serverUrl;
+
     this.transport = new WebSocketTransport(
-      {
-        projectId: this.deviceInfo.projectId,
-        server: serverUrl
-      },
+      { projectId: this.deviceInfo.projectId, server: this.serverUrl },
       {
         onConnect: () => {
           this.sendRegisterMessage();
         },
         onMessage: (data) => {
-          // 处理服务端请求
           if (data.type === 'refresh_storage') {
             this.onRefreshStorageCallback?.();
           }
         }
-      }
+      },
+      this.platform
     );
 
     this.transport.connect();
@@ -56,7 +52,7 @@ export class Reporter {
 
   enableRemote(): void {
     this.remoteEnabled = true;
-    localStorage.setItem(`aiconsole_remote_${this.deviceInfo.projectId}`, 'true');
+    this.platform.storage.setItem(`aiconsole_remote_${this.deviceInfo.projectId}`, 'true');
     if (!this.transport || this.transport.getState() === 'disconnected') {
       this.connect();
     }
@@ -64,7 +60,7 @@ export class Reporter {
 
   disableRemote(): void {
     this.remoteEnabled = false;
-    localStorage.setItem(`aiconsole_remote_${this.deviceInfo.projectId}`, 'false');
+    this.platform.storage.setItem(`aiconsole_remote_${this.deviceInfo.projectId}`, 'false');
     this.transport?.disconnect();
   }
 
@@ -75,7 +71,7 @@ export class Reporter {
   reportConsole(entry: Omit<ConsoleLogEntry, 'deviceId' | 'tabId'>): void {
     if (!this.remoteEnabled || !this.transport) return;
 
-    if (!this.checkRateLimit()) {
+    if (!this.rateLimiter.check()) {
       return;
     }
 
@@ -94,8 +90,7 @@ export class Reporter {
   reportNetwork(entry: Omit<NetworkRequestEntry, 'deviceId' | 'tabId'>): void {
     if (!this.remoteEnabled || !this.transport) return;
 
-    // 网络请求使用独立的速率限制检查（因为数据量更大）
-    if (!this.checkRateLimit()) {
+    if (!this.rateLimiter.check()) {
       return;
     }
 
@@ -151,20 +146,5 @@ export class Reporter {
 
   private send(data: any): void {
     this.transport?.send(JSON.stringify(data));
-  }
-
-  private checkRateLimit(): boolean {
-    const now = Date.now();
-    if (now > this.rateLimiter.resetTime + 1000) {
-      this.rateLimiter.count = 0;
-      this.rateLimiter.resetTime = now;
-    }
-
-    if (this.rateLimiter.count >= this.maxRatePerSecond) {
-      return false;
-    }
-
-    this.rateLimiter.count++;
-    return true;
   }
 }

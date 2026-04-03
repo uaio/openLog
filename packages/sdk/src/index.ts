@@ -2,7 +2,10 @@ import { getDeviceInfo, generateTabId, updateDeviceActiveTime } from './core/dev
 import { Reporter } from './transport/reporter.js';
 import { NetworkInterceptor } from './interceptors/network.js';
 import { StorageReader } from './interceptors/storage.js';
+import { BrowserAdapter } from './platform/browser/index.js';
+import type { PlatformAdapter } from './platform/types.js';
 import type { RemoteConfig, ErudaConfig, NetworkInterceptorConfig } from './types/index.js';
+import { serializeArgs, cleanStackTrace } from './core/utils/serialize.js';
 
 // Eruda 类型声明
 interface Eruda {
@@ -35,42 +38,8 @@ export interface AIConsoleOptions extends RemoteConfig {
   eruda?: ErudaConfig;
   /** 网络请求拦截配置 */
   network?: NetworkInterceptorConfig;
-}
-
-/** 将参数序列化为字符串，正确处理对象 */
-function serializeArgs(args: unknown[]): string {
-  return args.map(arg => {
-    if (arg === undefined) {
-      return 'undefined';
-    }
-    if (arg === null) {
-      return 'null';
-    }
-    if (typeof arg === 'object') {
-      try {
-        return JSON.stringify(arg);
-      } catch {
-        // 处理循环引用等情况
-        return String(arg);
-      }
-    }
-    return String(arg);
-  }).join(' ');
-}
-
-/** 清理堆栈跟踪，移除拦截器帧 */
-function cleanStackTrace(stack: string | undefined): string | undefined {
-  if (!stack) return undefined;
-
-  const lines = stack.split('\n');
-  // 过滤掉包含 interceptConsole 或 serializeArgs 的帧
-  const cleanedLines = lines.filter(line =>
-    !line.includes('interceptConsole') &&
-    !line.includes('serializeArgs') &&
-    !line.includes('cleanStackTrace')
-  );
-
-  return cleanedLines.join('\n');
+  /** 平台适配器，默认 BrowserAdapter */
+  platform?: PlatformAdapter;
 }
 
 export class AIConsole {
@@ -78,7 +47,8 @@ export class AIConsole {
   private deviceInfo: ReturnType<typeof getDeviceInfo>;
   private tabId: string;
   private projectId: string;
-  private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private platform: PlatformAdapter;
+  private heartbeatTimerId: number | null = null;
   private heartbeatIntervalMs: number;
   private originalConsole: OriginalConsole | null = null;
   private erudaInitialized = false;
@@ -98,14 +68,15 @@ export class AIConsole {
     }
 
     this.projectId = options.projectId;
-    this.deviceInfo = getDeviceInfo(options.projectId);
+    this.platform = options.platform ?? new BrowserAdapter();
+    this.deviceInfo = getDeviceInfo(options.projectId, this.platform);
     this.tabId = generateTabId();
     this.heartbeatIntervalMs = options.heartbeatInterval ?? DEFAULT_HEARTBEAT_INTERVAL;
 
-    this.reporter = new Reporter(this.deviceInfo, this.tabId);
+    this.reporter = new Reporter(this.deviceInfo, this.tabId, this.platform);
 
     // 检查用户是否之前关闭了远程监控
-    const remoteDisabled = localStorage.getItem(`aiconsole_remote_${this.projectId}`) === 'false';
+    const remoteDisabled = this.platform.storage.getItem(`aiconsole_remote_${this.projectId}`) === 'false';
     if (!remoteDisabled) {
       this.reporter.connect(options.server);
     }
@@ -123,8 +94,8 @@ export class AIConsole {
     (globalThis as Record<symbol, unknown>)[AICONSOLE_INSTANCE_KEY] = this;
 
     // 定期更新活跃时间
-    this.heartbeatInterval = setInterval(() => {
-      updateDeviceActiveTime(this.projectId);
+    this.heartbeatTimerId = this.platform.timer.setInterval(() => {
+      updateDeviceActiveTime(this.projectId, this.platform);
       this.reporter.updateDeviceInfo();
     }, this.heartbeatIntervalMs);
 
@@ -243,9 +214,9 @@ export class AIConsole {
 
   destroy(): void {
     // 清除心跳定时器
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
+    if (this.heartbeatTimerId !== null) {
+      this.platform.timer.clearInterval(this.heartbeatTimerId);
+      this.heartbeatTimerId = null;
     }
 
     // 恢复原始 console 方法
@@ -286,3 +257,7 @@ export class AIConsole {
 
 // 默认导出
 export default AIConsole;
+
+// 导出平台适配接口，供外部平台实现
+export type { PlatformAdapter, StorageAdapter, DeviceAdapter, TimerAdapter, WSConnection, WSEvents } from './platform/types.js';
+export { BrowserAdapter } from './platform/browser/index.js';
