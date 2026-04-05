@@ -1,4 +1,4 @@
-import type { Device } from '@aiconsole/server';
+import type { Device } from '@openlog/server';
 import { API_BASE_URL } from '../config';
 
 export const listDevices = {

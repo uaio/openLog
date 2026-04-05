@@ -1,15 +1,15 @@
 {
-  "name": "aiconsole",
+  "name": "openlog",
   "version": "0.1.0",
   "private": true,
-  "description": "AI console for mobile debugging",
+  "description": "Open log console for mobile debugging",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "start": "node packages/server/bin/aiconsole"
+    "start": "node packages/server/bin/openlog"
   },
   "workspaces": [
     "packages/*"

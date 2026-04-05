@@ -1,4 +1,4 @@
-import type { ConsoleLog } from '@aiconsole/server';
+import type { ConsoleLog } from '@openlog/server';
 import { API_BASE_URL } from '../config';
 
 export const getConsoleLogs = {

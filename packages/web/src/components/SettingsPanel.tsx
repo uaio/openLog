@@ -57,12 +57,12 @@ export function SettingsPanel({ deviceId }: SettingsPanelProps) {
             </div>
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>项目:</span>
-              <span style={styles.infoValue}>AIConsole</span>
+              <span style={styles.infoValue}>openLog</span>
             </div>
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>GitHub:</span>
-              <a href="https://github.com/uaio/AIConsole" style={styles.link} target="_blank" rel="noopener noreferrer">
-                github.com/uaio/AIConsole
+              <a href="https://github.com/uaio/openLog" style={styles.link} target="_blank" rel="noopener noreferrer">
+                github.com/uaio/openLog
               </a>
             </div>
           </div>

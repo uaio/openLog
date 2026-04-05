@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { DeviceStore, LogStore, NetworkStore, StorageStore } from '../store/index.js';
+import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
+import { sendToDevice } from '../ws/handlers.js';
 
-export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore, networkStore: NetworkStore, storageStore: StorageStore) {
+export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore, networkStore: NetworkStore, storageStore: StorageStore, domStore: DOMStore, performanceStore: PerformanceStore, screenshotStore: ScreenshotStore, perfRunStore: PerfRunStore) {
   return {
     listDevices: (req: Request, res: Response) => {
       const projectId = req.query.projectId as string;
@@ -119,6 +120,215 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
       }
 
       res.json(snapshot);
-    }
+    },
+
+    getDOM: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const snapshot = domStore.get(deviceId);
+
+      if (!snapshot) {
+        return res.status(404).json({ error: 'No DOM snapshot available for this device' });
+      }
+
+      res.json(snapshot);
+    },
+
+    getPerformance: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const report = performanceStore.get(deviceId);
+
+      if (!report) {
+        return res.status(404).json({ error: 'No performance data available for this device' });
+      }
+
+      res.json(report);
+    },
+
+    executeJs: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { code } = req.body as { code?: string };
+
+      if (!code || typeof code !== 'string' || !code.trim()) {
+        return res.status(400).json({ error: 'code is required' });
+      }
+
+      const device = deviceStore.get(deviceId);
+      if (!device) {
+        return res.status(404).json({ error: 'Device not found' });
+      }
+
+      sendToDevice(deviceId, { type: 'execute_js', code });
+      res.json({ ok: true, message: 'Command sent. Results will appear in console logs.' });
+    },
+
+    takeScreenshot: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'take_screenshot' });
+      res.json({ ok: true });
+    },
+
+    getScreenshot: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const snapshot = screenshotStore.get(deviceId);
+      if (!snapshot) return res.status(404).json({ error: 'No screenshot available for this device' });
+      res.json(snapshot);
+    },
+
+    reloadPage: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'reload_page' });
+      res.json({ ok: true });
+    },
+
+    setStorage: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { key, value, storageType } = req.body as { key?: string; value?: string; storageType?: string };
+      if (!key) return res.status(400).json({ error: 'key is required' });
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'set_storage', key, value: value ?? '', storageType: storageType || 'local' });
+      res.json({ ok: true });
+    },
+
+    clearStorage: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { storageType } = req.body as { storageType?: string };
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'clear_storage', storageType: storageType || 'all' });
+      res.json({ ok: true });
+    },
+
+    highlightElement: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { selector, duration } = req.body as { selector?: string; duration?: number };
+      if (!selector) return res.status(400).json({ error: 'selector is required' });
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'highlight_element', selector, duration: duration ?? 3000 });
+      res.json({ ok: true });
+    },
+
+    setZenMode: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { enabled } = req.body as { enabled?: boolean };
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'zen_mode', enabled: !!enabled });
+      res.json({ ok: true, zenMode: !!enabled });
+    },
+
+    startPerfRun: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'start_perf_run' });
+      res.json({ ok: true });
+    },
+
+    stopPerfRun: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'stop_perf_run' });
+      res.json({ ok: true });
+    },
+
+    listPerfRunSessions: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      res.json(perfRunStore.getAll(deviceId));
+    },
+
+    getPerfRunSession: (req: Request, res: Response) => {
+      const { deviceId, sessionId } = req.params;
+      const session = perfRunStore.get(deviceId, sessionId);
+      if (!session) return res.status(404).json({ error: 'Session not found' });
+      res.json(session);
+    },
+
+    setNetworkThrottle: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { preset } = req.body as { preset?: string };
+      if (!preset) return res.status(400).json({ error: 'preset is required' });
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'set_network_throttle', preset });
+      res.json({ ok: true, preset });
+    },
+
+    addMock: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      const rule = req.body;
+      if (!rule?.pattern) return res.status(400).json({ error: 'pattern is required' });
+      sendToDevice(deviceId, { type: 'add_mock', rule });
+      res.json({ ok: true });
+    },
+
+    removeMock: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const { mockId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'remove_mock', id: mockId });
+      res.json({ ok: true });
+    },
+
+    clearMocks: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      sendToDevice(deviceId, { type: 'clear_mocks' });
+      res.json({ ok: true });
+    },
+
+    getHealthCheck: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+
+      const logs = logStore.get(deviceId) ?? [];
+      const now = Date.now();
+      const fiveMinAgo = now - 5 * 60 * 1000;
+      const recentErrors = logs.filter((l: any) => l.level === 'error' && l.timestamp > fiveMinAgo).length;
+
+      const perfReport = performanceStore.get(deviceId);
+      const longTaskDuration = (perfReport as any)?.longTasks?.reduce((s: number, t: any) => s + t.duration, 0) ?? 0;
+      const latestSample = (perfReport as any)?.samples?.[(perfReport as any)?.samples?.length - 1];
+      const memoryMB = latestSample?.heapUsed ?? null;
+
+      const resources = (perfReport as any)?.resources ?? [];
+      const uncompressedResources = resources.filter((r: any) => r.transferSize > 102400).length;
+      const uncachedResources = resources.filter((r: any) => r.transferSize > 0).length;
+
+      const vitals = (perfReport as any)?.vitals ?? [];
+      const vitalRatings = vitals.reduce((acc: Record<string, string>, v: any) => {
+        acc[v.name] = v.rating;
+        return acc;
+      }, {});
+
+      const score = Math.max(0, 100
+        - recentErrors * 5
+        - Math.min(50, longTaskDuration / 100)
+        - (uncompressedResources * 3));
+
+      res.json({
+        deviceId,
+        timestamp: now,
+        score: Math.round(score),
+        recentErrors,
+        longTaskDurationMs: Math.round(longTaskDuration),
+        memoryMB,
+        uncompressedResources,
+        uncachedResources,
+        vitalRatings,
+        status: score >= 80 ? 'healthy' : score >= 50 ? 'warning' : 'critical',
+      });
+    },
   };
 }

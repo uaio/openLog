@@ -1,11 +1,11 @@
 {
-  "name": "@aiconsole/server",
+  "name": "@openlog/server",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "aiconsole": "./bin/aiconsole"
+    "openlog": "./bin/openlog"
   },
   "exports": {
     ".": {

@@ -3,20 +3,18 @@ import dts from 'vite-plugin-dts';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 export default defineConfig({
-  optimizeDeps: {
-    include: ['eruda']
-  },
   build: {
     commonjsOptions: {
       transformMixedEsModules: true
     },
     lib: {
       entry: './src/index.ts',
-      name: 'AIConsole',
+      name: 'OpenLog',
       formats: ['es', 'cjs'],
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`
     },
     rollupOptions: {
+      external: ['eruda'],
       input: {
         index: './src/index.ts'
       }

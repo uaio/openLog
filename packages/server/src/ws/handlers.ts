@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws';
-import { DeviceStore, LogStore, NetworkStore, StorageStore } from '../store/index.js';
+import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
 
 export interface MessageContext {
   ws: WebSocket;
@@ -7,6 +7,10 @@ export interface MessageContext {
   logStore: LogStore;
   networkStore: NetworkStore;
   storageStore: StorageStore;
+  domStore: DOMStore;
+  performanceStore: PerformanceStore;
+  screenshotStore: ScreenshotStore;
+  perfRunStore: PerfRunStore;
   deviceIds: Map<WebSocket, string>;
 }
 
@@ -43,6 +47,7 @@ export const handlers: Record<string, MessageHandler> = {
     });
 
     deviceIds.set(ws, deviceId);
+    registerDeviceClient(ws, deviceId);
     broadcastDeviceList(context);
   },
 
@@ -70,10 +75,41 @@ export const handlers: Record<string, MessageHandler> = {
   storage: (data, context) => {
     const { storageStore } = context;
     storageStore.update(data.deviceId, data);
-  }
+    broadcastStorage(data, context);
+  },
+
+  dom: (data, context) => {
+    const { domStore } = context;
+    domStore.update(data.deviceId, data);
+    broadcastDOM(data, context);
+  },
+
+  performance: (data, context) => {
+    const { performanceStore } = context;
+    performanceStore.update(data.deviceId, data);
+    broadcastPerformance(data, context);
+  },
+
+  screenshot: (data, context) => {
+    const { screenshotStore } = context;
+    screenshotStore.update(data.deviceId, data);
+    broadcastScreenshot(data, context);
+  },
+
+  perf_run: (data, context) => {
+    const { perfRunStore } = context;
+    perfRunStore.add(data);
+    broadcastPerfRun(data, context);
+  },
 };
 
 const pcClients = new Set<WebSocket>();
+const deviceClients = new Map<WebSocket, string>();
+
+export function registerDeviceClient(ws: WebSocket, deviceId: string): void {
+  deviceClients.set(ws, deviceId);
+  ws.on('close', () => deviceClients.delete(ws));
+}
 
 function broadcastDeviceList(context: MessageContext): void {
   const devices = context.deviceStore.list();
@@ -103,6 +139,65 @@ function broadcastNetwork(request: any, context: MessageContext): void {
   for (const client of pcClients) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(message);
+    }
+  }
+}
+
+function broadcastStorage(snapshot: any, context: MessageContext): void {
+  const message = JSON.stringify({ type: 'storage', data: snapshot });
+
+  for (const client of pcClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+function broadcastDOM(snapshot: any, context: MessageContext): void {
+  const message = JSON.stringify({ type: 'dom', data: snapshot });
+
+  for (const client of pcClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+function broadcastPerformance(report: any, _context: MessageContext): void {
+  const message = JSON.stringify({ type: 'performance', data: report });
+
+  for (const client of pcClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+function broadcastScreenshot(data: any, _context: MessageContext): void {
+  const message = JSON.stringify({ type: 'screenshot', data });
+
+  for (const client of pcClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+function broadcastPerfRun(data: any, _context: MessageContext): void {
+  const message = JSON.stringify({ type: 'perf_run', data });
+  for (const client of pcClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+export function sendToDevice(deviceId: string, message: any): void {
+  const msg = JSON.stringify(message);
+  for (const [client, id] of deviceClients) {
+    if (id === deviceId && client.readyState === WebSocket.OPEN) {
+      client.send(msg);
+      return;
     }
   }
 }

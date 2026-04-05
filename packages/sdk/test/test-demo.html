@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIConsole 功能测试</title>
+  <title>openLog 功能测试</title>
   <style>
     * {
       margin: 0;
@@ -123,7 +123,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🧪 AIConsole 功能测试</h1>
+    <h1>🧪 openLog 功能测试</h1>
     <p class="subtitle">测试页面 - 验证所有核心功能</p>
 
     <div class="status">
@@ -155,10 +155,10 @@
 
   <script type="module">
     // 导入 SDK
-    import AIConsole from '../dist/index.js';
+    import OpenLog from '../dist/index.js';
 
     // SDK 加载完成后初始化
-    initAIConsole();
+    initOpenLog();
 
     function updateStatus(message) {
       const statusEl = document.getElementById('status-content');
@@ -179,9 +179,9 @@
       }
     }
 
-    function initAIConsole() {
+    function initOpenLog() {
       try {
-        const aiconsole = new AIConsole({
+        const openlog = new OpenLog({
           projectId: 'test-demo',
           server: 'ws://localhost:38291',
           eruda: {
@@ -192,12 +192,12 @@
           }
         });
 
-        window.aiconsole = aiconsole;
-        updateStatus('✅ AIConsole 已初始化（含 Eruda 调试面板）');
+        window.openlog = openlog;
+        updateStatus('✅ openLog 已初始化（含 Eruda 调试面板）');
 
         // 监听连接状态（如果需要的话）
         setTimeout(() => {
-          updateStatus('✅ AIConsole 运行中，点击右下角悬浮球打开调试面板');
+          updateStatus('✅ openLog 运行中，点击右下角悬浮球打开调试面板');
         }, 1000);
       } catch (error) {
         updateStatus(`❌ 初始化失败: ${error.message}`);
@@ -258,39 +258,39 @@
 
     // 远程控制函数
     window.testDisableRemote = () => {
-      if (window.aiconsole) {
-        window.aiconsole.disableRemote();
+      if (window.openlog) {
+        window.openlog.disableRemote();
         updateStatus('🔴 远程监控已禁用 - 日志将不会上报到服务器');
         addLog('warn', '远程监控已禁用');
       } else {
-        addLog('error', 'AIConsole 未初始化');
+        addLog('error', 'openLog 未初始化');
       }
     };
 
     window.testEnableRemote = () => {
-      if (window.aiconsole) {
-        window.aiconsole.enableRemote();
+      if (window.openlog) {
+        window.openlog.enableRemote();
         updateStatus('✅ 远程监控已启用 - 日志将正常上报');
         addLog('info', '远程监控已启用');
       } else {
-        addLog('error', 'AIConsole 未初始化');
+        addLog('error', 'openLog 未初始化');
       }
     };
 
     window.testStatus = () => {
-      if (window.aiconsole) {
-        const enabled = window.aiconsole.isRemoteEnabled();
+      if (window.openlog) {
+        const enabled = window.openlog.isRemoteEnabled();
         updateStatus(`🔍 远程监控状态: ${enabled ? '✅ 启用' : '❌ 禁用'}`);
         addLog('info', `查询远程监控状态: ${enabled ? '启用' : '禁用'}`);
       } else {
-        addLog('error', 'AIConsole 未初始化');
+        addLog('error', 'openLog 未初始化');
       }
     };
 
     // 页面加载时的初始提示
     window.addEventListener('load', () => {
       setTimeout(() => {
-        if (!window.AIConsole) {
+        if (!window.OpenLog) {
           addLog('warn', 'SDK 正在加载中...');
         }
       }, 1000);

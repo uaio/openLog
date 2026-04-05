@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { websocketManager } from '../lib/websocketManager.js';
 
 export interface WebSocketMessage {
-  type: 'devices' | 'log' | 'heartbeat';
+  type: 'devices' | 'log' | 'heartbeat' | 'network' | 'storage' | 'dom' | 'performance';
   data: any;
 }
 

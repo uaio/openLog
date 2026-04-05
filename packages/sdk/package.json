@@ -1,5 +1,5 @@
 {
-  "name": "aiconsole",
+  "name": "openlog",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -21,6 +21,10 @@
     "eruda": "workspace:*",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.7.0",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "web-vitals": "^5.2.0"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1"
   }
 }

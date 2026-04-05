@@ -1,5 +1,5 @@
 {
-  "name": "@aiconsole/web",
+  "name": "@openlog/web",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -8,8 +8,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.13.23",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

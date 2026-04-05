@@ -1,13 +1,17 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { Server as HTTPServer } from 'http';
-import { DeviceStore, LogStore, NetworkStore, StorageStore } from '../store/index.js';
-import { handlers, type MessageContext, registerPCClient } from './handlers.js';
+import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
+import { handlers, type MessageContext, registerPCClient, registerDeviceClient, sendToDevice } from './handlers.js';
 
 export function createWebSocketServer(httpServer: HTTPServer) {
   const deviceStore = new DeviceStore();
   const logStore = new LogStore();
   const networkStore = new NetworkStore();
   const storageStore = new StorageStore();
+  const domStore = new DOMStore();
+  const performanceStore = new PerformanceStore();
+  const screenshotStore = new ScreenshotStore();
+  const perfRunStore = new PerfRunStore();
   const deviceIds = new Map<WebSocket, string>();
 
   const wss = new WebSocketServer({ server: httpServer });
@@ -25,19 +29,72 @@ export function createWebSocketServer(httpServer: HTTPServer) {
           return;
         }
 
-        if (!isViewer) {
-          const handler = handlers[message.type];
-          if (handler) {
-            const context: MessageContext = {
-              ws,
-              deviceStore,
-              logStore,
-              networkStore,
-              storageStore,
-              deviceIds
-            };
-            handler(message, context);
+        // PC viewer 发来的指令（注册后）
+        if (isViewer) {
+          if (message.type === 'refresh_storage' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'refresh_storage' });
           }
+          if (message.type === 'refresh_dom' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'refresh_dom' });
+          }
+          if (message.type === 'execute_js' && message.deviceId && message.code) {
+            sendToDevice(message.deviceId, { type: 'execute_js', code: message.code });
+          }
+          if (message.type === 'take_screenshot' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'take_screenshot' });
+          }
+          if (message.type === 'reload_page' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'reload_page' });
+          }
+          if (message.type === 'set_storage' && message.deviceId && message.key !== undefined) {
+            sendToDevice(message.deviceId, { type: 'set_storage', storageType: message.storageType || 'local', key: message.key, value: message.value ?? '' });
+          }
+          if (message.type === 'clear_storage' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'clear_storage', storageType: message.storageType || 'all' });
+          }
+          if (message.type === 'highlight_element' && message.deviceId && message.selector) {
+            sendToDevice(message.deviceId, { type: 'highlight_element', selector: message.selector, duration: message.duration ?? 3000 });
+          }
+          if (message.type === 'zen_mode' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'zen_mode', enabled: !!message.enabled });
+          }
+          if (message.type === 'start_perf_run' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'start_perf_run' });
+          }
+          if (message.type === 'stop_perf_run' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'stop_perf_run' });
+          }
+          if (message.type === 'set_network_throttle' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'set_network_throttle', preset: message.preset });
+          }
+          if (message.type === 'add_mock' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'add_mock', rule: message.rule });
+          }
+          if (message.type === 'remove_mock' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'remove_mock', id: message.id });
+          }
+          if (message.type === 'clear_mocks' && message.deviceId) {
+            sendToDevice(message.deviceId, { type: 'clear_mocks' });
+          }
+          return;
+        }
+
+        // 移动端设备消息
+        const handler = handlers[message.type];
+        if (handler) {
+          const context: MessageContext = {
+            ws,
+            deviceStore,
+            logStore,
+            networkStore,
+            storageStore,
+            domStore,
+            performanceStore,
+            screenshotStore,
+            perfRunStore,
+            deviceIds
+          };
+          handler(message, context);
         }
       } catch (error) {
         console.error('Failed to handle message:', error);
@@ -49,19 +106,20 @@ export function createWebSocketServer(httpServer: HTTPServer) {
         const deviceId = deviceIds.get(ws);
         if (deviceId) {
           deviceStore.unregister(deviceId);
-          // P0-1: 清理设备日志（延迟 30 分钟后删除）
           logStore.cleanup(deviceId);
-          // 清理网络请求
           networkStore.cleanup(deviceId);
-          // 清理存储快照
           storageStore.cleanup(deviceId);
+          domStore.cleanup(deviceId);
+          performanceStore.clear(deviceId);
+          screenshotStore.clear(deviceId);
+          perfRunStore.clear(deviceId);
           deviceIds.delete(ws);
         }
       }
     });
   });
 
-  return { wss, deviceStore, logStore, networkStore, storageStore };
+  return { wss, deviceStore, logStore, networkStore, storageStore, domStore, performanceStore, screenshotStore, perfRunStore };
 }
 
 // P0-2: 导出清理函数，用于服务器关闭时清理资源

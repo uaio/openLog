@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { AIConsole } from '../../src/index.js';
+import { OpenLog } from '../../src/index.js';
 
 // Mock browser APIs
 const mockLocation = {
@@ -42,8 +42,8 @@ vi.stubGlobal('window', {
 vi.stubGlobal('navigator', mockNavigator);
 vi.stubGlobal('localStorage', mockLocalStorage);
 
-describe('AIConsole E2E', () => {
-  let aiconsole: AIConsole;
+describe('OpenLog E2E', () => {
+  let openlog: OpenLog;
   let originalLog: typeof globalThis.console.log;
   let originalWarn: typeof globalThis.console.warn;
   let originalError: typeof globalThis.console.error;
@@ -64,8 +64,8 @@ describe('AIConsole E2E', () => {
 
   afterEach(() => {
     // Destroy console instance
-    if (aiconsole) {
-      aiconsole.destroy();
+    if (openlog) {
+      openlog.destroy();
     }
 
     // Restore console methods
@@ -79,18 +79,18 @@ describe('AIConsole E2E', () => {
 
   describe('Initialization', () => {
     it('should initialize with required projectId', () => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
 
-      expect(aiconsole).toBeDefined();
-      expect(aiconsole.isRemoteEnabled()).toBe(true);
+      expect(openlog).toBeDefined();
+      expect(openlog.isRemoteEnabled()).toBe(true);
     });
 
     it('should throw error without projectId', () => {
       expect(() => {
-        aiconsole = new AIConsole({
+        openlog = new OpenLog({
           server: 'ws://localhost:8080'
         } as any);
       }).toThrow('projectId is required');
@@ -99,13 +99,13 @@ describe('AIConsole E2E', () => {
     it('should warn when multiple instances detected', () => {
       const warnSpy = vi.spyOn(globalThis.console, 'warn');
 
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
 
       // Creating second instance should warn
-      const console2 = new AIConsole({
+      const console2 = new OpenLog({
         projectId: 'test-project-2',
         server: 'ws://localhost:8080'
       });
@@ -120,7 +120,7 @@ describe('AIConsole E2E', () => {
 
   describe('Console Interception', () => {
     beforeEach(() => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
@@ -191,33 +191,33 @@ describe('AIConsole E2E', () => {
 
   describe('Remote Control', () => {
     beforeEach(() => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
     });
 
     it('should disable remote monitoring', () => {
-      aiconsole.disableRemote();
+      openlog.disableRemote();
 
-      expect(aiconsole.isRemoteEnabled()).toBe(false);
-      expect(mockLocalStorage.getItem('aiconsole_remote_test-project')).toBe('false');
+      expect(openlog.isRemoteEnabled()).toBe(false);
+      expect(mockLocalStorage.getItem('openlog_remote_test-project')).toBe('false');
     });
 
     it('should enable remote monitoring', () => {
-      aiconsole.disableRemote();
-      expect(aiconsole.isRemoteEnabled()).toBe(false);
+      openlog.disableRemote();
+      expect(openlog.isRemoteEnabled()).toBe(false);
 
-      aiconsole.enableRemote();
+      openlog.enableRemote();
 
-      expect(aiconsole.isRemoteEnabled()).toBe(true);
+      expect(openlog.isRemoteEnabled()).toBe(true);
     });
 
     it('should respect localStorage preference on init', () => {
       // Set preference to disabled
-      mockLocalStorage.setItem('aiconsole_remote_test-project', 'false');
+      mockLocalStorage.setItem('openlog_remote_test-project', 'false');
 
-      const testConsole = new AIConsole({
+      const testConsole = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
@@ -236,7 +236,7 @@ describe('AIConsole E2E', () => {
 
   describe('Lifecycle', () => {
     it('should cleanup resources on destroy', () => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
@@ -244,7 +244,7 @@ describe('AIConsole E2E', () => {
       // Call some console methods to ensure interception is active
       globalThis.console.log('Before destroy');
 
-      aiconsole.destroy();
+      openlog.destroy();
 
       // After destroy, console methods should be restored to original
       // Verify we can call console methods without errors
@@ -254,21 +254,21 @@ describe('AIConsole E2E', () => {
     });
 
     it('should handle multiple destroy calls safely', () => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
 
       expect(() => {
-        aiconsole.destroy();
-        aiconsole.destroy(); // Second destroy should be safe
+        openlog.destroy();
+        openlog.destroy(); // Second destroy should be safe
       }).not.toThrow();
     });
   });
 
   describe('Custom Configuration', () => {
     it('should accept custom heartbeat interval', () => {
-      const testConsole = new AIConsole({
+      const testConsole = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080',
         heartbeatInterval: 5000
@@ -280,7 +280,7 @@ describe('AIConsole E2E', () => {
     });
 
     it('should accept default plugins configuration', () => {
-      const testConsole = new AIConsole({
+      const testConsole = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080',
         defaultPlugins: ['logger', 'network']
@@ -294,7 +294,7 @@ describe('AIConsole E2E', () => {
 
   describe('Error Handling', () => {
     it('should not throw when reporter fails', () => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });
@@ -306,7 +306,7 @@ describe('AIConsole E2E', () => {
     });
 
     it('should handle malformed arguments gracefully', () => {
-      aiconsole = new AIConsole({
+      openlog = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080'
       });

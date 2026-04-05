@@ -5,7 +5,7 @@ type MessageHandler = (message: WebSocketMessage) => void;
 class WebSocketManager {
   private ws: WebSocket | null = null;
   private url: string;
-  private reconnectTimeout: NodeJS.Timeout | null = null;
+  private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private reconnectCount = 0;
   private maxReconnectAttempts = Infinity;
   private handlers = new Set<MessageHandler>();
@@ -89,6 +89,12 @@ class WebSocketManager {
         this.disconnect();
       }
     };
+  }
+
+  send(message: object): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(message));
+    }
   }
 
   getConnectionState() {

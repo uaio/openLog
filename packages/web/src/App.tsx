@@ -2,7 +2,14 @@ import { useState } from 'react';
 import { DeviceList } from './components/DeviceList.js';
 import { LogPanel } from './components/LogPanel.js';
 import { NetworkPanel } from './components/NetworkPanel.js';
+import { StoragePanel } from './components/StoragePanel.js';
+import { DOMPanel } from './components/DOMPanel.js';
+import { PerformancePanel } from './components/PerformancePanel.js';
 import { SettingsPanel } from './components/SettingsPanel.js';
+import { PerfRunPanel } from './components/PerfRunPanel.js';
+import { MockPanel } from './components/MockPanel.js';
+import { HealthPanel } from './components/HealthPanel.js';
+import { AIAnalysisPanel } from './components/AIAnalysisPanel.js';
 import { Tabs, type Tab } from './components/Tabs.js';
 import type { Device } from './types/index.js';
 import './styles/global.css';
@@ -38,6 +45,48 @@ function App() {
       content: <NetworkPanel deviceId={selectedDevice?.deviceId} />
     },
     {
+      id: 'storage',
+      label: '存储',
+      icon: '💾',
+      content: <StoragePanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'element',
+      label: 'Element',
+      icon: '🌲',
+      content: <DOMPanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'performance',
+      label: 'Performance',
+      icon: '📊',
+      content: <PerformancePanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'perf_run',
+      label: '跑分',
+      icon: '🏁',
+      content: <PerfRunPanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'mock',
+      label: 'Mock',
+      icon: '🎭',
+      content: <MockPanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'health',
+      label: '健康',
+      icon: '🩺',
+      content: <HealthPanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
+      id: 'ai',
+      label: 'AI分析',
+      icon: '🤖',
+      content: <AIAnalysisPanel deviceId={selectedDevice?.deviceId} />
+    },
+    {
       id: 'settings',
       label: '设置',
       icon: '⚙️',
@@ -48,7 +97,7 @@ function App() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>AIConsole Web Viewer</h1>
+        <h1 style={styles.title}>openLog Web Viewer</h1>
         <p style={styles.subtitle}>
           {selectedDevice
             ? `当前设备: ${selectedDevice.ua.slice(0, 50)}${selectedDevice.ua.length > 50 ? '...' : ''}`

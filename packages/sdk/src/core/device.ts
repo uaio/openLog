@@ -16,11 +16,11 @@ export function generateDeviceId(projectId: string, platform: PlatformAdapter): 
 export function getDeviceInfo(projectId: string, platform: PlatformAdapter): DeviceInfo {
   const deviceId = generateDeviceId(projectId, platform);
 
-  const cachedId = platform.storage.getItem(`aiconsole_device_id_${projectId}`);
+  const cachedId = platform.storage.getItem(`openlog_device_id_${projectId}`);
   const isNew = !cachedId || cachedId !== deviceId;
 
   if (isNew) {
-    platform.storage.setItem(`aiconsole_device_id_${projectId}`, deviceId);
+    platform.storage.setItem(`openlog_device_id_${projectId}`, deviceId);
   }
 
   return {
@@ -31,12 +31,12 @@ export function getDeviceInfo(projectId: string, platform: PlatformAdapter): Dev
     pixelRatio: platform.device.getPixelRatio(),
     language: platform.device.getLanguage(),
     url: platform.device.getUrl(),
-    connectTime: isNew ? Date.now() : parseInt(platform.storage.getItem(`aiconsole_connect_time_${projectId}`) || '0'),
+    connectTime: isNew ? Date.now() : parseInt(platform.storage.getItem(`openlog_connect_time_${projectId}`) || '0'),
     lastActiveTime: Date.now()
   };
 }
 
 /** 更新设备活跃时间 */
 export function updateDeviceActiveTime(projectId: string, platform: PlatformAdapter): void {
-  platform.storage.setItem(`aiconsole_last_active_${projectId}`, Date.now().toString());
+  platform.storage.setItem(`openlog_last_active_${projectId}`, Date.now().toString());
 }

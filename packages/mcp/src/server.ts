@@ -1,7 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage } from './tools/index.js';
+import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport } from './tools/index.js';
 import { startEmbeddedServer, stopEmbeddedServer, type EmbeddedServerConfig } from './launcher.js';
 
 interface ToolArgs {
@@ -76,13 +76,13 @@ function setupGlobalErrorHandlers(server: Server): void {
 
 export async function startMCPServer(config?: EmbeddedServerConfig): Promise<void> {
   // 启动内嵌服务器
-  console.error('[AIConsole] Starting embedded server...');
+  console.error('[openLog] Starting embedded server...');
   const { url } = await startEmbeddedServer(config);
-  console.error(`[AIConsole] Embedded server running at ${url}`);
+  console.error(`[openLog] Embedded server running at ${url}`);
 
   const server = new Server(
     {
-      name: 'aiconsole-mcp',
+      name: 'openlog-mcp',
       version: '0.1.0'
     },
     {
@@ -122,6 +122,91 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
           name: getStorage.name,
           description: getStorage.description,
           inputSchema: getStorage.inputSchema
+        },
+        {
+          name: getPageContext.name,
+          description: getPageContext.description,
+          inputSchema: getPageContext.inputSchema
+        },
+        {
+          name: executeJs.name,
+          description: executeJs.description,
+          inputSchema: executeJs.inputSchema
+        },
+        {
+          name: takeScreenshot.name,
+          description: takeScreenshot.description,
+          inputSchema: takeScreenshot.inputSchema
+        },
+        {
+          name: reloadPage.name,
+          description: reloadPage.description,
+          inputSchema: reloadPage.inputSchema
+        },
+        {
+          name: setStorage.name,
+          description: setStorage.description,
+          inputSchema: setStorage.inputSchema
+        },
+        {
+          name: clearStorage.name,
+          description: clearStorage.description,
+          inputSchema: clearStorage.inputSchema
+        },
+        {
+          name: highlightElement.name,
+          description: highlightElement.description,
+          inputSchema: highlightElement.inputSchema
+        },
+        {
+          name: zenMode.name,
+          description: zenMode.description,
+          inputSchema: zenMode.inputSchema
+        },
+        {
+          name: networkThrottle.name,
+          description: networkThrottle.description,
+          inputSchema: networkThrottle.inputSchema
+        },
+        {
+          name: addMock.name,
+          description: addMock.description,
+          inputSchema: addMock.inputSchema
+        },
+        {
+          name: clearMocks.name,
+          description: clearMocks.description,
+          inputSchema: clearMocks.inputSchema
+        },
+        {
+          name: removeMock.name,
+          description: removeMock.description,
+          inputSchema: removeMock.inputSchema
+        },
+        {
+          name: startPerfRun.name,
+          description: startPerfRun.description,
+          inputSchema: startPerfRun.inputSchema
+        },
+        {
+          name: stopPerfRun.name,
+          description: stopPerfRun.description,
+          inputSchema: stopPerfRun.inputSchema
+        },
+        {
+          name: getPerfReport.name,
+          description: getPerfReport.description,
+          inputSchema: getPerfReport.inputSchema
+        },
+        {
+          name: healthCheck.name,
+          description: healthCheck.description,
+          inputSchema: healthCheck.inputSchema
+        },
+        {
+          name: aiAnalyze.name,
+          description: aiAnalyze.description,
+          inputSchema: aiAnalyze.inputSchema
         }
       ]
     };
@@ -193,6 +278,105 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
           return { content: [{ type: 'text', text: JSON.stringify(await getStorage.execute(storageArgs), null, 2) }] };
         }
 
+        case 'get_page_context': {
+          const ctxArgs = {
+            deviceId: typeof args?.deviceId === 'string' ? args.deviceId : undefined,
+            logLimit: typeof args?.logLimit === 'number' ? args.logLimit : undefined,
+            requestLimit: typeof args?.requestLimit === 'number' ? args.requestLimit : undefined,
+            includeStorage: typeof args?.includeStorage === 'boolean' ? args.includeStorage : undefined
+          };
+          return { content: [{ type: 'text', text: JSON.stringify(await getPageContext.execute(ctxArgs), null, 2) }] };
+        }
+
+        case 'execute_js': {
+          const jsArgs = args as { code: string; deviceId?: string };
+          if (!jsArgs?.code) throw new Error('execute_js requires code argument');
+          const result = await executeJs.execute(jsArgs);
+          return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        }
+
+        case 'take_screenshot': {
+          const ssArgs = args as { deviceId?: string };
+          const ssResult = await takeScreenshot.execute(ssArgs);
+          return { content: [{ type: 'text', text: JSON.stringify({ ...ssResult, dataUrl: ssResult.dataUrl.slice(0, 80) + '...' }, null, 2) }] };
+        }
+
+        case 'reload_page': {
+          const r = await reloadPage.execute(args as { deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'set_storage': {
+          const sa = args as { key: string; value?: string; storageType?: string; deviceId?: string };
+          if (!sa?.key) throw new Error('set_storage requires key argument');
+          const r = await setStorage.execute(sa);
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'clear_storage': {
+          const r = await clearStorage.execute(args as { storageType?: string; deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'highlight_element': {
+          const ha = args as { selector: string; duration?: number; deviceId?: string };
+          if (!ha?.selector) throw new Error('highlight_element requires selector argument');
+          const r = await highlightElement.execute(ha);
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'zen_mode': {
+          const za = args as { enabled: boolean; deviceId?: string };
+          if (typeof za?.enabled !== 'boolean') throw new Error('zen_mode requires enabled (boolean)');
+          const r = await zenMode.execute(za);
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'network_throttle': {
+          const r = await networkThrottle.execute(args as { preset: string; deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'add_mock': {
+          const r = await addMock.execute(args as { pattern: string; body: string; method?: string; status?: number; deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'clear_mocks': {
+          const r = await clearMocks.execute(args as { deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'remove_mock': {
+          const r = await removeMock.execute(args as { mockId: string; deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'start_perf_run': {
+          const r = await startPerfRun.execute(args as { deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'stop_perf_run': {
+          const r = await stopPerfRun.execute(args as { deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'get_perf_report': {
+          const r = await getPerfReport.execute(args as { deviceId?: string; sessionId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'health_check': {
+          const r = await healthCheck.execute(args as { deviceId?: string });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'ai_analyze': {
+          const r = await aiAnalyze.execute(args as { deviceId?: string; logLimit?: number });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -210,5 +394,5 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('AIConsole MCP Server running on stdio');
+  console.error('openLog MCP Server running on stdio');
 }

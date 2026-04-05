@@ -19,8 +19,9 @@ export async function start(options: CLIOptions = {}) {
 
   app.use(cors());
 
-  const { deviceStore, logStore, networkStore, storageStore } = createWebSocketServer(server);
-  app.use(createRoutes(deviceStore, logStore, networkStore, storageStore));
+  const { deviceStore, logStore, networkStore, storageStore, domStore, performanceStore, screenshotStore, perfRunStore } = createWebSocketServer(server);
+  app.use(express.json({ limit: '10mb' })); // screenshots are large
+  app.use(createRoutes(deviceStore, logStore, networkStore, storageStore, domStore, performanceStore, screenshotStore, perfRunStore));
 
   // 获取当前文件的目录路径
   const currentFilename = fileURLToPath(import.meta.url);
@@ -99,7 +100,7 @@ export async function start(options: CLIOptions = {}) {
         : localUrl;
 
       console.log(`
-AIConsole server running!
+openLog server running!
 
   Local:    ${localUrl}
   Network:  ${networkUrl}

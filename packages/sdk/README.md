@@ -1,6 +1,6 @@
-# AIConsole SDK
+# openLog SDK
 
-AIConsole SDK 是一个用于移动端调试的 JavaScript SDK，可以实时将移动设备的 console 日志、网络请求和系统信息同步到远程调试控制台。
+openLog SDK 是一个用于移动端调试的 JavaScript SDK，可以实时将移动设备的 console 日志、网络请求和系统信息同步到远程调试控制台。
 
 ## 特性
 
@@ -13,41 +13,41 @@ AIConsole SDK 是一个用于移动端调试的 JavaScript SDK，可以实时将
 ## 安装
 
 ```bash
-npm install aiconsole
+npm install openlog
 # 或
-pnpm add aiconsole
+pnpm add openlog
 ```
 
 ## 快速开始
 
 ```typescript
-import AIConsole from 'aiconsole';
+import OpenLog from 'openlog';
 
-// 初始化 AIConsole
-const aiconsole = new AIConsole({
+// 初始化 openLog
+const openlog = new OpenLog({
   projectId: 'your-project-id',
   server: 'ws://localhost:8080'
 });
 
 // 可选：禁用远程监控
-aiconsole.disableRemote();
+openlog.disableRemote();
 
 // 可选：重新启用远程监控
-aiconsole.enableRemote();
+openlog.enableRemote();
 
 // 检查远程监控状态
-console.log(aiconsole.isRemoteEnabled());
+console.log(openlog.isRemoteEnabled());
 
 // 销毁实例（恢复原始 console）
-aiconsole.destroy();
+openlog.destroy();
 ```
 
 ## 配置选项
 
-### AIConsoleOptions
+### OpenLogOptions
 
 ```typescript
-interface AIConsoleOptions {
+interface OpenLogOptions {
   /** 项目 ID，必填 */
   projectId: string;
 
@@ -67,10 +67,10 @@ interface AIConsoleOptions {
 ### 构造函数
 
 ```typescript
-new AIConsole(options: AIConsoleOptions)
+new OpenLog(options: OpenLogOptions)
 ```
 
-创建一个新的 AIConsole 实例。
+创建一个新的 OpenLog 实例。
 
 ### 方法
 
@@ -79,7 +79,7 @@ new AIConsole(options: AIConsoleOptions)
 启用远程监控功能。
 
 ```typescript
-aiconsole.enableRemote();
+openlog.enableRemote();
 ```
 
 #### disableRemote()
@@ -87,7 +87,7 @@ aiconsole.enableRemote();
 禁用远程监控功能。此设置会保存到 localStorage，刷新页面后仍然生效。
 
 ```typescript
-aiconsole.disableRemote();
+openlog.disableRemote();
 ```
 
 #### isRemoteEnabled()
@@ -95,21 +95,21 @@ aiconsole.disableRemote();
 检查远程监控是否启用。
 
 ```typescript
-const enabled = aiconsole.isRemoteEnabled();
+const enabled = openlog.isRemoteEnabled();
 console.log(enabled); // true 或 false
 ```
 
 #### destroy()
 
-销毁 AIConsole 实例，恢复原始 console 方法，并断开服务器连接。
+销毁 OpenLog 实例，恢复原始 console 方法，并断开服务器连接。
 
 ```typescript
-aiconsole.destroy();
+openlog.destroy();
 ```
 
 ## 工作原理
 
-AIConsole 通过以下方式工作：
+openLog 通过以下方式工作：
 
 1. **设备识别** - 生成唯一的设备 ID 和 Tab ID
 2. **Console 拦截** - 重写 console 方法以捕获日志
@@ -119,7 +119,7 @@ AIConsole 通过以下方式工作：
 
 ### 日志拦截
 
-AIConsole 会拦截以下 console 方法：
+openLog 会拦截以下 console 方法：
 - `console.log`
 - `console.warn`
 - `console.error`
@@ -129,15 +129,15 @@ AIConsole 会拦截以下 console 方法：
 
 ### 堆栈跟踪清理
 
-AIConsole 会自动清理堆栈跟踪，移除拦截器自身的帧，只保留用户代码的调用栈。
+openLog 会自动清理堆栈跟踪，移除拦截器自身的帧，只保留用户代码的调用栈。
 
 ### 单例检测
 
-AIConsole 会检测全局是否已存在实例，防止创建多个实例导致竞态条件。
+openLog 会检测全局是否已存在实例，防止创建多个实例导致竞态条件。
 
 ## 注意事项
 
-1. **性能影响** - AIConsole 会拦截所有 console 调用，在生产环境中建议谨慎使用
+1. **性能影响** - openLog 会拦截所有 console 调用，在生产环境中建议谨慎使用
 2. **隐私** - 会收集设备信息和 console 日志，确保用户知情
 3. **内存管理** - 使用完毕后记得调用 `destroy()` 清理资源
 4. **CORS** - 确保服务器支持 WebSocket 连接

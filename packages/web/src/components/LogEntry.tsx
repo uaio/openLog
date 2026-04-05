@@ -41,14 +41,26 @@ export function LogEntry({ log }: LogEntryProps) {
     }
   };
 
+  const isGlobalError = log.level === 'error' && (
+    log.message.startsWith('[Uncaught Error]') ||
+    log.message.startsWith('[Unhandled Promise Rejection]')
+  );
+
   return (
-    <div style={{ ...styles.entry, borderLeftColor: getLevelColor(log.level) }}>
+    <div style={{
+      ...styles.entry,
+      borderLeftColor: getLevelColor(log.level),
+      backgroundColor: isGlobalError ? '#fff2f0' : '#fff'
+    }}>
       <div style={styles.header}>
-        <span style={styles.icon}>{getLevelIcon(log.level)}</span>
+        <span style={styles.icon}>{isGlobalError ? '💥' : getLevelIcon(log.level)}</span>
         <span style={styles.timestamp}>{formatTime(log.timestamp)}</span>
         <span style={{ ...styles.levelTag, color: getLevelColor(log.level) }}>
           {log.level.toUpperCase()}
         </span>
+        {isGlobalError && (
+          <span style={styles.globalErrorTag}>GLOBAL</span>
+        )}
       </div>
       <div style={styles.message}>
         {log.message}
@@ -116,6 +128,16 @@ const styles = {
     '&:hover': {
       color: '#40a9ff'
     }
+  },
+  globalErrorTag: {
+    fontSize: '10px',
+    fontWeight: 'bold' as const,
+    padding: '1px 6px',
+    borderRadius: '3px',
+    backgroundColor: '#ff4d4f',
+    color: '#fff',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px'
   },
   stack: {
     margin: '8px 0 0 0',

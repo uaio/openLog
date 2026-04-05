@@ -5,5 +5,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3001
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'charts': ['recharts'],
+          'virtual': ['@tanstack/react-virtual']
+        }
+      }
+    }
   }
 });
