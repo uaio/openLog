@@ -70,17 +70,20 @@ const CLAUDE_COMMANDS: Record<string, string> = {
 - 如果没有设备连接，提示 SDK 初始化代码片段
 `,
 
-  'logs.md': `# 查看最新日志
+  'logs.md': `# 查看日志与 Checkpoint
 
-调用 \`list_devices\` 获取当前在线设备。
+调用 \`list_devices\` 获取当前在线设备，然后：
 
-如果只有一个设备，直接调用 \`get_console_logs\` 获取最近 50 条日志。
-如果有多个设备，列出设备列表让用户选择（或取第一个设备）。
+**优先查看 checkpoint 日志（验证开发节点）：**
+调用 \`get_checkpoints\` 获取所有 [checkpoint] 埋点日志，按节点名称分组展示，说明哪些节点已执行、哪些缺失。
 
-输出日志时：
-- 错误（error/warn）用醒目标记 ⚠️ / ❌ 标出
-- 按时间倒序排列，最新的在最前面
-- 如果有 JS 报错，自动分析可能的原因
+**查看全部日志：**
+调用 \`get_console_logs\` 获取最近 50 条日志。
+
+输出时：
+- checkpoint 链路：按时间顺序展示节点路径 A → B → C
+- 错误（error/warn）用 ⚠️ / ❌ 标出
+- 如果有节点缺失或有 JS 报错，自动分析可能原因
 `,
 
   'screenshot.md': `# 截取当前页面截图

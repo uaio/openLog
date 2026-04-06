@@ -1,7 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, ListPromptsRequestSchema, GetPromptRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport, verifyCheckpoint, startMonitor, pollMonitor, stopMonitor, listMonitors, initDevSession, startOpenlog, stopOpenlog } from './tools/index.js';
+import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport, verifyCheckpoint, startMonitor, pollMonitor, stopMonitor, listMonitors, initDevSession, startOpenlog, stopOpenlog, getCheckpoints } from './tools/index.js';
 import { startEmbeddedServer, stopEmbeddedServer, type EmbeddedServerConfig } from './launcher.js';
 import { wsClient } from './ws-client.js';
 import { API_BASE_URL } from './config.js';
@@ -244,6 +244,11 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
           name: stopOpenlog.name,
           description: stopOpenlog.description,
           inputSchema: stopOpenlog.inputSchema
+        },
+        {
+          name: getCheckpoints.name,
+          description: getCheckpoints.description,
+          inputSchema: getCheckpoints.inputSchema
         }
       ]
     };
@@ -264,48 +269,116 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     if (request.params.name === 'openlog_dev_workflow') {
       return {
-        description: 'openLog H5 开发自动验证工作流 SOP',
+        description: 'openLog H5 开发工作流 — AI 埋点验证 SOP',
         messages: [
           {
             role: 'user' as const,
             content: {
               type: 'text' as const,
-              text: `# openLog 开发工作流（自动注入，无需配置）
+              text: `# openLog 开发工作流（自动加载）
 
-## 开始开发 H5 功能时，必须执行以下步骤：
-
-### Step 1：启动开发会话（一次性）
-调用 \`init_dev_session()\`，它会：
-- 自动启动「报错监听器」和「日志监听器」
-- 返回两个 monitorId 和完整子代理 protocol
-
-### Step 2：启动两个子代理
-按照 protocol 启动：
-- **报错子代理**：每 3s 调用 \`poll_monitor(errorMonitorId)\`，hasAlert=true 时立即打断主代理
-- **日志子代理**：每 5s 调用 \`poll_monitor(logMonitorId)\`，warn/error 时通知主代理
-
-### Step 3：开发循环（主代理）
-每写完一个功能节点：
-\`\`\`
-verify_checkpoint(checkpoint="节点描述", triggerJs="触发代码", expects={...})
-  ✅ passed → 标注「✅ 节点已验证」→ 继续下一节点
-  ❌ failed → 查日志定位 → 修复 → 重新 verify_checkpoint（不得跳过）
-\`\`\`
-
-### Step 4：收到子代理告警时
-报错子代理报告 → 立即暂停开发 → \`get_console_logs(level="error")\` → 修复 → 恢复
-
-### Step 5：功能完成后
-\`\`\`
-health_check()   → 确认健康分 ≥ 80
-ai_analyze()     → 无高优先级问题
-\`\`\`
-
-### Step 6：会话结束
-通知两个子代理调用 \`stop_monitor()\` 清理资源。
+你在开发 H5 页面功能时，必须遵循以下工作流，通过 openLog 在真实设备上验证每个关键节点。
 
 ---
-**核心原则：主代理专注写代码和验证节点，子代理负责持续监控，互不阻塞。**`
+
+## 核心原则
+
+**在代码关键节点埋入 console.log checkpoint → 用户跑一遍 → 读取 checkpoint 日志验证**
+
+这比写单元测试更直接：在真实设备上验证真实行为。
+
+---
+
+## 标准埋点格式
+
+\`\`\`js
+// 格式：console.log('[checkpoint] 节点名: 描述', { 可选附加数据 })
+console.log('[checkpoint] login: 用户点击登录按钮')
+console.log('[checkpoint] login: 接口请求发出', { url: '/api/login', method: 'POST' })
+console.log('[checkpoint] login: 响应成功', { status: 200 })
+console.log('[checkpoint] login: token 已写入', { hasToken: !!localStorage.getItem('token') })
+\`\`\`
+
+**规则：**
+- 前缀固定为 \`[checkpoint]\`，openLog 工具专门过滤此前缀
+- 节点名用功能名命名（login / cart / payment 等）
+- 描述清晰说明当前步骤
+- 附加数据帮助判断状态是否正确
+
+---
+
+## 开发步骤
+
+### 1. 开始前
+\`\`\`
+/openlog:start   → 启动监控服务
+\`\`\`
+确认有设备在线：调用 list_devices
+
+### 2. 写代码时（同步进行）
+在每个关键节点加入 checkpoint 日志：
+- 用户操作触发点（点击、提交）
+- 异步操作发起点（接口请求前）
+- 异步操作完成点（接口响应后）
+- 状态变更点（数据写入、页面跳转）
+- 异常处理点（catch 块里加 error checkpoint）
+
+### 3. 请用户执行操作
+告知用户："请在手机上走一遍【功能名称】流程"
+
+### 4. 读取验证
+\`\`\`
+get_checkpoints(feature: "login")
+\`\`\`
+返回结果包含：
+- 哪些节点被执行了（按时间顺序）
+- 每个节点的附加数据
+- 缺失的节点（说明那段代码没有被执行）
+
+### 5. 判断结果
+- ✅ 所有预期节点都出现 → 功能跑通
+- ❌ 某节点缺失 → 该节点之前的代码有问题（条件判断、异步等待、路由等）
+- ❌ 附加数据不符合预期 → 逻辑错误（如 hasToken=false 说明存储失败）
+
+### 6. 有报错时
+\`\`\`
+get_console_logs(level: "error")
+\`\`\`
+结合 checkpoint 链路定位报错位置。
+
+---
+
+## 典型示例
+
+**登录功能验证：**
+\`\`\`js
+// AI 在代码中埋入：
+async function handleLogin(username, password) {
+  console.log('[checkpoint] login: 开始登录', { username })
+  try {
+    console.log('[checkpoint] login: 发起请求')
+    const res = await api.login(username, password)
+    console.log('[checkpoint] login: 请求成功', { status: res.status })
+    localStorage.setItem('token', res.data.token)
+    console.log('[checkpoint] login: token 已保存', { hasToken: true })
+    router.push('/home')
+    console.log('[checkpoint] login: 跳转首页')
+  } catch (e) {
+    console.log('[checkpoint] login: 请求失败', { error: e.message })
+  }
+}
+\`\`\`
+
+用户登录后调用 \`get_checkpoints(feature: "login")\`，返回：
+\`\`\`
+✅ 共发现 5 个检测点：login:开始登录 → login:发起请求 → login:请求成功 → login:token已保存 → login:跳转首页
+\`\`\`
+
+如果只到"发起请求"就断了，说明接口调用出错，结合 get_console_logs(level:"error") 查原因。
+
+---
+
+**记住：每个功能节点完成后必须验证，不得跳过。checkpoint 是你和设备之间的沟通语言。**`
             }
           }
         ]
@@ -522,6 +595,11 @@ ai_analyze()     → 无高优先级问题
 
         case 'stop_openlog': {
           const r = await stopOpenlog.execute(args as Record<string, never>);
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'get_checkpoints': {
+          const r = await getCheckpoints.execute(args as { deviceId?: string; feature?: string; limit?: number });
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 

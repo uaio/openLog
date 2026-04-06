@@ -17,3 +17,4 @@ export { verifyCheckpoint } from './verify_checkpoint.js';
 export { startMonitor, pollMonitor, stopMonitor, listMonitors } from './monitor.js';
 export { initDevSession } from './init_dev_session.js';
 export { startOpenlog, stopOpenlog } from './session.js';
+export { getCheckpoints } from './get_checkpoints.js';
