@@ -132,53 +132,6 @@ new OpenLog({ projectId: 'my-app', server: 'ws://192.168.x.x:38291', lang: 'zh' 
 
 ---
 
-## 📱 三种使用模式
-
-### 模式一：仅 SDK（本地调试）
-
-不需要启动任何服务，最轻量的使用方式。SDK 初始化后直接在手机上打开内置的 Eruda 调试面板。
-
-```html
-<script src="https://unpkg.com/openlog@latest/dist/openlog.iife.js"></script>
-<script>
-  OpenLog.init({ projectId: 'my-app', lang: 'zh' })
-  // 页面左下角会出现调试入口
-</script>
-```
-
-适合：快速排查问题、不方便连网络、纯本地开发。
-
----
-
-### 模式二：SDK + PC 面板（远程监控）
-
-启动服务后，手机数据实时推送到 PC 端可视化面板，支持多设备同时接入。
-
-```bash
-npx openlog          # 启动，自动打印局域网 IP 和 SDK 接入代码
-npx openlog -p 8080  # 指定端口（手机和电脑不在同一 WiFi 时按需调整）
-```
-
-PC 浏览器打开 `http://localhost:38291`，从左侧选择设备开始监控。
-
-适合：远程调试、联调接口、性能分析、团队协作。
-
----
-
-### 模式三：SDK + PC 面板 + AI（AI 辅助开发）
-
-在模式二基础上，配置 MCP 让 AI 工具接入实时数据流，AI 可自动验证开发节点、分析报错、执行远程操作。
-
-```bash
-npx openlog init     # 自动检测并配置 Claude Code / Cursor / Windsurf
-```
-
-重启 AI 工具后，Claude Code 里直接输入 `/openlog:start` 开始 AI 辅助开发。
-
-适合：AI Agent 开发、功能节点自动验证、AI 驱动的调试闭环。
-
----
-
 ## 🤖 AI 开发工作流
 
 这是 openLog 的核心场景：AI 工具在开发 H5 功能时，通过真实设备数据验证每个关键节点。
@@ -305,6 +258,52 @@ Claude 搜索代码中所有 `@openlog` 前缀的 console.log 行并删除。
 
 ---
 
+## 📱 三种使用模式
+
+### 模式一：仅 SDK（本地调试）
+
+不需要启动任何服务，最轻量的使用方式。SDK 初始化后直接在手机上打开内置的 Eruda 调试面板。
+
+```html
+<script src="https://unpkg.com/openlog@latest/dist/openlog.iife.js"></script>
+<script>
+  OpenLog.init({ projectId: 'my-app', lang: 'zh' })
+  // 页面左下角会出现调试入口
+</script>
+```
+
+适合：快速排查问题、不方便连网络、纯本地开发。
+
+---
+
+### 模式二：SDK + PC 面板（远程监控）
+
+启动服务后，手机数据实时推送到 PC 端可视化面板，支持多设备同时接入。
+
+```bash
+npx openlog          # 启动，自动打印局域网 IP 和 SDK 接入代码
+npx openlog -p 8080  # 指定端口（手机和电脑不在同一 WiFi 时按需调整）
+```
+
+PC 浏览器打开 `http://localhost:38291`，从左侧选择设备开始监控。
+
+适合：远程调试、联调接口、性能分析、团队协作。
+
+---
+
+### 模式三：SDK + PC 面板 + AI（AI 辅助开发）
+
+在模式二基础上，配置 MCP 让 AI 工具接入实时数据流，AI 可自动验证开发节点、分析报错、执行远程操作。
+
+```bash
+npx openlog init     # 自动检测并配置 Claude Code / Cursor / Windsurf
+```
+
+重启 AI 工具后，Claude Code 里直接输入 `/openlog:start` 开始 AI 辅助开发。
+
+适合：AI Agent 开发、功能节点自动验证、AI 驱动的调试闭环。
+
+---
 ## 🏗️ 架构
 
 ```
