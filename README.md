@@ -43,7 +43,8 @@ set_storage           clear_storage         highlight_element
 zen_mode              network_throttle      add_mock
 remove_mock           clear_mocks           health_check
 ai_analyze            start_perf_run        stop_perf_run
-get_perf_report       verify_checkpoint     init_dev_session
+get_perf_report       verify_checkpoint     get_checkpoints
+start_openlog         stop_openlog          init_dev_session
 start_monitor         poll_monitor          stop_monitor
 ```
 
@@ -64,13 +65,24 @@ npx openlog
 ```bash
 npx openlog init
 # 自动检测已安装的 AI 工具（Claude Code / Cursor / Windsurf）
-# 一键写入 MCP 配置，重启 AI 工具即可
+# 一键写入 MCP 配置 + Claude Code slash commands，重启 AI 工具即可
 
 # 指定工具：
 npx openlog init --for=claude
 npx openlog init --for=cursor
 npx openlog init --for=windsurf
 ```
+
+`init` 对 Claude Code 额外写入 `~/.claude/commands/openlog/`，安装后可直接使用：
+
+| Slash Command | 功能 |
+|---|---|
+| `/openlog:start` | 启动监控服务 + 建立 WS 连接 |
+| `/openlog:stop` | 停止监控服务 |
+| `/openlog:status` | 查看设备连接状态 |
+| `/openlog:logs` | 查看日志 + checkpoint 链路 |
+| `/openlog:screenshot` | 截取当前页面截图 |
+| `/openlog:clean` | 清除代码中所有 `@openlog` 调试日志 |
 
 ### 三、接入移动端 SDK
 
@@ -106,9 +118,135 @@ new OpenLog({ projectId: 'my-app', server: 'ws://192.168.x.x:38291', lang: 'zh' 
 浏览器打开 `http://localhost:38291`，从左侧设备列表选择设备即可。
 
 > **三种使用模式**（按需选择，互相独立）
-> - **仅 SDK**：不启动服务，OpenLog.init 后直接打开本地 Eruda 面板
+> - **仅 SDK**：不启动服务，`OpenLog.init` 后直接打开本地 Eruda 面板
 > - **SDK + PC 面板**：`npx openlog` 启动服务，实时远程监控
 > - **SDK + PC 面板 + AI**：再执行 `npx openlog init`，AI 自动编排开发闭环
+
+---
+
+## 🤖 AI 开发工作流
+
+这是 openLog 的核心场景：AI 工具在开发 H5 功能时，通过真实设备数据验证每个关键节点。
+
+### 完整流程
+
+**第 1 步：启动监控**
+
+```
+/openlog:start
+```
+
+Claude 调用 `start_openlog` → 服务启动 → WS 长连接建立 → 自动打开 PC 面板。
+
+---
+
+**第 2 步：开发 + 埋点（AI 自动完成）**
+
+AI 在代码关键节点自动埋入 `@openlog[checkpoint]` 日志：
+
+```javascript
+async function handleLogin(username, password) {
+  console.log('@openlog[checkpoint] login: 开始登录', { username })
+  try {
+    console.log('@openlog[checkpoint] login: 发起请求')
+    const res = await api.login(username, password)
+    console.log('@openlog[checkpoint] login: 请求成功', { status: res.status })
+    localStorage.setItem('token', res.data.token)
+    console.log('@openlog[checkpoint] login: token 已保存', { hasToken: true })
+    router.push('/home')
+    console.log('@openlog[checkpoint] login: 跳转首页')
+  } catch (e) {
+    console.log('@openlog[checkpoint] login: 请求失败', { error: e.message })
+  }
+}
+```
+
+**埋点格式约定：**
+```
+console.log('@openlog[checkpoint] 功能名: 步骤描述', { 可选附加数据 })
+                ^^^^^^^^ openLog 统一标识符
+```
+
+`@openlog` 是 openLog 所有开发期日志的标识前缀，方便统一查询和清除。
+
+---
+
+**第 3 步：真机验证**
+
+用户在手机上走一遍流程，然后：
+
+```
+/openlog:logs
+```
+
+或告诉 Claude："登录流程跑完了，帮我验证一下"
+
+Claude 调用 `get_checkpoints(feature: "login")`，返回：
+
+```
+✅ 共发现 5 个检测点：
+  开始登录 → 发起请求 → 请求成功 → token已保存 → 跳转首页
+
+附加数据：
+  请求成功: { status: 200 }
+  token已保存: { hasToken: true }
+```
+
+---
+
+**第 4 步：分析结果**
+
+| 结果 | 含义 | 下一步 |
+|------|------|--------|
+| ✅ 所有节点出现且数据正确 | 功能验证通过 | 执行清除步骤 |
+| ❌ 某节点缺失 | 该节点前的代码未执行（条件判断/异步/路由问题） | `get_console_logs(level: "error")` 定位 |
+| ❌ 附加数据不符合预期 | 逻辑错误（如 `hasToken: false`） | 检查对应逻辑并修复 |
+
+---
+
+**第 5 步：清除 @openlog 日志（验证通过后必须执行）**
+
+```
+/openlog:clean
+```
+
+Claude 搜索代码中所有 `@openlog` 前缀的 console.log 行并删除。
+
+**`@openlog` 日志是开发期工具，不应进入生产代码。**
+
+---
+
+**第 6 步：结束监控**
+
+```
+/openlog:stop
+```
+
+---
+
+### 一图总结
+
+```
+你                       Claude Code (AI)              真实手机
+│                              │                           │
+│  /openlog:start              │                           │
+│ ────────────────────────────►│ start_openlog()           │
+│                              │──── WS 长连接 ────────────►│
+│                              │                           │
+│  "帮我写登录功能"             │                           │
+│ ────────────────────────────►│ 写代码 + 埋 @openlog 日志 │
+│ ◄────────────────────────────│                           │
+│                              │                           │
+│  （手机上走登录流程）          │                      SDK 上报日志
+│                              │◄──────────────────────────│
+│                              │                           │
+│  "验证一下" / /openlog:logs  │                           │
+│ ────────────────────────────►│ get_checkpoints()         │
+│ ◄────────────────────────────│ ✅ 5个节点全部命中         │
+│                              │                           │
+│  /openlog:clean              │                           │
+│ ────────────────────────────►│ 删除所有 @openlog 日志    │
+```
 
 ---
 
@@ -130,13 +268,15 @@ openLog/
 移动端 H5 SDK
   └── DataBus（统一数据总线）
         ├── Eruda 本地面板（独立可用）
-        └── WebSocket Reporter → Server
-                                    ├── PC Web 面板（实时推送）
-                                    └── REST API → MCP 工具查询
+        └── WebSocket Reporter → Server（中控）
+                                    ├── PC Web 面板（viewer）
+                                    └── MCP AI 工具（viewer）
 
 外部系统（CI/CD / 服务端 / Native / 第三方）
   └── POST /api/ingest ──────────→ Server（同上消费链路）
 ```
+
+**双向通信：** PC 面板和 MCP 不仅接收数据，还可向 SDK 下发指令（reload、execute_js、mock 等），Server 作为中控负责转发。
 
 ---
 
@@ -149,21 +289,21 @@ openLog/
 ```typescript
 // 完整类型定义：packages/types/src/
 {
-  "v": "1",                    // Schema 版本，当前固定为 "1"
-  "platform": "web",           // 平台标识，见下方支持列表
+  "v": "1",                    // Schema 版本
+  "platform": "web",           // 平台标识
   "device": {
     "deviceId": "uuid",        // 设备唯一 ID
-    "projectId": "my-app",     // 项目标识（与 SDK init 保持一致）
-    "ua": "Mozilla/5.0...",    // User-Agent 或设备型号
-    "screen": "390x844",       // 屏幕分辨率
+    "projectId": "my-app",     // 项目标识
+    "ua": "Mozilla/5.0...",
+    "screen": "390x844",
     "pixelRatio": 3,
     "language": "zh-CN",
-    "url": "https://..."       // 当前页面 URL（可选）
+    "url": "https://..."
   },
-  "tabId": "tab-uuid",         // Tab/会话 ID
+  "tabId": "tab-uuid",
   "ts": 1712345678901,         // Unix 毫秒时间戳
-  "type": "console",           // 事件类型，见下方类型列表
-  "data": { ... }              // 具体事件数据，由 type 决定结构
+  "type": "console",           // 事件类型
+  "data": { ... }              // 具体事件数据
 }
 ```
 
@@ -251,8 +391,6 @@ openLog/
 
 任何系统均可通过 REST 接口向 openLog 推送数据，数据将实时出现在 PC 面板和 MCP 工具中。
 
-### 接口说明
-
 ```
 POST http://localhost:38291/api/ingest
 Content-Type: application/json
@@ -260,104 +398,26 @@ Content-Type: application/json
 
 支持**单条**或**批量**（最多 500 条/次）：
 
-### 示例：推送一条错误日志
-
 ```bash
 curl -X POST http://localhost:38291/api/ingest \
   -H "Content-Type: application/json" \
   -d '{
     "v": "1",
     "platform": "unknown",
-    "device": {
-      "deviceId": "ci-pipeline-001",
-      "projectId": "my-app",
-      "ua": "CI/CD Pipeline",
-      "screen": "n/a",
-      "pixelRatio": 1,
-      "language": "zh-CN"
-    },
+    "device": { "deviceId": "ci-001", "projectId": "my-app", "ua": "CI", "screen": "n/a", "pixelRatio": 1, "language": "zh-CN" },
     "tabId": "build-456",
     "ts": 1712345678901,
     "type": "error",
-    "data": {
-      "source": "uncaught",
-      "message": "单元测试失败：LoginForm 渲染异常",
-      "stack": "AssertionError: expected true to equal false\n  at test.js:15"
-    }
+    "data": { "source": "uncaught", "message": "单测失败", "stack": "..." }
   }'
 ```
-
-### 批量推送
-
-```javascript
-// 一次推送多条
-await fetch('http://localhost:38291/api/ingest', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify([envelope1, envelope2, envelope3])
-})
-```
-
-### 响应格式
-
-```json
-// 全部成功（200）
-{ "ok": true, "accepted": 3, "rejected": 0, "ts": 1712345678901 }
-
-// 部分失败（207）
-{ "ok": true, "accepted": 2, "rejected": 1, "errors": ["[2] missing field: device.deviceId"], "ts": ... }
-
-// 全部失败（400）
-{ "ok": false, "accepted": 0, "rejected": 1, "errors": ["[0] unsupported schema version: \"2\""], "ts": ... }
-```
-
-### 典型使用场景
 
 | 场景 | 说明 |
 |------|------|
 | **CI/CD 流水线** | 单测失败、构建错误实时推送，AI 自动分析 |
-| **服务端日志** | 接口异常、业务错误推送到 openLog，与前端数据关联 |
+| **服务端日志** | 接口异常推送到 openLog，与前端数据关联 |
 | **Native App** | React Native / Flutter 接入，复用同一套监控体系 |
-| **自定义采集** | 埋点数据、A/B 测试结果等通过 `custom` 类型推送 |
-
----
-
-## 🤖 MCP 接入（AI 调试）
-
-### 配置
-
-```bash
-# 自动配置（推荐）
-npx openlog init
-
-# 手动配置
-```
-
-```json
-{
-  "mcpServers": {
-    "openlog": {
-      "command": "node",
-      "args": ["/path/to/openLog/packages/mcp/dist/index.js"],
-      "env": { "OPENLOG_API_BASE_URL": "http://localhost:38291" }
-    }
-  }
-}
-```
-
-### AI 开发工作流（自动编排，无需手动配置）
-
-连接 MCP 后，Claude Code 等 AI 工具会自动加载 openLog 的开发 SOP：
-
-```
-开始开发 H5 功能
-  → init_dev_session()          # 一键启动，返回监控 protocol
-  → 启动「报错子代理」           # 每 3s poll，报错立即打断主代理
-  → 启动「日志子代理」           # 每 5s poll，异常时通知主代理
-  → 主代理写代码
-  → verify_checkpoint(...)      # 每个功能节点写完后真机验证
-  → health_check()              # 功能完成后健康检查
-```
+| **自定义采集** | 埋点数据、A/B 测试结果通过 `custom` 类型推送 |
 
 ---
 
@@ -372,7 +432,7 @@ npx openlog init
 await logger.startPerfRun();
 // ... 执行用户操作 ...
 const report = await logger.stopPerfRun();
-console.log(report.score); // { total: 87, grade: 'B', issues: [...] }
+// { total: 87, grade: 'B', issues: [...] }
 ```
 
 ---
@@ -405,12 +465,14 @@ console.log(report.score); // { total: 87, grade: 'B', issues: [...] }
 - [x] Web H5 SDK + PC 监控面板 + MCP 工具集
 - [x] `@openlog/types` 统一数据标准（Envelope v1）
 - [x] `POST /api/ingest` 外部数据接入接口
-- [x] `npx openlog init` 一键配置 AI 工具
-- [x] AI 开发自动编排（`init_dev_session` + 子代理 monitor）
-- [x] `verify_checkpoint` 功能节点自动验证 Harness
+- [x] `npx openlog init` 一键配置 AI 工具 + Claude Code slash commands
+- [x] `@openlog[checkpoint]` 开发期埋点约定 + `get_checkpoints` 验证工具
+- [x] `/openlog:clean` 验证完成后自动清除调试日志
+- [x] `start_openlog` / `stop_openlog` 显式生命周期管理
+- [x] MCP Prompt 自动加载开发 SOP（连接即生效，无需 CLAUDE.md）
 
 ### 中期
-- [ ] **React Native SDK**（`platform: "react-native"`，复用同一套 Envelope 标准）
+- [ ] **React Native SDK**（`platform: "react-native"`）
 - [ ] **小程序 SDK**（微信/支付宝，`platform: "miniprogram"`）
 - [ ] **PC 面板 `custom` 类型展示**（通用 JSON 树 + 自定义渲染插件）
 - [ ] **ingest 鉴权**（API Key + 项目级权限）
@@ -439,249 +501,3 @@ pnpm start      # 启动服务器
 
 MIT © [openLog](https://github.com/uaio/openLog)
 
-
-openLog 是一套完整的移动端远程调试解决方案。通过在 H5 页面中嵌入轻量 SDK，将设备的 console、网络请求、存储、DOM、性能等数据实时同步到 PC 端，同时支持 AI（MCP）直接查询和操控，实现「移动端采集 → PC 分析 → AI 诊断」的完整调试闭环。
-
----
-
-## ✨ 核心能力
-
-### 📡 实时数据采集（移动端 SDK）
-| 采集项 | 说明 |
-|--------|------|
-| **Console** | log / warn / error / info，保留原始参数富文本 |
-| **网络请求** | XHR + Fetch 拦截，含请求体/响应体/耗时 |
-| **Storage** | localStorage / sessionStorage / Cookie 实时监听 |
-| **DOM 快照** | 页面结构序列化，响应 PC 刷新指令 |
-| **性能数据** | FPS + Web Vitals (LCP/CLS/FCP/TTFB/INP) + 长任务 + 资源加载 + 交互延迟 |
-| **截图** | html2canvas 截取当前页面 |
-| **错误捕获** | 全局 JS 错误 + 未处理 Promise rejection |
-
-### 🖥️ PC 可视化面板（9 个 Tab）
-| Tab | 功能 |
-|-----|------|
-| 📝 控制台 | 实时日志流 + JS 远程执行 + 日志导出 + 网速模拟 |
-| 🌐 网络 | 请求瀑布流，支持过滤 |
-| 💾 存储 | localStorage / sessionStorage / Cookie 查看与写入 |
-| 🌲 Element | DOM 树结构查看 |
-| 📊 Performance | FPS 折线图 + Web Vitals + 长任务 + 资源时序 |
-| 🏁 跑分 | 性能跑分报告（评分 + 等级 + 问题建议 + 历史对比） |
-| 🎭 Mock | API Mock 规则管理（URL 正则匹配） |
-| 🩺 健康 | 页面健康检查（错误数/内存/长任务/Vitals 综合评分） |
-| 🤖 AI 分析 | 汇总全量数据，生成问题清单与优化建议 |
-
-### 🤖 MCP 工具集（AI 可直接调用）
-```
-list_devices          get_console_logs      get_network_requests
-watch_logs            get_storage           get_page_context
-execute_js            take_screenshot       reload_page
-set_storage           clear_storage         highlight_element
-zen_mode              network_throttle      add_mock
-remove_mock           clear_mocks           health_check
-ai_analyze            start_perf_run        stop_perf_run
-get_perf_report
-```
-
----
-
-## 🚀 快速开始
-
-### 安装
-
-```bash
-git clone https://github.com/uaio/openLog.git
-cd openLog
-pnpm install
-pnpm build
-```
-
-### 启动服务器
-
-```bash
-pnpm start
-# 默认监听 http://localhost:38291
-# 指定端口: PORT=3001 pnpm start
-```
-
-### 在 H5 页面中接入 SDK
-
-```html
-<script type="module">
-  import OpenLog from './packages/sdk/dist/index.js';
-
-  const logger = new OpenLog({
-    projectId: 'my-app',           // 必填，项目标识
-    server: 'ws://192.168.x.x:38291', // 服务器地址（局域网 IP）
-    eruda: { enabled: true },      // 开启 Eruda 本地调试面板
-  });
-</script>
-```
-
-### 访问 PC 控制台
-
-浏览器打开 `http://localhost:38291`，从左侧设备列表选择设备即可开始调试。
-
----
-
-## 🏗️ 架构
-
-```
-openLog/
-├── packages/
-│   ├── sdk/        # 移动端 SDK（数据采集 + Eruda 集成）
-│   ├── server/     # Node.js 服务（WebSocket + REST API）
-│   ├── web/        # PC 调试面板（React）
-│   └── mcp/        # MCP Server（AI 工具集）
-```
-
-### 数据流
-
-```
-移动端 H5
-  └── DataBus（统一数据总线）
-        ├── Eruda 本地面板（展示层）
-        └── Reporter → WebSocket → Server
-                                      ├── PC Web 面板（消费）
-                                      └── MCP 工具（消费）
-```
-
-**DataBus 是核心**：所有采集器（Console/Network/Storage/DOM/Performance）在第一时间向 DataBus emit 数据，Eruda 和远程传输各自按需消费，互不干扰。
-
----
-
-## 🏁 性能跑分
-
-openLog 内置基于 Lighthouse 权重的评分系统：
-
-```
-综合评分 = FPS(20%) + LCP(15%) + CLS(10%) + FCP(10%) +
-           TTFB(10%) + INP(10%) + 长任务(15%) + 资源(10%)
-```
-
-**触发方式：**
-
-```javascript
-// SDK 直接调用
-await logger.startPerfRun();
-// ... 执行用户操作 ...
-const report = await logger.stopPerfRun();
-console.log(report.score); // { total: 87, grade: 'B', issues: [...] }
-```
-
-```bash
-# MCP（AI 触发）
-start_perf_run → stop_perf_run → get_perf_report
-```
-
-PC 端「🏁 跑分」Tab 提供图形化报告，支持历史对比和 JSON 导出。
-
-> **禅模式**：跑分期间 SDK 自动进入禅模式，暂停 Network/Storage/DOM 采集，确保测量结果不被 SDK 自身干扰。
-
----
-
-## 🐢 网络节流
-
-模拟弱网环境测试：
-
-```javascript
-logger.setNetworkThrottle('3g');   // 300ms 延迟，750Kbps
-logger.setNetworkThrottle('2g');   // 600ms 延迟，250Kbps
-logger.setNetworkThrottle('offline'); // 离线
-logger.setNetworkThrottle('none'); // 恢复正常
-```
-
-PC 控制台和 MCP（`network_throttle`）均可远程切换。
-
----
-
-## 🎭 Mock API
-
-在设备上拦截指定请求并返回自定义响应：
-
-```javascript
-// SDK 直接调用
-const id = logger.addMock('/api/user', {
-  status: 200,
-  headers: { 'Content-Type': 'application/json' },
-  body: '{"name":"test","role":"admin"}',
-});
-logger.removeMock(id);
-```
-
-PC「🎭 Mock」Tab 和 MCP（`add_mock`）均可远程配置。
-
----
-
-## 🤖 MCP 接入（AI 调试）
-
-### 配置（以 Claude Code 为例）
-
-```json
-{
-  "mcpServers": {
-    "openlog": {
-      "command": "node",
-      "args": ["/path/to/openLog/packages/mcp/dist/index.js"],
-      "env": {
-        "OPENLOG_API_BASE_URL": "http://localhost:38291"
-      }
-    }
-  }
-}
-```
-
-### 典型 AI 工作流
-
-```
-# 查看设备状态
-list_devices → get_page_context
-
-# 诊断问题
-ai_analyze → 输出问题清单和优化建议
-
-# 跑分
-start_perf_run → (等待操作) → stop_perf_run → get_perf_report
-
-# 调试
-execute_js "document.title"
-highlight_element "#submit-btn"
-set_storage "token" "test-value"
-```
-
----
-
-## 🔌 REST API
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/devices` | 设备列表 |
-| GET | `/api/devices/:id/logs` | 控制台日志 |
-| GET | `/api/devices/:id/network` | 网络请求 |
-| GET | `/api/devices/:id/storage` | 存储快照 |
-| GET | `/api/devices/:id/performance` | 性能数据 |
-| GET | `/api/devices/:id/health` | 健康检查 |
-| POST | `/api/devices/:id/perf-run/start` | 开始跑分 |
-| POST | `/api/devices/:id/perf-run/stop` | 停止跑分 |
-| GET | `/api/devices/:id/perf-run` | 跑分历史 |
-| POST | `/api/devices/:id/execute` | 远程执行 JS |
-| POST | `/api/devices/:id/screenshot` | 触发截图 |
-| POST | `/api/devices/:id/network-throttle` | 网络节流 |
-| POST | `/api/devices/:id/mocks` | 添加 Mock |
-| DELETE | `/api/devices/:id/mocks/:mockId` | 删除 Mock |
-
----
-
-## 💻 开发
-
-```bash
-pnpm build      # 构建所有包
-pnpm dev        # 开发模式（watch）
-pnpm test       # 运行测试
-pnpm start      # 启动服务器
-```
-
----
-
-## 📄 许可证
-
-MIT © [openLog](https://github.com/uaio/openLog)
