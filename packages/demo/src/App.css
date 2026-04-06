@@ -1,0 +1,83 @@
+/* ── Layout ── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 52px;
+  background: #1a1a2e;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar-brand { display: flex; align-items: center; gap: 8px; }
+.brand-icon { font-size: 18px; }
+.brand-name { font-weight: 700; font-size: 16px; }
+.brand-tag { font-size: 11px; background: #e94560; padding: 2px 8px; border-radius: 10px; }
+.navbar-links { display: flex; gap: 4px; }
+.nav-link { color: #aaa; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.15s; }
+.nav-link:hover, .nav-link.active { background: #e94560; color: #fff; }
+
+.main { padding: 20px; max-width: 900px; margin: 0 auto; }
+
+/* ── Home ── */
+.home-hero { text-align: center; padding: 32px 0 24px; }
+.home-hero h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 8px; }
+.home-hero p { color: #666; font-size: 14px; }
+.home-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+.home-card { display: block; background: #fff; border: 1.5px solid #e8e8e8; border-radius: 10px; padding: 18px 20px; text-decoration: none; transition: all 0.15s; }
+.home-card:hover { border-color: #e94560; box-shadow: 0 4px 12px rgba(233,69,96,0.12); transform: translateY(-2px); }
+.card-label { font-weight: 600; color: #1a1a2e; font-size: 15px; margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: #888; }
+.home-tip { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #666; margin-top: 8px; }
+.home-tip code { background: #f5f5f5; padding: 1px 6px; border-radius: 4px; font-size: 12px; color: #e94560; }
+
+/* ── Page shared ── */
+.page-header { margin-bottom: 20px; }
+.page-header h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 4px; }
+.page-header p { font-size: 13px; color: #888; }
+.section { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 14px; border: 1px solid #e8e8e8; }
+.section h3 { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: #e94560; color: #fff; }
+.btn-primary:hover { background: #c73652; }
+.btn-secondary { background: #f0f0f0; color: #333; }
+.btn-secondary:hover { background: #e0e0e0; }
+.btn-warn { background: #ff9800; color: #fff; }
+.btn-warn:hover { background: #e68900; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #d32f2f; }
+.btn-success { background: #4caf50; color: #fff; }
+.btn-success:hover { background: #388e3c; }
+
+/* ── Log output ── */
+.log-output { background: #1a1a2e; border-radius: 8px; padding: 12px; min-height: 80px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+.log-item { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.log-item.log { color: #e0e0e0; }
+.log-item.info { color: #64b5f6; }
+.log-item.warn { color: #ffb74d; }
+.log-item.error { color: #ef9a9a; }
+.log-item.checkpoint { color: #81c784; font-weight: bold; }
+.log-time { color: #555; margin-right: 6px; }
+
+/* ── Status badge ── */
+.status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+.status-badge.connected { background: #e8f5e9; color: #2e7d32; }
+.status-badge.disconnected { background: #fce4ec; color: #c62828; }
+
+/* ── Form ── */
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+.form-group input { width: 100%; padding: 8px 12px; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.15s; }
+.form-group input:focus { border-color: #e94560; }
+
+/* ── Checkpoint result ── */
+.checkpoint-result { margin-top: 12px; }
+.cp-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 13px; }
+.cp-item.hit { background: #e8f5e9; color: #2e7d32; }
+.cp-item.miss { background: #fce4ec; color: #c62828; }
+.cp-node { font-weight: 600; }
+.cp-desc { color: #666; font-size: 12px; }
