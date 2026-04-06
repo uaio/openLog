@@ -2,9 +2,22 @@
 
 > 首款面向 AI Agent 的前端 H5 数据监控工具 — 实时采集、PC 可视化、AI 可查询、开放接入
 
-openLog 是专为 **AI 辅助开发场景**设计的前端监控工具。通过在 H5 页面嵌入轻量 SDK，将设备的 console、网络请求、存储、DOM、性能等数据实时同步到 PC 端和 AI Agent，实现「移动端采集 → PC 分析 → AI 诊断」的完整闭环。
+**开发 H5 页面，你有没有遇到这些问题：**
+- 在手机上看到白屏，不知道哪里报错了
+- 接口调没调、参数对不对，只能靠猜
+- AI 帮你写了代码，但你不知道在真机上跑没跑通
 
-**同时，openLog 是一个开放数据平台**：任何系统（CI/CD、服务端日志、Native App、第三方工具）均可通过标准接口向 openLog 推送数据，供 PC 面板展示和 AI 工具查询。
+**openLog 解决这些问题。** 在 H5 页面嵌入一行代码，手机上发生的一切——日志、请求、存储、性能——实时同步到你的电脑，也同步给 AI Agent，让 AI 能在真实设备上验证它写的每一行代码。
+
+openLog 有三种用法，按需选择，互相独立：
+
+| 模式 | 适合场景 | 如何使用 |
+|------|---------|---------|
+| **仅 SDK** | 本地调试，不需要远程 | 引入 SDK，本机直接打开 Eruda 面板 |
+| **SDK + PC 面板** | 远程监控，团队协作 | `npx openlog` 启动服务 |
+| **SDK + PC 面板 + AI** | AI 辅助开发，自动验证 | 再执行 `npx openlog init` 配置 MCP |
+
+**同时，openLog 是一个开放数据平台**：任何系统（CI/CD、服务端、Native App、第三方工具）均可通过标准接口推送数据，供 PC 面板展示和 AI 工具查询。
 
 ---
 
@@ -117,10 +130,52 @@ new OpenLog({ projectId: 'my-app', server: 'ws://192.168.x.x:38291', lang: 'zh' 
 
 浏览器打开 `http://localhost:38291`，从左侧设备列表选择设备即可。
 
-> **三种使用模式**（按需选择，互相独立）
-> - **仅 SDK**：不启动服务，`OpenLog.init` 后直接打开本地 Eruda 面板
-> - **SDK + PC 面板**：`npx openlog` 启动服务，实时远程监控
-> - **SDK + PC 面板 + AI**：再执行 `npx openlog init`，AI 自动编排开发闭环
+---
+
+## 📱 三种使用模式
+
+### 模式一：仅 SDK（本地调试）
+
+不需要启动任何服务，最轻量的使用方式。SDK 初始化后直接在手机上打开内置的 Eruda 调试面板。
+
+```html
+<script src="https://unpkg.com/openlog@latest/dist/openlog.iife.js"></script>
+<script>
+  OpenLog.init({ projectId: 'my-app', lang: 'zh' })
+  // 页面左下角会出现调试入口
+</script>
+```
+
+适合：快速排查问题、不方便连网络、纯本地开发。
+
+---
+
+### 模式二：SDK + PC 面板（远程监控）
+
+启动服务后，手机数据实时推送到 PC 端可视化面板，支持多设备同时接入。
+
+```bash
+npx openlog          # 启动，自动打印局域网 IP 和 SDK 接入代码
+npx openlog -p 8080  # 指定端口（手机和电脑不在同一 WiFi 时按需调整）
+```
+
+PC 浏览器打开 `http://localhost:38291`，从左侧选择设备开始监控。
+
+适合：远程调试、联调接口、性能分析、团队协作。
+
+---
+
+### 模式三：SDK + PC 面板 + AI（AI 辅助开发）
+
+在模式二基础上，配置 MCP 让 AI 工具接入实时数据流，AI 可自动验证开发节点、分析报错、执行远程操作。
+
+```bash
+npx openlog init     # 自动检测并配置 Claude Code / Cursor / Windsurf
+```
+
+重启 AI 工具后，Claude Code 里直接输入 `/openlog:start` 开始 AI 辅助开发。
+
+适合：AI Agent 开发、功能节点自动验证、AI 驱动的调试闭环。
 
 ---
 
