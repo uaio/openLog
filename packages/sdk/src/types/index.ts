@@ -197,6 +197,24 @@ export interface PerfRunScore {
   summary: string;         // 一句话评语
 }
 
+/** 页面审计单项 */
+export interface AuditItem {
+  id: string;
+  title: string;
+  score: number;        // 0-100, 100=pass
+  rating: 'good' | 'needs-improvement' | 'poor';
+  value: string;        // 人类可读的值描述
+  details?: any;        // 结构化细节供 AI 分析
+}
+
+/** 页面审计报告 */
+export interface PageAuditReport {
+  timestamp: number;
+  url: string;
+  audits: AuditItem[];
+  summary: { good: number; warning: number; poor: number };
+}
+
 /** 跑分会话 */
 export interface PerfRunSession {
   sessionId: string;
@@ -207,4 +225,5 @@ export interface PerfRunSession {
   duration: number;          // ms
   snapshot: Omit<PerformanceReport, 'deviceId' | 'tabId'>;
   score: PerfRunScore;
+  audit?: PageAuditReport;   // 页面静态审计结果
 }

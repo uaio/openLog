@@ -10,6 +10,7 @@ import { ScreenshotCollector } from './interceptors/screenshot.js';
 import { ErudaPlugin } from './plugins/ErudaPlugin.js';
 import { BrowserAdapter } from './platform/browser/index.js';
 import { scorePerfRun } from './core/perf-score.js';
+import { runPageAudit } from './interceptors/page-audit.js';
 import { NetworkThrottle } from './interceptors/network-throttle.js';
 import { MockAPI } from './interceptors/mock-api.js';
 import type { PlatformAdapter } from './platform/types.js';
@@ -350,6 +351,7 @@ export class OpenLog {
     this.perfRunCollector = null;
     this.exitZenMode();
     const scoreResult = scorePerfRun(snapshot);
+    const audit = runPageAudit();
     const endTime = Date.now();
     const session: PerfRunSession = {
       sessionId: Date.now().toString(36),
@@ -360,6 +362,7 @@ export class OpenLog {
       duration: endTime - this.perfRunStartTime,
       snapshot,
       score: scoreResult,
+      audit,
     };
     this.dataBus.emit('perf_run', session);
     this.lastPerfRunSession = session;

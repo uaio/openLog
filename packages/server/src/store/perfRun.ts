@@ -24,6 +24,7 @@ export interface PerfRunSession {
   duration: number;
   snapshot: any;
   score: PerfRunScore;
+  audit?: any;
 }
 
 export class PerfRunStore {
