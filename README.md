@@ -53,16 +53,17 @@ openLog has three usage modes — pick what fits, they're independent:
 
 ### 🤖 MCP Toolset (AI-callable)
 ```
-list_devices          get_console_logs      get_network_requests
-watch_logs            get_storage           get_page_context
-execute_js            take_screenshot       reload_page
-set_storage           clear_storage         highlight_element
-zen_mode              network_throttle      add_mock
-remove_mock           clear_mocks           health_check
-ai_analyze            start_perf_run        stop_perf_run
-get_perf_report       verify_checkpoint     get_checkpoints
-ensure_sdk            start_openlog         stop_openlog
-start_monitor         poll_monitor          stop_monitor
+list_devices          focus_device          get_console_logs
+get_network_requests  watch_logs            get_storage
+get_page_context      execute_js            take_screenshot
+reload_page           set_storage           clear_storage
+highlight_element     zen_mode              network_throttle
+add_mock              remove_mock           clear_mocks
+health_check          ai_analyze            start_perf_run
+stop_perf_run         get_perf_report       verify_checkpoint
+get_checkpoints       ensure_sdk            start_openlog
+stop_openlog          start_monitor         poll_monitor
+stop_monitor          list_monitors
 ```
 
 ---
@@ -75,6 +76,7 @@ start_monitor         poll_monitor          stop_monitor
 npx @openlog/cli
 # Terminal prints all LAN IPs and SDK snippet — just copy and use
 # Custom port: npx @openlog/cli -p 8080
+# Public/cloud deployment: npx @openlog/cli --host myapp.example.com
 ```
 
 ### 2. Configure AI Tools (Auto-detection)
@@ -150,6 +152,8 @@ This is openLog's core scenario: AI tools verify each development milestone usin
 ```
 
 Claude calls `start_openlog` → server starts → WS connection established → PC panel auto-opens.
+
+If multiple devices are connected, Claude calls `list_devices` to show you the list, then `focus_device(deviceId)` to lock onto the target device. All subsequent operations automatically target that device.
 
 ---
 
@@ -550,9 +554,14 @@ const report = await logger.stopPerfRun();
 
 ```bash
 pnpm build      # Build all packages
+pnpm test       # Run tests (requires build first)
 pnpm dev        # Dev mode (watch)
-pnpm test       # Run tests
-pnpm start      # Start server
+
+# Run tests for a specific package:
+pnpm --filter @openlog/server test
+pnpm --filter @openlog/mcp test
+pnpm --filter @openlog/cli test
+pnpm --filter @openlog/sdk test
 ```
 
 ---

@@ -53,16 +53,17 @@ openLog 有三种用法，按需选择，互相独立：
 
 ### 🤖 MCP 工具集（AI 直接调用）
 ```
-list_devices          get_console_logs      get_network_requests
-watch_logs            get_storage           get_page_context
-execute_js            take_screenshot       reload_page
-set_storage           clear_storage         highlight_element
-zen_mode              network_throttle      add_mock
-remove_mock           clear_mocks           health_check
-ai_analyze            start_perf_run        stop_perf_run
-get_perf_report       verify_checkpoint     get_checkpoints
-ensure_sdk            start_openlog         stop_openlog
-start_monitor         poll_monitor          stop_monitor
+list_devices          focus_device          get_console_logs
+get_network_requests  watch_logs            get_storage
+get_page_context      execute_js            take_screenshot
+reload_page           set_storage           clear_storage
+highlight_element     zen_mode              network_throttle
+add_mock              remove_mock           clear_mocks
+health_check          ai_analyze            start_perf_run
+stop_perf_run         get_perf_report       verify_checkpoint
+get_checkpoints       ensure_sdk            start_openlog
+stop_openlog          start_monitor         poll_monitor
+stop_monitor          list_monitors
 ```
 
 ---
@@ -75,6 +76,7 @@ start_monitor         poll_monitor          stop_monitor
 npx @openlog/cli
 # 启动后终端会打印所有局域网 IP 和 SDK 接入代码，直接复制使用
 # 指定端口：npx @openlog/cli -p 8080
+# 公网/云端部署：npx @openlog/cli --host myapp.example.com
 ```
 
 ### 二、配置 AI 工具（自动检测）
@@ -150,6 +152,8 @@ new OpenLog({ projectId: 'my-app', server: 'ws://192.168.x.x:38291', lang: 'zh' 
 ```
 
 Claude 调用 `start_openlog` → 服务启动 → WS 长连接建立 → 自动打开 PC 面板。
+
+如果有多个设备连接，Claude 会调用 `list_devices` 展示设备列表，然后调用 `focus_device(deviceId)` 锁定目标设备。后续所有操作自动指向该设备。
 
 ---
 
@@ -549,9 +553,14 @@ const report = await logger.stopPerfRun();
 
 ```bash
 pnpm build      # 构建所有包
+pnpm test       # 运行测试（需先 build）
 pnpm dev        # 开发模式（watch）
-pnpm test       # 运行测试
-pnpm start      # 启动服务器
+
+# 单独运行某个包的测试：
+pnpm --filter @openlog/server test
+pnpm --filter @openlog/mcp test
+pnpm --filter @openlog/cli test
+pnpm --filter @openlog/sdk test
 ```
 
 ---
