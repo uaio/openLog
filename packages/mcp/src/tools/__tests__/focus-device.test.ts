@@ -24,7 +24,7 @@ const mockSetFocusedDevice = vi.fn<(id: string | null) => void>();
 vi.mock('../../lib/device-selector.js', () => ({
   sharedDeviceSelector: {
     listDevices: (...args: unknown[]) => mockListDevices(...(args as [])),
-    setFocusedDevice: (...args: unknown[]) => mockSetFocusedDevice(...(args as [string | null])),
+    setFocusedDevice: (id: string | null) => mockSetFocusedDevice(id),
   },
 }));
 

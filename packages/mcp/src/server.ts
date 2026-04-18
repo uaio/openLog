@@ -286,113 +286,119 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
             role: 'user' as const,
             content: {
               type: 'text' as const,
-              text: `# openLog Development Workflow (auto-loaded)
+              text: `# openLog — AI Real-Device Debugging Workflow
 
-When developing H5 pages, follow this workflow to verify every key node on real devices via openLog.
+You have access to a real device monitoring system (openLog). Use it to verify code on real phones, diagnose errors, and analyze app state — all without needing to see the screen.
 
 ---
 
-## Step 0: Auto-detect & Inject SDK (ALWAYS do this first)
+## Setup (run once per session)
 
-Before any monitoring/debugging, call \`ensure_sdk\` to check if the user's project has the openLog SDK:
+1. Call \`start_openlog\` — starts server + auto-detects SDK status
+2. If SDK not detected: inject it (see ensure_sdk output for framework-specific code)
+3. Call \`list_devices\` — confirm device is connected
+4. If multiple devices: call \`focus_device(deviceId)\` to lock target
 
+If no device appears: tell user to open the page on their phone (same WiFi as this machine).
+
+---
+
+## Scenario A: Write Code + Verify on Real Device
+
+**When**: You're building a feature and need to confirm it actually works on a real phone.
+
+### Workflow:
+1. **Write code** with \`@openlog[checkpoint]\` logs at key nodes:
+\`\`\`js
+console.log('@openlog[checkpoint] featureName: step', { data })
 \`\`\`
-ensure_sdk(mode: "auto")
+Place checkpoints at: user actions, before/after async calls, state changes, error catches.
+
+2. **Ask user to test**: "Please run [feature] on your phone"
+
+3. **Verify**: call \`get_checkpoints(feature: "featureName")\`
+   - ✅ All nodes present + data correct → feature works
+   - ❌ Node missing → code before that node didn't execute
+   - ❌ Data mismatch → logic error
+
+4. **On failure**: call \`get_console_logs(level: "error")\` to find errors, fix, re-verify
+
+5. **After passing**: remove ALL \`@openlog\` log lines from code (mandatory — they are dev-only)
+
+---
+
+## Scenario B: Diagnose Errors
+
+**When**: User reports "something is wrong" / "white screen" / "feature doesn't work" on their phone.
+
+### Workflow:
+1. **Get errors**: \`get_console_logs(level: "error")\` — check for JS exceptions
+2. **Check network**: \`get_network_requests()\` — look for failed requests (status 4xx/5xx, missing responses)
+3. **Check storage**: \`get_storage()\` — verify auth tokens, user state, cached data
+4. **Deep analysis**: \`ai_analyze()\` — automated issue detection + recommendations
+5. **If needed**: \`execute_js("document.querySelector('.xxx')?.textContent")\` — inspect DOM state remotely
+
+### Common patterns:
+| Symptom | First tool to call |
+|---------|-------------------|
+| White screen | \`get_console_logs(level: "error")\` — likely uncaught exception |
+| API not working | \`get_network_requests()\` — check status codes and response bodies |
+| Login broken | \`get_storage()\` — check if token exists and is valid |
+| Page slow | \`health_check()\` or \`ai_analyze()\` — performance issues |
+| Layout broken | \`take_screenshot()\` — see what user sees |
+
+---
+
+## Scenario C: Proactive Analysis
+
+**When**: You want to understand the current state of the app, optimize performance, or audit behavior.
+
+### Available tools:
+| Tool | Use when |
+|------|----------|
+| \`ai_analyze()\` | Comprehensive diagnostics — errors + performance + health combined |
+| \`health_check()\` | Quick score: is the page healthy? (errors/memory/vitals/long tasks) |
+| \`get_console_logs()\` | Browse all log output (supports level filter) |
+| \`get_network_requests()\` | See all API calls (filter by method/URL pattern/status) |
+| \`get_storage()\` | Read localStorage/sessionStorage/cookie state |
+| \`get_page_context()\` | Get current URL, page title, DOM structure |
+| \`take_screenshot()\` | Capture what the user currently sees |
+| \`execute_js(code)\` | Run arbitrary JS on the phone (inspect state, trigger actions) |
+
+### Background monitoring:
+For continuous watching (e.g., while user navigates multiple pages):
+\`\`\`
+start_monitor(type: "error")  → monitorId
+poll_monitor(monitorId)       → new events since last poll
+stop_monitor(monitorId)       → cleanup
 \`\`\`
 
-- If \`detected: true\` → SDK is ready, proceed to Step 1.
-- If \`detected: false\` → Read the \`instructions\` and \`injectionCode\` fields:
-  - For **HTML projects**: call \`ensure_sdk(mode: "inject")\` to auto-inject the CDN snippet.
-  - For **npm projects** (React/Vue/Next.js/etc): install the package (\`npm install @openlog/sdk\`) and insert the init code into the entry file yourself.
-  - The \`serverAddresses\` field lists all available LAN IPs for mobile connection.
-
-**Important**: The SDK injection is for development only. CDN script tags should be removed after debugging. npm dependencies can stay but \`OpenLog.init()\` should be removed or guarded by \`process.env.NODE_ENV !== 'production'\`.
-
 ---
 
-## Step 1: Start Monitoring
-
-Call \`start_openlog\` — it will start the server AND auto-run ensure_sdk detection.
-
----
-
-## Core Principle
-
-**Embed @openlog checkpoint logs at key code nodes → User runs the flow on device → Read & verify → Clean up after passing**
-
-This is more direct than unit tests: verify real behavior on real devices.
-
----
-
-## Checkpoint Format
+## Checkpoint Format Reference
 
 \`\`\`js
-// Format: console.log('@openlog[checkpoint] featureName: step description', { optional data })
-console.log('@openlog[checkpoint] login: user clicked login', { username })
-console.log('@openlog[checkpoint] login: API request sent', { url: '/api/login', method: 'POST' })
+console.log('@openlog[checkpoint] login: clicked submit', { username })
+console.log('@openlog[checkpoint] login: API request sent')
 console.log('@openlog[checkpoint] login: response received', { status: 200 })
-console.log('@openlog[checkpoint] login: token saved', { hasToken: !!localStorage.getItem('token') })
+console.log('@openlog[checkpoint] login: token saved', { hasToken: true })
+console.log('@openlog[checkpoint] login: navigated to home')
 \`\`\`
 
-**Rules:**
-- Prefix is always \`@openlog[checkpoint]\` — openLog specifically recognizes this
-- Name checkpoints by feature (login / cart / payment)
-- Describe each step clearly
-- Attach data to help verify correctness
-- **All @openlog logs MUST be removed after verification passes**
+Rules:
+- Prefix: \`@openlog[checkpoint]\` (openLog recognizes this specifically)
+- Format: \`featureName: step description\`
+- Always remove after verification — these MUST NOT ship to production
 
 ---
 
-## Development Steps
+## Key Reminders
 
-### 1. Before coding
-Confirm monitoring is started (\`start_openlog\` or /openlog:start), device is online: call \`list_devices\`
-- If multiple devices connected, call \`focus_device(deviceId)\` to lock the target device for this session
-- All subsequent tool calls will auto-target the focused device
-
-### 2. While coding (embed checkpoints)
-Add @openlog checkpoint logs at every key node:
-- User action triggers (click, submit)
-- Async operation start (before API call)
-- Async operation complete (after response)
-- State changes (data write, page navigation)
-- Error handling (in catch blocks)
-
-### 3. Ask user to execute
-Tell user: "Please run the [feature] flow on your phone"
-
-### 4. Verify
-\`\`\`
-get_checkpoints(feature: "login")
-\`\`\`
-Returns: which nodes executed, whether attached data matches expectations, missing nodes
-
-### 5. Judge results
-- ✅ All expected nodes present with correct data → Verified → **Execute cleanup**
-- ❌ A node is missing → Code before that node has issues → Fix and re-verify
-- ❌ Attached data doesn't match → Logic error → Fix and re-verify
-
-### 6. On errors
-\`\`\`
-get_console_logs(level: "error")
-\`\`\`
-Cross-reference with checkpoint chain to locate the error
-
-### 7. After verification passes — Clean up @openlog logs ⚠️ MANDATORY
-Search and delete all console.log lines containing \`@openlog\`:
-\`\`\`
-grep -r "@openlog" src/ --include="*.js" --include="*.ts" --include="*.vue" --include="*.tsx" --include="*.jsx" -l
-\`\`\`
-Delete all \`console.log('@openlog...')\` lines from each file.
-
-**For CDN-injected SDK**: also remove the \`<script>\` tags that were added by ensure_sdk.
-**For npm-installed SDK**: keep the dependency but remove or guard \`OpenLog.init()\`.
-
-These are development-time debug logs and must NOT ship to production.
-
----
-
-**Remember: @openlog logs are dev tools — clean up after verification, never ship to production.**`
+- **@openlog logs are dev tools** — always clean up after verification passes
+- **Device must be on same WiFi** — if list_devices is empty, remind user
+- **All tools accept optional deviceId** — omit it to auto-select (or use focus_device)
+- **execute_js is powerful** — use it to read DOM, trigger clicks, check JS state remotely
+- **Screenshots return base64** — useful when you need to "see" the page`
             }
           }
         ]
