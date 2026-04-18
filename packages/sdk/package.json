@@ -1,5 +1,5 @@
 {
-  "name": "openlog",
+  "name": "@openlog/sdk",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -12,6 +12,8 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build --config build/vite.config.ts",

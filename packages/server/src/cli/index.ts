@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 
 export interface CLIOptions {
   port?: number;
+  webDistPath?: string;
 }
 
 export async function start(options: CLIOptions = {}) {
@@ -27,9 +28,8 @@ export async function start(options: CLIOptions = {}) {
   const currentFilename = fileURLToPath(import.meta.url);
   const currentDirname = dirname(currentFilename);
 
-  // 提供静态文件：指向 web 包的 dist 目录
-  // 从 packages/server/dist/cli/ 向上三级到 packages/，然后进入 web/dist
-  const webDistPath = join(currentDirname, '../../../web/dist');
+  // 提供静态文件：优先使用传入的路径，否则回退到 monorepo 中 web/dist（开发模式）
+  const webDistPath = options.webDistPath ?? join(currentDirname, '../../../web/dist');
   app.use(express.static(webDistPath));
 
   // 全局异常处理
@@ -127,7 +127,7 @@ ${networkLines.split('\n').map(l => `│    ${l}`).join('\n')}
 ├─────────────────────────────────────────────────────┤
 │  SDK 接入（选择上方对应网络的 server 地址粘贴）       │
 │                                                     │
-│  <script src="https://unpkg.com/openlog@latest      │
+│  <script src="https://unpkg.com/@openlog/sdk@latest  │
 │    /dist/openlog.iife.js"></script>                 │
 │  <script>                                           │
 │    OpenLog.init({                                   │
@@ -141,9 +141,9 @@ ${networkLines.split('\n').map(l => `│    ${l}`).join('\n')}
 │     从上方局域网列表选择手机可达的网卡地址替换 server │
 ├─────────────────────────────────────────────────────┤
 │  MCP 配置（AI 工具接入）                             │
-│    运行: npx openlog init  自动写入 MCP 配置         │
+│    运行: npx @openlog/cli init  自动写入 MCP 配置     │
 └─────────────────────────────────────────────────────┘
-  按 Ctrl+C 停止   端口: ${port}   (切换端口: openlog -p <port>)
+  按 Ctrl+C 停止   端口: ${port}   (切换端口: npx @openlog/cli -p <port>)
 `);
 
       resolve();

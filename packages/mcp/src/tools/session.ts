@@ -1,19 +1,21 @@
 import { startEmbeddedServer, stopEmbeddedServer } from '../launcher.js';
 import { wsClient } from '../ws-client.js';
 import { API_BASE_URL } from '../config.js';
+import { ensureSdk } from './ensure_sdk.js';
 
 export const startOpenlog = {
   name: 'start_openlog',
-  description: '启动 openLog 监控服务并建立 WebSocket 长连接。在需要监控 H5 页面数据时调用，启动后 SDK 即可连入。',
+  description: 'Start the openLog monitoring server, establish WebSocket connection, and auto-detect whether the user project has the SDK integrated. Returns server addresses and SDK status.',
   inputSchema: {
     type: 'object' as const,
     properties: {
-      port: { type: 'number' as const, description: '服务端口号（默认 38291）' },
-      openBrowser: { type: 'boolean' as const, description: '是否自动打开浏览器监控面板（默认 true）' }
+      port: { type: 'number' as const, description: 'Server port (default 38291)' },
+      openBrowser: { type: 'boolean' as const, description: 'Auto-open browser panel (default true)' },
+      projectDir: { type: 'string' as const, description: 'User project directory to check for SDK (defaults to cwd)' }
     },
     required: []
   },
-  async execute(args: { port?: number; openBrowser?: boolean }): Promise<unknown> {
+  async execute(args: { port?: number; openBrowser?: boolean; projectDir?: string }): Promise<unknown> {
     const { url } = await startEmbeddedServer({
       port: args.port,
       openBrowser: args.openBrowser ?? true
@@ -21,10 +23,19 @@ export const startOpenlog = {
 
     wsClient.connect(API_BASE_URL);
 
+    // Auto-detect SDK status in the user's project
+    const sdkStatus = await ensureSdk.execute({
+      projectDir: args.projectDir,
+      mode: 'auto'
+    });
+
     return {
       status: 'started',
       url,
-      message: `openLog 服务已启动：${url}，WebSocket 连接已建立。请在 H5 页面初始化 SDK 后使用 list_devices 查看设备。`
+      sdkStatus,
+      message: sdkStatus.detected
+        ? `openLog server started at ${url}. SDK is already integrated. Use list_devices to check connected devices.`
+        : `openLog server started at ${url}. SDK is NOT yet integrated in the project. Follow the instructions in sdkStatus to inject it.`
     };
   }
 };

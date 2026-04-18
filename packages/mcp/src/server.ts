@@ -1,7 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, ListPromptsRequestSchema, GetPromptRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport, verifyCheckpoint, startMonitor, pollMonitor, stopMonitor, listMonitors, initDevSession, startOpenlog, stopOpenlog, getCheckpoints } from './tools/index.js';
+import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport, verifyCheckpoint, startMonitor, pollMonitor, stopMonitor, listMonitors, initDevSession, startOpenlog, stopOpenlog, getCheckpoints, ensureSdk } from './tools/index.js';
 import { startEmbeddedServer, stopEmbeddedServer, type EmbeddedServerConfig } from './launcher.js';
 import { wsClient } from './ws-client.js';
 import { API_BASE_URL } from './config.js';
@@ -84,7 +84,8 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
     },
     {
       capabilities: {
-        tools: {}
+        tools: {},
+        prompts: {}
       }
     }
   );
@@ -249,6 +250,11 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
           name: getCheckpoints.name,
           description: getCheckpoints.description,
           inputSchema: getCheckpoints.inputSchema
+        },
+        {
+          name: ensureSdk.name,
+          description: ensureSdk.description,
+          inputSchema: ensureSdk.inputSchema
         }
       ]
     };
@@ -266,127 +272,120 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
     };
   });
 
-  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     if (request.params.name === 'openlog_dev_workflow') {
       return {
-        description: 'openLog H5 开发工作流 — AI 埋点验证 SOP',
+        description: 'openLog H5 development workflow — auto-detection + checkpoint verification SOP',
         messages: [
           {
             role: 'user' as const,
             content: {
               type: 'text' as const,
-              text: `# openLog 开发工作流（自动加载）
+              text: `# openLog Development Workflow (auto-loaded)
 
-你在开发 H5 页面功能时，必须遵循以下工作流，通过 openLog 在真实设备上验证每个关键节点。
-
----
-
-## 核心原则
-
-**在代码关键节点埋入 @openlog checkpoint 日志 → 用户跑一遍 → 读取验证 → 验证通过后清除**
-
-这比写单元测试更直接：在真实设备上验证真实行为。
+When developing H5 pages, follow this workflow to verify every key node on real devices via openLog.
 
 ---
 
-## 标准埋点格式
+## Step 0: Auto-detect & Inject SDK (ALWAYS do this first)
 
-\`\`\`js
-// 格式：console.log('@openlog[checkpoint] 节点名: 描述', { 可选附加数据 })
-console.log('@openlog[checkpoint] login: 用户点击登录按钮')
-console.log('@openlog[checkpoint] login: 接口请求发出', { url: '/api/login', method: 'POST' })
-console.log('@openlog[checkpoint] login: 响应成功', { status: 200 })
-console.log('@openlog[checkpoint] login: token 已写入', { hasToken: !!localStorage.getItem('token') })
+Before any monitoring/debugging, call \`ensure_sdk\` to check if the user's project has the openLog SDK:
+
+\`\`\`
+ensure_sdk(mode: "auto")
 \`\`\`
 
-**规则：**
-- 前缀固定为 \`@openlog[checkpoint]\`，openLog 专门识别此前缀
-- 节点名用功能名命名（login / cart / payment 等）
-- 描述清晰说明当前步骤
-- 附加数据帮助判断状态是否正确
-- **所有带 @openlog 前缀的 log 在验证完成后必须清除**
+- If \`detected: true\` → SDK is ready, proceed to Step 1.
+- If \`detected: false\` → Read the \`instructions\` and \`injectionCode\` fields:
+  - For **HTML projects**: call \`ensure_sdk(mode: "inject")\` to auto-inject the CDN snippet.
+  - For **npm projects** (React/Vue/Next.js/etc): install the package (\`npm install @openlog/sdk\`) and insert the init code into the entry file yourself.
+  - The \`serverAddresses\` field lists all available LAN IPs for mobile connection.
+
+**Important**: The SDK injection is for development only. CDN script tags should be removed after debugging. npm dependencies can stay but \`OpenLog.init()\` should be removed or guarded by \`process.env.NODE_ENV !== 'production'\`.
 
 ---
 
-## 开发步骤
+## Step 1: Start Monitoring
 
-### 1. 开始前
-确认监控已启动（/openlog:start），有设备在线：调用 list_devices
+Call \`start_openlog\` — it will start the server AND auto-run ensure_sdk detection.
 
-### 2. 写代码时（同步埋点）
-在每个关键节点加入 @openlog checkpoint 日志：
-- 用户操作触发点（点击、提交）
-- 异步操作发起点（接口请求前）
-- 异步操作完成点（接口响应后）
-- 状态变更点（数据写入、页面跳转）
-- 异常处理点（catch 块里）
+---
 
-### 3. 请用户执行操作
-告知用户："请在手机上走一遍【功能名称】流程"
+## Core Principle
 
-### 4. 读取验证
+**Embed @openlog checkpoint logs at key code nodes → User runs the flow on device → Read & verify → Clean up after passing**
+
+This is more direct than unit tests: verify real behavior on real devices.
+
+---
+
+## Checkpoint Format
+
+\`\`\`js
+// Format: console.log('@openlog[checkpoint] featureName: step description', { optional data })
+console.log('@openlog[checkpoint] login: user clicked login', { username })
+console.log('@openlog[checkpoint] login: API request sent', { url: '/api/login', method: 'POST' })
+console.log('@openlog[checkpoint] login: response received', { status: 200 })
+console.log('@openlog[checkpoint] login: token saved', { hasToken: !!localStorage.getItem('token') })
+\`\`\`
+
+**Rules:**
+- Prefix is always \`@openlog[checkpoint]\` — openLog specifically recognizes this
+- Name checkpoints by feature (login / cart / payment)
+- Describe each step clearly
+- Attach data to help verify correctness
+- **All @openlog logs MUST be removed after verification passes**
+
+---
+
+## Development Steps
+
+### 1. Before coding
+Confirm monitoring is started (\`start_openlog\` or /openlog:start), device is online: call \`list_devices\`
+
+### 2. While coding (embed checkpoints)
+Add @openlog checkpoint logs at every key node:
+- User action triggers (click, submit)
+- Async operation start (before API call)
+- Async operation complete (after response)
+- State changes (data write, page navigation)
+- Error handling (in catch blocks)
+
+### 3. Ask user to execute
+Tell user: "Please run the [feature] flow on your phone"
+
+### 4. Verify
 \`\`\`
 get_checkpoints(feature: "login")
 \`\`\`
-返回：哪些节点被执行、附加数据是否符合预期、缺失的节点
+Returns: which nodes executed, whether attached data matches expectations, missing nodes
 
-### 5. 判断结果
-- ✅ 所有预期节点出现且数据正确 → 功能验证通过 → **执行清除步骤**
-- ❌ 某节点缺失 → 该节点前的代码有问题 → 修复后重新验证
-- ❌ 附加数据不符合预期 → 逻辑错误 → 修复后重新验证
+### 5. Judge results
+- ✅ All expected nodes present with correct data → Verified → **Execute cleanup**
+- ❌ A node is missing → Code before that node has issues → Fix and re-verify
+- ❌ Attached data doesn't match → Logic error → Fix and re-verify
 
-### 6. 有报错时
+### 6. On errors
 \`\`\`
 get_console_logs(level: "error")
 \`\`\`
-结合 checkpoint 链路定位报错位置
+Cross-reference with checkpoint chain to locate the error
 
-### 7. 验证通过后 — 清除 @openlog 日志 ⚠️ 必须执行
-验证通过后，在代码文件中搜索并删除所有包含 \`@openlog\` 的 console.log 行：
+### 7. After verification passes — Clean up @openlog logs ⚠️ MANDATORY
+Search and delete all console.log lines containing \`@openlog\`:
 \`\`\`
-grep -r "@openlog" src/ --include="*.js" --include="*.ts" --include="*.vue" -l
+grep -r "@openlog" src/ --include="*.js" --include="*.ts" --include="*.vue" --include="*.tsx" --include="*.jsx" -l
 \`\`\`
-逐文件删除所有 \`console.log('@openlog...')\` 行。
-这些是开发期调试日志，不应出现在生产代码中。
+Delete all \`console.log('@openlog...')\` lines from each file.
+
+**For CDN-injected SDK**: also remove the \`<script>\` tags that were added by ensure_sdk.
+**For npm-installed SDK**: keep the dependency but remove or guard \`OpenLog.init()\`.
+
+These are development-time debug logs and must NOT ship to production.
 
 ---
 
-## 典型示例
-
-**埋点：**
-\`\`\`js
-async function handleLogin(username, password) {
-  console.log('@openlog[checkpoint] login: 开始登录', { username })
-  try {
-    console.log('@openlog[checkpoint] login: 发起请求')
-    const res = await api.login(username, password)
-    console.log('@openlog[checkpoint] login: 请求成功', { status: res.status })
-    localStorage.setItem('token', res.data.token)
-    console.log('@openlog[checkpoint] login: token 已保存', { hasToken: true })
-    router.push('/home')
-    console.log('@openlog[checkpoint] login: 跳转首页')
-  } catch (e) {
-    console.log('@openlog[checkpoint] login: 请求失败', { error: e.message })
-  }
-}
-\`\`\`
-
-**验证通过后清除，代码变为：**
-\`\`\`js
-async function handleLogin(username, password) {
-  try {
-    const res = await api.login(username, password)
-    localStorage.setItem('token', res.data.token)
-    router.push('/home')
-  } catch (e) {
-    // handle error
-  }
-}
-\`\`\`
-
----
-
-**记住：@openlog 日志是开发期工具，验证通过即清除，不进入生产代码。**`
+**Remember: @openlog logs are dev tools — clean up after verification, never ship to production.**`
             }
           }
         ]
@@ -608,6 +607,11 @@ async function handleLogin(username, password) {
 
         case 'get_checkpoints': {
           const r = await getCheckpoints.execute(args as { deviceId?: string; feature?: string; limit?: number });
+          return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
+        }
+
+        case 'ensure_sdk': {
+          const r = await ensureSdk.execute(args as { projectDir?: string; mode?: 'check' | 'inject' | 'auto'; server?: string });
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 

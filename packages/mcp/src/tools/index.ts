@@ -18,3 +18,4 @@ export { startMonitor, pollMonitor, stopMonitor, listMonitors } from './monitor.
 export { initDevSession } from './init_dev_session.js';
 export { startOpenlog, stopOpenlog } from './session.js';
 export { getCheckpoints } from './get_checkpoints.js';
+export { ensureSdk } from './ensure_sdk.js';

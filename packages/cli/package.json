@@ -1,0 +1,25 @@
+{
+  "name": "@openlog/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "openlog": "./bin/openlog.js"
+  },
+  "files": ["bin", "dist", "public"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "clean": "rm -rf dist public",
+    "prebuild": "npm run clean",
+    "build": "tsc && npm run copy-web",
+    "copy-web": "node scripts/copy-web.cjs",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@openlog/server": "workspace:*",
+    "@openlog/mcp": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
+  }
+}

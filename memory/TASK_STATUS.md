@@ -1,40 +1,25 @@
 # 任务状态
 
-> 最后更新: 2026-03-21
+> 最后更新: 2026-04-18
 
-## 已完成任务
+## ✅ 已完成
 
-### ✅ Eruda 集成 (2026-03-21)
-- ✅ 安装 eruda 依赖
-- ✅ 修改 AIConsole 类集成 Eruda 初始化
-- ✅ 添加 ErudaConfig 类型定义
-- ✅ 删除自定义 FloatingBall、DragHandler、ClickDetector 组件
-- ✅ 更新测试文件
-- ✅ Clone eruda 源码到 packages/eruda 用于定制化
-- ✅ 修复 eruda 构建脚本和依赖
-- ✅ 使用动态导入加载 eruda UMD 模块
-- ✅ 验证功能正常
+### Eruda 集成 (2026-03-21)
+- 替换自研浮球 → Eruda 移动端调试面板
+- ErudaPlugin 订阅 DataBus，overrideConsole: false 防止双重捕获
+- 删除自定义 FloatingBall / DragHandler / ClickDetector
 
-### ✅ 悬浮球基础实现（已删除）
-- ~~FloatingBall 主组件~~
-- ~~DragHandler 拖拽处理~~
-- ~~ClickDetector 连击检测~~
-- ~~CSS 样式和动画~~
+### Claude Code 生态集成 (2026-04-18)
+- MCP SDK 升级 ^0.5.0 → ^1.29.0（+ zod peer dep）
+- 新增 `ensure_sdk` MCP 工具（自动检测框架 + SDK 注入）
+- `start_openlog` 增强：启动时自动调用 ensure_sdk 检测
+- MCP Prompt 重写：包含 Step 0 自动检测 SDK
+- 新增 `/openlog:setup` slash command（一键从零到就绪）
+- 文档整理：新增 debug-flow-guide.md，清理过时文档
 
-### ✅ Bug 修复
-- ✅ 移除 left/right/top 的 !important 标记
-- ✅ 吸附时清除内联位置样式
-- ✅ 拖动与点击冲突解决
-- ✅ 边界检测和自动重置
-- ✅ 日志显示顺序修正
+## 📋 待处理
 
-## 待处理事项
-
-### 🧪 测试相关
-- [x] 验证 Eruda 悬浮球功能正常
-- [ ] 添加单元测试
-- [ ] 添加 E2E 测试
-
-### 📚 文档相关
-- [ ] 补充 API 文档
-- [ ] 添加 Eruda 配置说明
+- [ ] 单元测试补充
+- [ ] E2E 测试
+- [ ] eruda 包 webpack 构建修复
+- [ ] API 文档补充
