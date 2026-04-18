@@ -13,17 +13,23 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "bin"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "dev": "tsc --watch",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@openlog/types": "workspace:*",
-    "@openlog/server": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@openlog/server": "workspace:*",
+    "@openlog/types": "workspace:*",
     "open": "^10.0.0",
     "ws": "^8.16.0"
   },
@@ -31,11 +37,14 @@
     "zod": "^3.25.0"
   },
   "peerDependenciesMeta": {
-    "zod": { "optional": true }
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/ws": "^8.5.0",
+    "vitest": "^1.6.0",
     "zod": "^3.25.0"
   }
 }

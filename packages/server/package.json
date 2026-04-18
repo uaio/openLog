@@ -18,12 +18,17 @@
       "import": "./dist/cli/init.js"
     }
   },
-  "files": ["dist"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "dev": "tsc --watch",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "test": "vitest run"
   },
   "dependencies": {
     "@openlog/types": "workspace:*",
@@ -34,6 +39,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.0",
-    "@types/ws": "^8.5.0"
+    "@types/ws": "^8.5.0",
+    "vitest": "^1.6.0"
   }
 }
