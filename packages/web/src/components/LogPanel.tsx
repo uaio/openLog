@@ -119,8 +119,8 @@ export function LogPanel({ deviceId }: LogPanelProps) {
       const result = await api.deleteLogs(deviceId);
       clearLogs();
     } catch (error) {
-      console.error('[LogPanel] 清空历史日志失败:', error);
-      alert('清空历史日志失败：' + (error instanceof Error ? error.message : '未知错误'));
+      console.error('[LogPanel] clear history failed:', error);
+      alert(t.logPanel.clearHistoryFailed + '：' + (error instanceof Error ? error.message : t.common.unknownError));
     } finally {
       setClearingHistory(false);
     }
@@ -271,7 +271,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
               e.currentTarget.style.color = '#ff4d4f';
             }}
           >
-            {clearingHistory ? '清空中...' : '清空历史'}
+            {clearingHistory ? t.logPanel.clearing : t.logPanel.clearHistory}
           </button>
         </div>
       </div>
@@ -343,7 +343,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           value={jsInput}
           onChange={(e) => setJsInput(e.target.value)}
           onKeyDown={handleJsKeyDown}
-          placeholder={deviceId ? '输入 JS 代码，按 Enter 在手机端执行...' : '请先选择设备'}
+          placeholder={deviceId ? t.logPanel.jsPlaceholder : t.logPanel.jsPlaceholderNoDevice}
           disabled={!deviceId}
           style={styles.jsInput}
           spellCheck={false}
@@ -357,7 +357,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             ...(!deviceId || !jsInput.trim() ? styles.jsRunButtonDisabled : {}),
           }}
         >
-          执行
+          {t.logPanel.run}
         </button>
       </div>
 
@@ -369,7 +369,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={styles.screenshotHeader}>
-              <span>🤖 AI 日志分析</span>
+              <span>🤖 {t.logPanel.aiLogAnalysis}</span>
               <button style={styles.screenshotClose} onClick={() => setAiModal(false)}>
                 ✕
               </button>

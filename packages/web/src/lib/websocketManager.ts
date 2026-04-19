@@ -1,6 +1,7 @@
 import { WebSocketMessage } from '../hooks/useWebSocket.js';
 
 type MessageHandler = (message: WebSocketMessage) => void;
+type StateChangeHandler = (state: 'connecting' | 'connected' | 'disconnected') => void;
 
 class WebSocketManager {
   private ws: WebSocket | null = null;
@@ -9,6 +10,7 @@ class WebSocketManager {
   private reconnectCount = 0;
   private maxReconnectAttempts = Infinity;
   private handlers = new Set<MessageHandler>();
+  private stateHandlers = new Set<StateChangeHandler>();
   private connectionState: 'connecting' | 'connected' | 'disconnected' = 'disconnected';
 
   constructor(url = 'ws://localhost:38291') {
@@ -21,11 +23,11 @@ class WebSocketManager {
     }
 
     if (this.reconnectCount >= this.maxReconnectAttempts) {
-      console.error('WebSocket: 达到最大重连次数，停止重连');
       return;
     }
 
     this.connectionState = 'connecting';
+    this.notifyStateChange();
 
     const ws = new WebSocket(this.url);
     this.ws = ws;
@@ -41,8 +43,8 @@ class WebSocketManager {
       try {
         const message = JSON.parse(event.data) as WebSocketMessage;
         this.handlers.forEach((handler) => handler(message));
-      } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+      } catch {
+        // ignore parse errors
       }
     };
 
@@ -57,8 +59,8 @@ class WebSocketManager {
       }
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    ws.onerror = () => {
+      // error is followed by close event
     };
   }
 
@@ -76,18 +78,22 @@ class WebSocketManager {
   subscribe(handler: MessageHandler) {
     this.handlers.add(handler);
 
-    // 如果还没有连接，自动连接
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       this.connect();
     }
 
-    // 返回取消订阅函数
     return () => {
       this.handlers.delete(handler);
-      // 如果没有订阅者了，断开连接
       if (this.handlers.size === 0) {
         this.disconnect();
       }
+    };
+  }
+
+  onStateChange(handler: StateChangeHandler): () => void {
+    this.stateHandlers.add(handler);
+    return () => {
+      this.stateHandlers.delete(handler);
     };
   }
 
@@ -102,7 +108,7 @@ class WebSocketManager {
   }
 
   private notifyStateChange() {
-    // 可以在这里添加状态变化通知逻辑
+    this.stateHandlers.forEach((handler) => handler(this.connectionState));
   }
 }
 

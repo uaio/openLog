@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../api/client.js';
+import { useI18n } from '../i18n/index.js';
 
 interface MockPanelProps {
   deviceId?: string;
@@ -29,6 +30,7 @@ export function MockPanel({ deviceId }: MockPanelProps) {
   const [msg, setMsg] = useState('');
   const [rules, setRules] = useState<MockRule[]>([]);
   const [loadingRules, setLoadingRules] = useState(false);
+  const { t } = useI18n();
 
   // 加载已有规则
   const loadRules = useCallback(async () => {
@@ -88,7 +90,7 @@ export function MockPanel({ deviceId }: MockPanelProps) {
 
   const handleClearAll = useCallback(async () => {
     if (!deviceId) return;
-    if (!confirm('清空该设备所有 Mock 规则?')) return;
+    if (!confirm(t.mockPanel.clearAllConfirm)) return;
     try {
       await api.delete(`/api/devices/${deviceId}/mocks`);
       setRules([]);

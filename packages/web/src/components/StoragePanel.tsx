@@ -1,5 +1,6 @@
 import { CSSProperties, useState, useCallback } from 'react';
 import { useStorage } from '../hooks/useStorage.js';
+import { useI18n } from '../i18n/index.js';
 import { api } from '../api/client.js';
 
 interface StoragePanelProps {
@@ -23,6 +24,7 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
   const [setKey, setSetKey] = useState('');
   const [setValue, setSetValue] = useState('');
   const [setLoading, setSetLoading] = useState(false);
+  const { t } = useI18n();
 
   const storageType = activeTab === 'sessionStorage' ? 'session' : 'local';
 
@@ -47,7 +49,7 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
 
   const handleClearStorage = useCallback(async () => {
     if (!deviceId || activeTab === 'cookies') return;
-    if (!window.confirm(`确认清空手机端 ${activeTab}？`)) return;
+    if (!window.confirm(t.storagePanel.clearConfirm)) return;
     try {
       await api.post(`/api/devices/${deviceId}/storage/clear`, { storageType });
       setTimeout(refresh, 300);

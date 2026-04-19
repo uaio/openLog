@@ -27,6 +27,11 @@ export interface Locale {
     selectDevice: string;
     online: string;
     offline: string;
+    connected: string;
+    connecting: string;
+    disconnected: string;
+    operationFailed: string;
+    unknownError: string;
   };
   // Device list
   deviceList: {
@@ -39,10 +44,16 @@ export interface Locale {
     historicalLoaded: string;
     clearHistory: string;
     clearHistoryConfirm: string;
+    clearHistoryFailed: string;
     refreshPage: string;
     analysis: string;
     all: string;
     search: string;
+    jsPlaceholder: string;
+    jsPlaceholderNoDevice: string;
+    clearing: string;
+    run: string;
+    aiLogAnalysis: string;
   };
   // Network panel
   networkPanel: {
@@ -87,6 +98,22 @@ export interface Locale {
     title: string;
     addRule: string;
     clearAll: string;
+    clearAllConfirm: string;
     activeRules: string;
+  };
+  // DOM panel
+  domPanel: {
+    title: string;
+    waitingHint: string;
+  };
+  // PerfRun panel
+  perfRunPanel: {
+    title: string;
+    start: string;
+    stop: string;
+    history: string;
+    startFailed: string;
+    stopFailed: string;
+    running: string;
   };
 }

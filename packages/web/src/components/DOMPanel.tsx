@@ -1,5 +1,6 @@
 import { CSSProperties, useState } from 'react';
 import { useDOM } from '../hooks/useDOM.js';
+import { useI18n } from '../i18n/index.js';
 import type { DOMNode } from '../types/index.js';
 
 interface DOMPanelProps {
@@ -89,13 +90,14 @@ function DOMNodeView({ node, depth = 0 }: DOMNodeViewProps) {
 
 export function DOMPanel({ deviceId }: DOMPanelProps) {
   const { snapshot, loading, refresh } = useDOM(deviceId);
+  const { t } = useI18n();
 
   if (!deviceId) {
     return (
       <div style={styles.container}>
         <div style={styles.placeholder}>
           <div style={styles.placeholderIcon}>🌲</div>
-          <div style={styles.placeholderText}>从左侧选择设备查看 DOM 结构</div>
+          <div style={styles.placeholderText}>{t.common.selectDevice}</div>
         </div>
       </div>
     );
@@ -118,7 +120,7 @@ export function DOMPanel({ deviceId }: DOMPanelProps) {
             onClick={refresh}
             disabled={loading}
           >
-            🔄 刷新
+            🔄 {t.common.refresh}
           </button>
         </div>
       </div>
@@ -133,11 +135,11 @@ export function DOMPanel({ deviceId }: DOMPanelProps) {
 
       {/* DOM Tree */}
       <div style={styles.tree}>
-        {loading && <div style={styles.loadingWrap}>⏳ 加载中...</div>}
+        {loading && <div style={styles.loadingWrap}>⏳ {t.common.loading}</div>}
         {!loading && !snapshot && (
           <div style={styles.emptyWrap}>
             <span style={styles.emptyIcon}>📡</span>
-            <span>等待设备上报 DOM，点击「刷新」触发采集</span>
+            <span>{t.domPanel.waitingHint}</span>
           </div>
         )}
         {!loading && snapshot && <DOMNodeView node={snapshot.dom} depth={0} />}

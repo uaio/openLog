@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DeviceList } from './components/DeviceList.js';
 import { LogPanel } from './components/LogPanel.js';
 import { NetworkPanel } from './components/NetworkPanel.js';
@@ -12,13 +12,19 @@ import { HealthPanel } from './components/HealthPanel.js';
 import { AIAnalysisPanel } from './components/AIAnalysisPanel.js';
 import { Tabs, type Tab } from './components/Tabs.js';
 import { useI18n } from './i18n/index.js';
+import { websocketManager } from './lib/websocketManager.js';
 import type { Device } from './types/index.js';
 import './styles/global.css';
 
 function App() {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [activeTab, setActiveTab] = useState('console');
+  const [wsState, setWsState] = useState(websocketManager.getConnectionState());
   const { t } = useI18n();
+
+  useEffect(() => {
+    return websocketManager.onStateChange(setWsState);
+  }, []);
 
   const handleSelectDevice = (device: Device) => {
     setSelectedDevice(device);
@@ -97,12 +103,23 @@ function App() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>openLog Web Viewer</h1>
-        <p style={styles.subtitle}>
-          {selectedDevice
-            ? `${selectedDevice.ua.slice(0, 50)}${selectedDevice.ua.length > 50 ? '...' : ''}`
-            : t.common.selectDevice}
-        </p>
+        <div style={styles.headerLeft}>
+          <h1 style={styles.title}>openLog Web Viewer</h1>
+          <p style={styles.subtitle}>
+            {selectedDevice
+              ? `${selectedDevice.ua.slice(0, 50)}${selectedDevice.ua.length > 50 ? '...' : ''}`
+              : t.common.selectDevice}
+          </p>
+        </div>
+        <div style={styles.statusBadge}>
+          <span style={{
+            ...styles.statusDot,
+            backgroundColor: wsState === 'connected' ? '#52c41a' : wsState === 'connecting' ? '#faad14' : '#ff4d4f',
+          }} />
+          <span style={styles.statusText}>
+            {wsState === 'connected' ? 'Connected' : wsState === 'connecting' ? 'Connecting...' : 'Disconnected'}
+          </span>
+        </div>
       </div>
 
       <div style={styles.content}>
@@ -129,10 +146,16 @@ const styles = {
     backgroundColor: '#f5f5f5',
   },
   header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#fff',
     borderBottom: '1px solid #e0e0e0',
     padding: '16px 24px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+  },
+  headerLeft: {
+    flex: 1,
   },
   title: {
     fontSize: '20px',
@@ -178,6 +201,25 @@ const styles = {
   placeholderText: {
     fontSize: '16px',
     fontWeight: 500,
+  },
+  statusBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '4px 12px',
+    borderRadius: '12px',
+    backgroundColor: '#f5f5f5',
+    border: '1px solid #e0e0e0',
+  },
+  statusDot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+  },
+  statusText: {
+    fontSize: '12px',
+    color: '#666',
+    fontWeight: 500 as const,
   },
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../api/client.js';
+import { useI18n } from '../i18n/index.js';
 import { websocketManager } from '../lib/websocketManager.js';
 import type { PerfRunSession, PerfScoreItem } from '../types/index.js';
 
@@ -75,6 +76,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
   const [polling, setPolling] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { t } = useI18n();
 
   const loadSessions = useCallback(async () => {
     if (!deviceId) return;
@@ -125,7 +127,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
       setElapsed(0);
       timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
     } catch (e: any) {
-      alert('启动跑分失败: ' + e.message);
+      alert(t.perfRunPanel.startFailed + ': ' + e.message);
     }
   }, [deviceId, running]);
 
@@ -148,7 +150,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
         }
       }, 30000);
     } catch (e: any) {
-      alert('停止跑分失败: ' + e.message);
+      alert(t.perfRunPanel.stopFailed + ': ' + e.message);
     }
   }, [deviceId, running, loadSessions]);
 
@@ -177,7 +179,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
         }}
       >
         <div style={{ fontSize: 48 }}>🏁</div>
-        <div>请选择设备后开始跑分</div>
+        <div>{t.common.selectDevice}</div>
       </div>
     );
 
@@ -195,13 +197,13 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
           flexShrink: 0,
         }}
       >
-        <span style={{ fontWeight: 'bold', fontSize: 14 }}>🏁 跑分</span>
+        <span style={{ fontWeight: 'bold', fontSize: 14 }}>🏁 {t.perfRunPanel.title}</span>
         {running && (
           <span style={{ fontSize: 13, color: '#ff4d4f', fontVariantNumeric: 'tabular-nums' }}>
             ⏱ {elapsed}s
           </span>
         )}
-        {polling && <span style={{ fontSize: 12, color: '#888' }}>⏳ 等待结果...</span>}
+        {polling && <span style={{ fontSize: 12, color: '#888' }}>⏳ {t.perfRunPanel.running}</span>}
         <div style={{ flex: 1 }} />
         {!running ? (
           <button
@@ -217,7 +219,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               cursor: 'pointer',
             }}
           >
-            ▶ 开始跑分
+            ▶ {t.perfRunPanel.start}
           </button>
         ) : (
           <button
@@ -232,7 +234,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               cursor: 'pointer',
             }}
           >
-            ⏹ 停止跑分
+            ⏹ {t.perfRunPanel.stop}
           </button>
         )}
         {selected && (
@@ -248,7 +250,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               cursor: 'pointer',
             }}
           >
-            📤 导出
+            📤 {t.common.export}
           </button>
         )}
       </div>
@@ -266,11 +268,11 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               borderBottom: '1px solid #f0f0f0',
             }}
           >
-            历史记录
+            {t.perfRunPanel.history}
           </div>
           {sessions.length === 0 && (
             <div style={{ padding: 12, fontSize: 12, color: '#bbb', textAlign: 'center' }}>
-              暂无记录
+              {t.common.noData}
             </div>
           )}
           {sessions.map((s) => (
@@ -290,7 +292,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               }}
             >
               <div style={{ fontWeight: 'bold', color: GRADE_COLOR[s.score.grade] }}>
-                {s.score.grade} · {s.score.total}分
+                {s.score.grade} · {s.score.total}pts
               </div>
               <div style={{ color: '#999', fontSize: 11, marginTop: 2 }}>
                 {new Date(s.startTime).toLocaleTimeString()}
@@ -315,12 +317,12 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
               {running ? (
                 <>
                   <div style={{ fontSize: 48 }}>⏱</div>
-                  <div>正在采集性能数据...</div>
+                  <div>{t.perfRunPanel.running}</div>
                 </>
               ) : (
                 <>
                   <div style={{ fontSize: 48 }}>🏁</div>
-                  <div>点击"开始跑分"采集性能数据</div>
+                  <div>{t.perfRunPanel.start}</div>
                 </>
               )}
             </div>
@@ -345,7 +347,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
                     {selected.score.summary}
                   </div>
                   <div style={{ fontSize: 12, color: '#888' }}>
-                    持续时间: {(selected.duration / 1000).toFixed(1)}s ·{' '}
+                    {(selected.duration / 1000).toFixed(1)}s ·{' '}
                     {new Date(selected.startTime).toLocaleString()}
                   </div>
                 </div>
@@ -376,7 +378,7 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
                   }}
                 >
                   <div style={{ fontWeight: 'bold', fontSize: 13, marginBottom: 10 }}>
-                    ⚠️ 问题列表
+                    ⚠️ Issues
                   </div>
                   {selected.score.issues.map((issue, i) => (
                     <div
