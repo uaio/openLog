@@ -63,6 +63,17 @@ function validateEnvelope(env: any): { valid: boolean; error?: string } {
   if (typeof env.ts !== 'number') return { valid: false, error: 'missing field: ts (unix ms)' };
   if (!env.type) return { valid: false, error: 'missing field: type' };
   if (!env.data) return { valid: false, error: 'missing field: data' };
+
+  // 单个 envelope 大小限制（512KB）防止超大 payload
+  const MAX_ENVELOPE_SIZE = 512 * 1024;
+  const estimatedSize = JSON.stringify(env).length;
+  if (estimatedSize > MAX_ENVELOPE_SIZE) {
+    return {
+      valid: false,
+      error: `envelope too large: ${estimatedSize} bytes (max ${MAX_ENVELOPE_SIZE})`,
+    };
+  }
+
   return { valid: true };
 }
 

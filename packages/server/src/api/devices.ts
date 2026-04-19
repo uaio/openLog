@@ -8,6 +8,7 @@ import {
   PerformanceStore,
   ScreenshotStore,
   PerfRunStore,
+  MockStore,
 } from '../store/index.js';
 import { sendToDevice } from '../ws/handlers.js';
 
@@ -20,6 +21,7 @@ export function createDeviceRoutes(
   performanceStore: PerformanceStore,
   screenshotStore: ScreenshotStore,
   perfRunStore: PerfRunStore,
+  mockStore: MockStore,
 ) {
   return {
     listDevices: (req: Request, res: Response) => {
@@ -289,14 +291,22 @@ export function createDeviceRoutes(
       res.json({ ok: true, preset });
     },
 
+    listMocks: (req: Request, res: Response) => {
+      const { deviceId } = req.params;
+      const device = deviceStore.get(deviceId);
+      if (!device) return res.status(404).json({ error: 'Device not found' });
+      res.json(mockStore.list(deviceId));
+    },
+
     addMock: (req: Request, res: Response) => {
       const { deviceId } = req.params;
       const device = deviceStore.get(deviceId);
       if (!device) return res.status(404).json({ error: 'Device not found' });
       const rule = req.body;
       if (!rule?.pattern) return res.status(400).json({ error: 'pattern is required' });
-      sendToDevice(deviceId, { type: 'add_mock', rule });
-      res.json({ ok: true });
+      const stored = mockStore.add(deviceId, rule);
+      sendToDevice(deviceId, { type: 'add_mock', rule: { ...rule, id: stored.id } });
+      res.json({ ok: true, rule: stored });
     },
 
     removeMock: (req: Request, res: Response) => {
@@ -304,6 +314,7 @@ export function createDeviceRoutes(
       const { mockId } = req.params;
       const device = deviceStore.get(deviceId);
       if (!device) return res.status(404).json({ error: 'Device not found' });
+      mockStore.remove(deviceId, mockId);
       sendToDevice(deviceId, { type: 'remove_mock', id: mockId });
       res.json({ ok: true });
     },
@@ -312,6 +323,7 @@ export function createDeviceRoutes(
       const { deviceId } = req.params;
       const device = deviceStore.get(deviceId);
       if (!device) return res.status(404).json({ error: 'Device not found' });
+      mockStore.clear(deviceId);
       sendToDevice(deviceId, { type: 'clear_mocks' });
       res.json({ ok: true });
     },

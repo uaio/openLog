@@ -8,6 +8,7 @@ import {
   PerformanceStore,
   ScreenshotStore,
   PerfRunStore,
+  MockStore,
 } from '../store/index.js';
 import { createDeviceRoutes } from './devices.js';
 import { createIngestRoute } from './ingest.js';
@@ -21,6 +22,7 @@ export function createRoutes(
   performanceStore: PerformanceStore,
   screenshotStore: ScreenshotStore,
   perfRunStore: PerfRunStore,
+  mockStore: MockStore,
 ): Router {
   const router = Router();
   const deviceRoutes = createDeviceRoutes(
@@ -32,6 +34,7 @@ export function createRoutes(
     performanceStore,
     screenshotStore,
     perfRunStore,
+    mockStore,
   );
 
   // ── 外部数据接入（统一 Envelope 标准）──────────────────────────────
@@ -68,6 +71,7 @@ export function createRoutes(
   router.get('/api/devices/:deviceId/perf-run', deviceRoutes.listPerfRunSessions);
   router.get('/api/devices/:deviceId/perf-run/:sessionId', deviceRoutes.getPerfRunSession);
   router.post('/api/devices/:deviceId/network-throttle', deviceRoutes.setNetworkThrottle);
+  router.get('/api/devices/:deviceId/mocks', deviceRoutes.listMocks);
   router.post('/api/devices/:deviceId/mocks', deviceRoutes.addMock);
   router.delete('/api/devices/:deviceId/mocks/:mockId', deviceRoutes.removeMock);
   router.delete('/api/devices/:deviceId/mocks', deviceRoutes.clearMocks);

@@ -1,8 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { api } from '../api/client.js';
 
 interface MockPanelProps {
   deviceId?: string;
+}
+
+interface MockRule {
+  id: string;
+  pattern: string;
+  method?: string;
+  status: number;
+  body?: string;
+  createdAt: number;
 }
 
 interface MockRuleForm {
@@ -18,6 +27,28 @@ export function MockPanel({ deviceId }: MockPanelProps) {
   const [form, setForm] = useState<MockRuleForm>(defaultForm);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
+  const [rules, setRules] = useState<MockRule[]>([]);
+  const [loadingRules, setLoadingRules] = useState(false);
+
+  // 加载已有规则
+  const loadRules = useCallback(async () => {
+    if (!deviceId) return;
+    setLoadingRules(true);
+    try {
+      const data = await api.get(`/api/devices/${deviceId}/mocks`);
+      setRules(Array.isArray(data) ? data : []);
+    } catch {
+      // 设备不存在或网络错误
+      setRules([]);
+    } finally {
+      setLoadingRules(false);
+    }
+  }, [deviceId]);
+
+  useEffect(() => {
+    setRules([]);
+    loadRules();
+  }, [loadRules]);
 
   const handleSubmit = useCallback(async () => {
     if (!deviceId || !form.pattern.trim()) return;
@@ -32,19 +63,35 @@ export function MockPanel({ deviceId }: MockPanelProps) {
       });
       setMsg('✅ Mock 规则已添加到设备');
       setForm(defaultForm);
+      loadRules();
     } catch (e: any) {
       setMsg('❌ 失败: ' + e.message);
     } finally {
       setSaving(false);
       setTimeout(() => setMsg(''), 3000);
     }
-  }, [deviceId, form]);
+  }, [deviceId, form, loadRules]);
+
+  const handleRemoveRule = useCallback(
+    async (mockId: string) => {
+      if (!deviceId) return;
+      try {
+        await api.delete(`/api/devices/${deviceId}/mocks/${mockId}`);
+        setRules((prev) => prev.filter((r) => r.id !== mockId));
+      } catch (e: any) {
+        setMsg('❌ 删除失败: ' + e.message);
+        setTimeout(() => setMsg(''), 3000);
+      }
+    },
+    [deviceId],
+  );
 
   const handleClearAll = useCallback(async () => {
     if (!deviceId) return;
     if (!confirm('清空该设备所有 Mock 规则?')) return;
     try {
       await api.delete(`/api/devices/${deviceId}/mocks`);
+      setRules([]);
       setMsg('✅ 已清空所有 Mock 规则');
     } catch (e: any) {
       setMsg('❌ 失败: ' + e.message);
@@ -72,7 +119,7 @@ export function MockPanel({ deviceId }: MockPanelProps) {
     );
 
   return (
-    <div style={{ padding: 20, maxWidth: 600 }}>
+    <div style={{ padding: 20, maxWidth: 600, overflow: 'auto', height: '100%' }}>
       <div style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 16 }}>🎭 API Mock</div>
       {msg && (
         <div
@@ -89,6 +136,96 @@ export function MockPanel({ deviceId }: MockPanelProps) {
         </div>
       )}
 
+      {/* 已有规则列表 */}
+      {rules.length > 0 && (
+        <div
+          style={{
+            backgroundColor: '#fff',
+            border: '1px solid #e0e0e0',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ fontWeight: 'bold', marginBottom: 12, fontSize: 13 }}>
+            已生效规则 ({rules.length})
+          </div>
+          {rules.map((rule) => (
+            <div
+              key={rule.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 10px',
+                marginBottom: 6,
+                backgroundColor: '#f9f9f9',
+                borderRadius: 4,
+                border: '1px solid #f0f0f0',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 'bold',
+                  color: '#1890ff',
+                  backgroundColor: '#e6f7ff',
+                  padding: '2px 6px',
+                  borderRadius: 3,
+                  flexShrink: 0,
+                }}
+              >
+                {rule.method || 'ANY'}
+              </span>
+              <span
+                style={{
+                  flex: 1,
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={rule.pattern}
+              >
+                {rule.pattern}
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: rule.status >= 400 ? '#ff4d4f' : '#52c41a',
+                  flexShrink: 0,
+                }}
+              >
+                {rule.status}
+              </span>
+              <button
+                onClick={() => handleRemoveRule(rule.id)}
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  color: '#ff4d4f',
+                  padding: '0 4px',
+                  flexShrink: 0,
+                }}
+                title="删除此规则"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {loadingRules && rules.length === 0 && (
+        <div style={{ textAlign: 'center', color: '#999', padding: 12, fontSize: 13 }}>
+          加载规则中...
+        </div>
+      )}
+
+      {/* 添加规则表单 */}
       <div
         style={{
           backgroundColor: '#fff',
@@ -201,14 +338,15 @@ export function MockPanel({ deviceId }: MockPanelProps) {
           </button>
           <button
             onClick={handleClearAll}
+            disabled={rules.length === 0}
             style={{
               padding: '6px 16px',
               fontSize: 13,
               border: '1px solid #ff4d4f',
               borderRadius: 4,
               backgroundColor: '#fff',
-              color: '#ff4d4f',
-              cursor: 'pointer',
+              color: rules.length === 0 ? '#ccc' : '#ff4d4f',
+              cursor: rules.length === 0 ? 'not-allowed' : 'pointer',
             }}
           >
             🗑 清空全部

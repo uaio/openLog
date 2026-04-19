@@ -9,6 +9,7 @@ import {
   PerformanceStore,
   ScreenshotStore,
   PerfRunStore,
+  MockStore,
 } from '../store/index.js';
 import {
   handlers,
@@ -27,6 +28,7 @@ export function createWebSocketServer(httpServer: HTTPServer) {
   const performanceStore = new PerformanceStore();
   const screenshotStore = new ScreenshotStore();
   const perfRunStore = new PerfRunStore();
+  const mockStore = new MockStore();
   const deviceIds = new Map<WebSocket, string>();
 
   const wss = new WebSocketServer({ server: httpServer });
@@ -143,6 +145,7 @@ export function createWebSocketServer(httpServer: HTTPServer) {
           performanceStore.clear(deviceId);
           screenshotStore.clear(deviceId);
           perfRunStore.clear(deviceId);
+          mockStore.cleanup(deviceId);
           deviceIds.delete(ws);
         }
       }
@@ -159,6 +162,7 @@ export function createWebSocketServer(httpServer: HTTPServer) {
     performanceStore,
     screenshotStore,
     perfRunStore,
+    mockStore,
   };
 }
 

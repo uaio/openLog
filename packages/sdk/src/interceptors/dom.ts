@@ -124,4 +124,8 @@ export class DOMCollector {
   triggerRefresh(): void {
     this.refreshHandler?.();
   }
+
+  destroy(): void {
+    this.refreshHandler = null;
+  }
 }

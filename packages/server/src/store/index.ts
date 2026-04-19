@@ -11,3 +11,4 @@ export {
 } from './performance.js';
 export { ScreenshotStore, type ScreenshotSnapshot } from './screenshot.js';
 export { PerfRunStore, type PerfRunSession as PerfRunSessionData } from './perfRun.js';
+export { MockStore, type MockRule } from './mocks.js';

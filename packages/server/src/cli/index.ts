@@ -31,8 +31,9 @@ export async function start(options: CLIOptions = {}) {
     performanceStore,
     screenshotStore,
     perfRunStore,
+    mockStore,
   } = createWebSocketServer(server);
-  app.use(express.json({ limit: '10mb' })); // screenshots are large
+  app.use(express.json({ limit: '5mb' })); // screenshots can be large, but cap at 5MB
   app.use(
     createRoutes(
       deviceStore,
@@ -43,6 +44,7 @@ export async function start(options: CLIOptions = {}) {
       performanceStore,
       screenshotStore,
       perfRunStore,
+      mockStore,
     ),
   );
 

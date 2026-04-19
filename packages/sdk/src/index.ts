@@ -545,6 +545,7 @@ export class OpenLog {
 
     // 清理 DOM 采集器
     if (this.domCollector) {
+      this.domCollector.destroy();
       this.domCollector = null;
     }
 
