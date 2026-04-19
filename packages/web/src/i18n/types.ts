@@ -32,6 +32,7 @@ export interface Locale {
     disconnected: string;
     operationFailed: string;
     unknownError: string;
+    all: string;
   };
   // Device list
   deviceList: {
@@ -92,6 +93,22 @@ export interface Locale {
     good: string;
     warning: string;
     critical: string;
+    checking: string;
+    selectDevice: string;
+    clickRefresh: string;
+    updatedAt: string;
+    recentErrors: string;
+    longTaskDuration: string;
+    memoryUsage: string;
+    uncompressedResources: string;
+    healthy: string;
+    count: string;
+  };
+  // Performance panel
+  perfPanel: {
+    ratingGood: string;
+    ratingNeedsImprovement: string;
+    ratingPoor: string;
   };
   // Mock panel
   mockPanel: {

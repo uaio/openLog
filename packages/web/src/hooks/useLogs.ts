@@ -3,7 +3,7 @@ import { useWebSocket } from './useWebSocket.js';
 import { api } from '../api/client.js';
 import type { ConsoleLog } from '../types/index.js';
 
-export function useLogs(deviceId?: string, maxLogs = 500) {
+export function useLogs(deviceId?: string, maxLogs = 500, tabId?: string | null) {
   const [logs, setLogs] = useState<ConsoleLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -42,6 +42,7 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
       if (message.type === 'event' && message.envelope?.type === 'console') {
         const envelope = message.envelope;
         if (deviceId && message.deviceId !== deviceId) return;
+        if (tabId && envelope.tabId !== tabId) return;
 
         const newLog: ConsoleLog = {
           deviceId: envelope.device.deviceId,
@@ -56,7 +57,7 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
         if (logBufferRef.current.length >= 10) flushLogs();
       }
     },
-    [deviceId],
+    [deviceId, tabId],
   );
 
   const flushLogs = useCallback(() => {

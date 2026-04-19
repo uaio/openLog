@@ -10,6 +10,7 @@ import { PerfRunPanel } from './components/PerfRunPanel.js';
 import { MockPanel } from './components/MockPanel.js';
 import { HealthPanel } from './components/HealthPanel.js';
 import { AIAnalysisPanel } from './components/AIAnalysisPanel.js';
+import { TabFilter } from './components/TabFilter.js';
 import { Tabs, type Tab } from './components/Tabs.js';
 import { useI18n } from './i18n/index.js';
 import { websocketManager } from './lib/websocketManager.js';
@@ -20,6 +21,7 @@ function App() {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [activeTab, setActiveTab] = useState('console');
   const [wsState, setWsState] = useState(websocketManager.getConnectionState());
+  const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
   const { t } = useI18n();
 
   useEffect(() => {
@@ -36,7 +38,7 @@ function App() {
       label: t.tabs.console,
       icon: '📝',
       content: selectedDevice ? (
-        <LogPanel deviceId={selectedDevice.deviceId} />
+        <LogPanel deviceId={selectedDevice.deviceId} tabId={selectedTabId} />
       ) : (
         <div style={styles.placeholder}>
           <div style={styles.placeholderIcon}>📱</div>
@@ -48,7 +50,7 @@ function App() {
       id: 'network',
       label: t.tabs.network,
       icon: '🌐',
-      content: <NetworkPanel deviceId={selectedDevice?.deviceId} />,
+      content: <NetworkPanel deviceId={selectedDevice?.deviceId} tabId={selectedTabId} />,
     },
     {
       id: 'storage',
@@ -131,6 +133,11 @@ function App() {
         </div>
 
         <div style={styles.main}>
+          <TabFilter
+            deviceId={selectedDevice?.deviceId}
+            value={selectedTabId}
+            onChange={setSelectedTabId}
+          />
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
   Legend,
 } from 'recharts';
 import { usePerformance } from '../hooks/usePerformance.js';
+import { useI18n } from '../i18n/index.js';
 import type {
   WebVital,
   PerformanceSample,
@@ -40,29 +41,29 @@ const RATING_COLOR: Record<string, string> = {
   poor: '#f44336',
 };
 
-const RATING_LABEL: Record<string, string> = {
-  good: '良好',
-  'needs-improvement': '需改善',
-  poor: '较差',
-};
-
 function VitalCard({ vital }: { vital: WebVital }) {
   const meta = VITAL_THRESHOLDS[vital.name];
   const color = RATING_COLOR[vital.rating];
   const formatted = meta?.unit === 'ms' ? `${vital.value.toFixed(0)}ms` : vital.value.toFixed(3);
+  const { t } = useI18n();
+  const ratingLabel: Record<string, string> = {
+    good: t.perfPanel.ratingGood,
+    'needs-improvement': t.perfPanel.ratingNeedsImprovement,
+    poor: t.perfPanel.ratingPoor,
+  };
 
   return (
     <div style={{ ...styles.vitalCard, borderTop: `3px solid ${color}` }}>
       <div style={styles.vitalName}>{vital.name}</div>
       <div style={{ ...styles.vitalValue, color }}>{formatted}</div>
-      <div style={{ ...styles.vitalRating, color }}>{RATING_LABEL[vital.rating]}</div>
+      <div style={{ ...styles.vitalRating, color }}>{ratingLabel[vital.rating]}</div>
       {meta && <div style={styles.vitalDesc}>{meta.desc}</div>}
     </div>
   );
 }
 
 function formatTime(ts: number): string {
-  return new Date(ts).toLocaleTimeString('zh-CN', {
+  return new Date(ts).toLocaleTimeString(undefined, {
     hour12: false,
     hour: '2-digit',
     minute: '2-digit',

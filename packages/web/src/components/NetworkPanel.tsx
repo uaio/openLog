@@ -5,6 +5,7 @@ import type { NetworkRequest } from '../types/index.js';
 
 interface NetworkPanelProps {
   deviceId?: string;
+  tabId?: string | null;
 }
 
 function statusColor(status?: number): string {
@@ -136,8 +137,8 @@ function RequestDetail({ request, onClose }: { request: NetworkRequest; onClose:
   );
 }
 
-export function NetworkPanel({ deviceId }: NetworkPanelProps) {
-  const { requests, clearRequests, loading } = useNetworkRequests(deviceId);
+export function NetworkPanel({ deviceId, tabId }: NetworkPanelProps) {
+  const { requests, clearRequests, loading } = useNetworkRequests(deviceId, 500, tabId);
   const [selected, setSelected] = useState<NetworkRequest | null>(null);
   const [filterMethod, setFilterMethod] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('all');

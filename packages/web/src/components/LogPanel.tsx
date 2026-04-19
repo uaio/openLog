@@ -8,10 +8,11 @@ import { websocketManager } from '../lib/websocketManager.js';
 import type { ConsoleLog } from '../types/index.js';
 interface LogPanelProps {
   deviceId?: string;
+  tabId?: string | null;
 }
 
-export function LogPanel({ deviceId }: LogPanelProps) {
-  const { logs, clearLogs, loading } = useLogs(deviceId);
+export function LogPanel({ deviceId, tabId }: LogPanelProps) {
+  const { logs, clearLogs, loading } = useLogs(deviceId, 500, tabId);
   const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const prevLogsLengthRef = useRef(0);

@@ -3,7 +3,7 @@ import { useWebSocket } from './useWebSocket.js';
 import { api } from '../api/client.js';
 import type { NetworkRequest } from '../types/index.js';
 
-export function useNetworkRequests(deviceId?: string, maxRequests = 500) {
+export function useNetworkRequests(deviceId?: string, maxRequests = 500, tabId?: string | null) {
   const [requests, setRequests] = useState<NetworkRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const bufferRef = useRef<NetworkRequest[]>([]);
@@ -35,6 +35,7 @@ export function useNetworkRequests(deviceId?: string, maxRequests = 500) {
       if (message.type === 'event' && message.envelope?.type === 'network') {
         const envelope = message.envelope;
         if (deviceId && message.deviceId !== deviceId) return;
+        if (tabId && envelope.tabId !== tabId) return;
 
         const req: NetworkRequest = {
           deviceId: envelope.device?.deviceId || message.deviceId,
@@ -58,7 +59,7 @@ export function useNetworkRequests(deviceId?: string, maxRequests = 500) {
         if (bufferRef.current.length >= 5) flushBuffer();
       }
     },
-    [deviceId],
+    [deviceId, tabId],
   );
 
   const flushBuffer = useCallback(() => {

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../api/client.js';
+import { useI18n } from '../i18n/index.js';
 
 interface HealthPanelProps {
   deviceId?: string;
@@ -24,12 +25,6 @@ const STATUS_COLOR: Record<string, string> = {
   critical: '#f44336',
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  healthy: '健康',
-  warning: '警告',
-  critical: '严重',
-};
-
 const RATING_COLOR: Record<string, string> = {
   good: '#4caf50',
   'needs-improvement': '#ff9800',
@@ -40,6 +35,7 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
   const [data, setData] = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useI18n();
   const [autoRefresh, setAutoRefresh] = useState(false);
 
   const fetchHealth = useCallback(async () => {
@@ -82,14 +78,14 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
         }}
       >
         <div style={{ fontSize: 48 }}>🩺</div>
-        <div>请选择设备查看健康状态</div>
+        <div>{t.healthPanel.selectDevice}</div>
       </div>
     );
 
   return (
     <div style={{ padding: 20, maxWidth: 700 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <span style={{ fontWeight: 'bold', fontSize: 16 }}>🩺 设备健康检查</span>
+        <span style={{ fontWeight: 'bold', fontSize: 16 }}>🩺 {t.healthPanel.title}</span>
         <button
           onClick={fetchHealth}
           disabled={loading}
@@ -103,7 +99,7 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
             cursor: 'pointer',
           }}
         >
-          {loading ? '检查中...' : '🔄 刷新'}
+          {loading ? t.healthPanel.checking : '🔄 ' + t.common.refresh}
         </button>
         <label
           style={{
@@ -120,7 +116,7 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
             checked={autoRefresh}
             onChange={(e) => setAutoRefresh(e.target.checked)}
           />
-          自动刷新 (5s)
+          {t.healthPanel.autoRefresh}
         </label>
       </div>
 
@@ -160,10 +156,10 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
             </div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 'bold', color: STATUS_COLOR[data.status] }}>
-                {STATUS_LABEL[data.status]} · {data.score}分
+                {data.status === 'healthy' ? t.healthPanel.healthy : data.status === 'warning' ? t.healthPanel.warning : t.healthPanel.critical} · {data.score}pts
               </div>
               <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
-                更新时间: {new Date(data.timestamp).toLocaleTimeString()}
+                {t.healthPanel.updatedAt}: {new Date(data.timestamp).toLocaleTimeString()}
               </div>
             </div>
           </div>
@@ -179,27 +175,27 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
           >
             {[
               {
-                label: '近5分钟错误数',
+                label: t.healthPanel.recentErrors,
                 value: data.recentErrors,
-                unit: '次',
+                unit: t.healthPanel.count,
                 warn: data.recentErrors > 5,
               },
               {
-                label: '长任务总耗时',
+                label: t.healthPanel.longTaskDuration,
                 value: data.longTaskDurationMs,
                 unit: 'ms',
                 warn: data.longTaskDurationMs > 1000,
               },
               {
-                label: '内存占用',
+                label: t.healthPanel.memoryUsage,
                 value: data.memoryMB !== null ? (data.memoryMB as number).toFixed(1) : 'N/A',
                 unit: 'MB',
                 warn: (data.memoryMB ?? 0) > 200,
               },
               {
-                label: '大体积未压缩资源',
+                label: t.healthPanel.uncompressedResources,
                 value: data.uncompressedResources,
-                unit: '个',
+                unit: t.healthPanel.count,
                 warn: data.uncompressedResources > 0,
               },
             ].map(({ label, value, unit, warn }) => (
@@ -261,7 +257,7 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
       )}
 
       {!data && !loading && !error && (
-        <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>点击刷新获取健康数据</div>
+        <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>{t.healthPanel.clickRefresh}</div>
       )}
     </div>
   );
