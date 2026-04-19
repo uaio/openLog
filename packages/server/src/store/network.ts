@@ -65,7 +65,7 @@ export class NetworkStore {
 
     // 应用过滤
     if (options) {
-      requests = requests.filter(req => {
+      requests = requests.filter((req) => {
         if (options.method && req.method.toUpperCase() !== options.method.toUpperCase()) {
           return false;
         }
@@ -108,10 +108,13 @@ export class NetworkStore {
   /** 设备断开后延迟清理 */
   cleanup(deviceId: string): void {
     // 30 分钟后清理
-    const timer = setTimeout(() => {
-      this.requests.delete(deviceId);
-      this.cleanupTimers.delete(deviceId);
-    }, 30 * 60 * 1000);
+    const timer = setTimeout(
+      () => {
+        this.requests.delete(deviceId);
+        this.cleanupTimers.delete(deviceId);
+      },
+      30 * 60 * 1000,
+    );
 
     this.cleanupTimers.set(deviceId, timer);
   }

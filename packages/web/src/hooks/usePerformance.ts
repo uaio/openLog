@@ -18,14 +18,27 @@ export function usePerformance(deviceId?: string) {
     }
   }, [deviceId]);
 
-  useEffect(() => { fetchReport(); }, [fetchReport]);
+  useEffect(() => {
+    fetchReport();
+  }, [fetchReport]);
 
-  const handleMessage = useCallback((message: any) => {
-    if (message.type === 'event' && message.envelope?.type === 'performance' && message.deviceId === deviceId) {
-      const envelope = message.envelope;
-      setReport({ deviceId: envelope.device.deviceId, tabId: envelope.tabId, ...envelope.data } as PerformanceReport);
-    }
-  }, [deviceId]);
+  const handleMessage = useCallback(
+    (message: any) => {
+      if (
+        message.type === 'event' &&
+        message.envelope?.type === 'performance' &&
+        message.deviceId === deviceId
+      ) {
+        const envelope = message.envelope;
+        setReport({
+          deviceId: envelope.device.deviceId,
+          tabId: envelope.tabId,
+          ...envelope.data,
+        } as PerformanceReport);
+      }
+    },
+    [deviceId],
+  );
 
   useWebSocket(handleMessage);
 

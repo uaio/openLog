@@ -32,66 +32,64 @@ function App() {
       ) : (
         <div style={styles.placeholder}>
           <div style={styles.placeholderIcon}>📱</div>
-          <div style={styles.placeholderText}>
-            从左侧选择一个设备开始调试
-          </div>
+          <div style={styles.placeholderText}>从左侧选择一个设备开始调试</div>
         </div>
-      )
+      ),
     },
     {
       id: 'network',
       label: '网络',
       icon: '🌐',
-      content: <NetworkPanel deviceId={selectedDevice?.deviceId} />
+      content: <NetworkPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'storage',
       label: '存储',
       icon: '💾',
-      content: <StoragePanel deviceId={selectedDevice?.deviceId} />
+      content: <StoragePanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'element',
       label: 'Element',
       icon: '🌲',
-      content: <DOMPanel deviceId={selectedDevice?.deviceId} />
+      content: <DOMPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'performance',
       label: 'Performance',
       icon: '📊',
-      content: <PerformancePanel deviceId={selectedDevice?.deviceId} />
+      content: <PerformancePanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'perf_run',
       label: '跑分',
       icon: '🏁',
-      content: <PerfRunPanel deviceId={selectedDevice?.deviceId} />
+      content: <PerfRunPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'mock',
       label: 'Mock',
       icon: '🎭',
-      content: <MockPanel deviceId={selectedDevice?.deviceId} />
+      content: <MockPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'health',
       label: '健康',
       icon: '🩺',
-      content: <HealthPanel deviceId={selectedDevice?.deviceId} />
+      content: <HealthPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'ai',
       label: 'AI分析',
       icon: '🤖',
-      content: <AIAnalysisPanel deviceId={selectedDevice?.deviceId} />
+      content: <AIAnalysisPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'settings',
       label: '设置',
       icon: '⚙️',
-      content: <SettingsPanel deviceId={selectedDevice?.deviceId} />
-    }
+      content: <SettingsPanel deviceId={selectedDevice?.deviceId} />,
+    },
   ];
 
   return (
@@ -101,8 +99,7 @@ function App() {
         <p style={styles.subtitle}>
           {selectedDevice
             ? `当前设备: ${selectedDevice.ua.slice(0, 50)}${selectedDevice.ua.length > 50 ? '...' : ''}`
-            : '请选择一个设备查看日志'
-          }
+            : '请选择一个设备查看日志'}
         </p>
       </div>
 
@@ -127,41 +124,41 @@ const styles = {
     display: 'flex',
     flexDirection: 'column' as const,
     height: '100vh',
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f5f5f5',
   },
   header: {
     backgroundColor: '#fff',
     borderBottom: '1px solid #e0e0e0',
     padding: '16px 24px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
   },
   title: {
     fontSize: '20px',
     fontWeight: 'bold' as const,
     color: '#333',
-    margin: 0
+    margin: 0,
   },
   subtitle: {
     fontSize: '14px',
     color: '#666',
-    margin: '4px 0 0 0'
+    margin: '4px 0 0 0',
   },
   content: {
     display: 'flex',
     flex: 1,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   sidebar: {
     width: '280px',
     borderRight: '1px solid #e0e0e0',
-    overflow: 'auto'
+    overflow: 'auto',
   },
   main: {
     flex: 1,
     padding: '8px',
     overflow: 'hidden',
     display: 'flex',
-    flexDirection: 'column' as const
+    flexDirection: 'column' as const,
   },
   placeholder: {
     display: 'flex',
@@ -169,17 +166,17 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    color: '#999'
+    color: '#999',
   },
   placeholderIcon: {
     fontSize: '64px',
     marginBottom: '16px',
-    opacity: 0.5
+    opacity: 0.5,
   },
   placeholderText: {
     fontSize: '16px',
-    fontWeight: 500
-  }
+    fontWeight: 500,
+  },
 };
 
 export default App;

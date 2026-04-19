@@ -1,7 +1,6 @@
 import { wsClient } from '../ws-client.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 
-
 export const zenMode = {
   name: 'zen_mode',
   description: `控制手机端 openLog 的禅模式。
@@ -12,13 +11,16 @@ export const zenMode = {
     type: 'object' as const,
     properties: {
       enabled: { type: 'boolean' as const, description: 'true=开启禅模式，false=关闭' },
-      deviceId: { type: 'string' as const, description: '设备 ID（可选）' }
+      deviceId: { type: 'string' as const, description: '设备 ID（可选）' },
     },
-    required: ['enabled']
+    required: ['enabled'],
   },
-  async execute(args: { enabled: boolean; deviceId?: string }): Promise<{ ok: boolean; zenMode: boolean }> {
+  async execute(args: {
+    enabled: boolean;
+    deviceId?: string;
+  }): Promise<{ ok: boolean; zenMode: boolean }> {
     const id = await deviceSelector.selectDevice(args.deviceId);
     wsClient.sendCommand(id, { type: 'zen_mode', enabled: args.enabled });
     return { ok: true, zenMode: args.enabled };
-  }
+  },
 };

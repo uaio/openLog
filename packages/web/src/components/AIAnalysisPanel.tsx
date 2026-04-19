@@ -28,7 +28,8 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
 
   const runAnalysis = useCallback(async () => {
     if (!deviceId) return;
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     try {
       const [logsRes, perfRes, healthRes, storageRes] = await Promise.allSettled([
         api.get(`/api/devices/${deviceId}/logs?limit=${logLimit}&level=error`),
@@ -58,11 +59,15 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
         const poor = perf.vitals.filter((v: any) => v.rating === 'poor');
         const needsImprovement = perf.vitals.filter((v: any) => v.rating === 'needs-improvement');
         if (poor.length > 0) {
-          issues.push(`${poor.length} 个 Web Vitals 指标较差: ${poor.map((v: any) => v.name).join(', ')}`);
+          issues.push(
+            `${poor.length} 个 Web Vitals 指标较差: ${poor.map((v: any) => v.name).join(', ')}`,
+          );
           recommendations.push('重点优化 LCP/CLS/INP 等核心 Web Vitals');
         }
         if (needsImprovement.length > 0) {
-          issues.push(`${needsImprovement.length} 个 Web Vitals 指标需改善: ${needsImprovement.map((v: any) => v.name).join(', ')}`);
+          issues.push(
+            `${needsImprovement.length} 个 Web Vitals 指标需改善: ${needsImprovement.map((v: any) => v.name).join(', ')}`,
+          );
         }
       }
 
@@ -98,9 +103,10 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
       if (recommendations.length === 0) recommendations.push('当前状态良好，继续保持 👍');
 
       const overallScore = health?.score ?? 100;
-      const summary = issues.length === 0
-        ? '✅ 设备状态良好，未发现明显问题'
-        : `⚠️ 发现 ${issues.length} 个问题，健康分 ${overallScore}/100`;
+      const summary =
+        issues.length === 0
+          ? '✅ 设备状态良好，未发现明显问题'
+          : `⚠️ 发现 ${issues.length} 个问题，健康分 ${overallScore}/100`;
 
       setResult({
         deviceId,
@@ -109,7 +115,7 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
         overallScore,
         issues,
         recommendations,
-        raw: { errorCount, perfVitals: perf?.vitals ?? [], longTaskCount, health }
+        raw: { errorCount, perfVitals: perf?.vitals ?? [], longTaskCount, health },
       });
     } catch (e: any) {
       setError(e.message ?? '分析失败');
@@ -123,12 +129,18 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `ai-analysis-${result.deviceId}-${Date.now()}.json`;
-    a.click(); URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = `ai-analysis-${result.deviceId}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }, [result]);
 
   const scoreColor = result
-    ? result.overallScore >= 80 ? '#4caf50' : result.overallScore >= 50 ? '#ff9800' : '#f44336'
+    ? result.overallScore >= 80
+      ? '#4caf50'
+      : result.overallScore >= 50
+        ? '#ff9800'
+        : '#f44336'
     : '#9e9e9e';
 
   return (
@@ -139,7 +151,7 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
           <label style={styles.label}>分析错误日志条数：</label>
           <select
             value={logLimit}
-            onChange={e => setLogLimit(Number(e.target.value))}
+            onChange={(e) => setLogLimit(Number(e.target.value))}
             style={styles.select}
           >
             <option value={20}>20 条</option>
@@ -150,18 +162,16 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
             {loading ? '分析中...' : '🚀 开始分析'}
           </button>
           {result && (
-            <button onClick={handleExport} style={styles.exportBtn}>📤 导出</button>
+            <button onClick={handleExport} style={styles.exportBtn}>
+              📤 导出
+            </button>
           )}
         </div>
       </div>
 
-      {!deviceId && (
-        <div style={styles.empty}>请先从左侧选择设备</div>
-      )}
+      {!deviceId && <div style={styles.empty}>请先从左侧选择设备</div>}
 
-      {error && (
-        <div style={styles.errorBox}>{error}</div>
-      )}
+      {error && <div style={styles.errorBox}>{error}</div>}
 
       {result && (
         <div style={styles.content}>
@@ -169,7 +179,9 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
           <div style={styles.summaryCard}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ ...styles.scoreCircle, borderColor: scoreColor }}>
-                <span style={{ fontSize: 28, fontWeight: 'bold', color: scoreColor }}>{result.overallScore}</span>
+                <span style={{ fontSize: 28, fontWeight: 'bold', color: scoreColor }}>
+                  {result.overallScore}
+                </span>
                 <span style={{ fontSize: 11, color: '#888' }}>健康分</span>
               </div>
               <div>
@@ -186,11 +198,25 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
             <div style={styles.section}>
               <div style={styles.sectionTitle}>📊 Web Vitals</div>
               <div style={styles.vitalsGrid}>
-                {result.raw.perfVitals.map(v => (
-                  <div key={v.name} style={{ ...styles.vitalChip, borderColor: RATING_COLOR[v.rating] ?? '#9e9e9e' }}>
-                    <span style={{ fontWeight: 'bold', color: RATING_COLOR[v.rating] ?? '#9e9e9e' }}>{v.name}</span>
-                    <span style={{ fontSize: 11, color: '#555' }}>{formatVitalValue(v.name, v.value)}</span>
-                    <span style={{ fontSize: 10, color: RATING_COLOR[v.rating] ?? '#9e9e9e' }}>{RATING_LABEL[v.rating] ?? v.rating}</span>
+                {result.raw.perfVitals.map((v) => (
+                  <div
+                    key={v.name}
+                    style={{
+                      ...styles.vitalChip,
+                      borderColor: RATING_COLOR[v.rating] ?? '#9e9e9e',
+                    }}
+                  >
+                    <span
+                      style={{ fontWeight: 'bold', color: RATING_COLOR[v.rating] ?? '#9e9e9e' }}
+                    >
+                      {v.name}
+                    </span>
+                    <span style={{ fontSize: 11, color: '#555' }}>
+                      {formatVitalValue(v.name, v.value)}
+                    </span>
+                    <span style={{ fontSize: 10, color: RATING_COLOR[v.rating] ?? '#9e9e9e' }}>
+                      {RATING_LABEL[v.rating] ?? v.rating}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -203,7 +229,10 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
               <div style={styles.sectionTitle}>⚠️ 发现的问题</div>
               <div style={styles.issueList}>
                 {result.issues.map((issue, i) => (
-                  <div key={i} style={{ ...styles.issueItem, paddingLeft: issue.startsWith('  ·') ? 28 : 12 }}>
+                  <div
+                    key={i}
+                    style={{ ...styles.issueItem, paddingLeft: issue.startsWith('  ·') ? 28 : 12 }}
+                  >
                     {issue.startsWith('  ·') ? issue : `• ${issue}`}
                   </div>
                 ))}
@@ -228,10 +257,23 @@ export function AIAnalysisPanel({ deviceId }: AIAnalysisPanelProps) {
           <div style={styles.section}>
             <div style={styles.sectionTitle}>📋 数据概览</div>
             <div style={styles.statsRow}>
-              <div style={styles.statChip}>JS错误 <b>{result.raw.errorCount}</b></div>
-              <div style={styles.statChip}>长任务 <b>{result.raw.longTaskCount}</b></div>
-              <div style={styles.statChip}>内存 <b>{result.raw.health?.memoryMB != null ? `${Number(result.raw.health.memoryMB).toFixed(1)}MB` : 'N/A'}</b></div>
-              <div style={styles.statChip}>大资源 <b>{result.raw.health?.uncompressedResources ?? 0}</b></div>
+              <div style={styles.statChip}>
+                JS错误 <b>{result.raw.errorCount}</b>
+              </div>
+              <div style={styles.statChip}>
+                长任务 <b>{result.raw.longTaskCount}</b>
+              </div>
+              <div style={styles.statChip}>
+                内存{' '}
+                <b>
+                  {result.raw.health?.memoryMB != null
+                    ? `${Number(result.raw.health.memoryMB).toFixed(1)}MB`
+                    : 'N/A'}
+                </b>
+              </div>
+              <div style={styles.statChip}>
+                大资源 <b>{result.raw.health?.uncompressedResources ?? 0}</b>
+              </div>
             </div>
           </div>
         </div>
@@ -258,29 +300,137 @@ function formatVitalValue(name: string, value: number): string {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: { display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f9f9f9', borderRadius: 8, overflow: 'hidden' },
-  toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', backgroundColor: '#fff', borderBottom: '1px solid #e0e0e0', flexWrap: 'wrap', gap: 8 },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  toolbar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 16px',
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e0e0e0',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   title: { fontSize: 15, fontWeight: 'bold', color: '#333' },
   controls: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   label: { fontSize: 12, color: '#666' },
   select: { fontSize: 12, padding: '3px 6px', borderRadius: 4, border: '1px solid #ccc' },
-  runBtn: { padding: '6px 16px', backgroundColor: '#7c4dff', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-  exportBtn: { padding: '5px 12px', backgroundColor: '#fff', color: '#555', border: '1px solid #ccc', borderRadius: 6, cursor: 'pointer', fontSize: 12 },
-  empty: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 14 },
-  errorBox: { margin: 12, padding: '8px 12px', backgroundColor: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 4, fontSize: 13, color: '#f44336' },
-  content: { flex: 1, overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 14 },
-  summaryCard: { backgroundColor: '#fff', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
-  scoreCircle: { width: 72, height: 72, borderRadius: '50%', border: '3px solid', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  runBtn: {
+    padding: '6px 16px',
+    backgroundColor: '#7c4dff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'pointer',
+    fontWeight: 600,
+    fontSize: 13,
+  },
+  exportBtn: {
+    padding: '5px 12px',
+    backgroundColor: '#fff',
+    color: '#555',
+    border: '1px solid #ccc',
+    borderRadius: 6,
+    cursor: 'pointer',
+    fontSize: 12,
+  },
+  empty: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#aaa',
+    fontSize: 14,
+  },
+  errorBox: {
+    margin: 12,
+    padding: '8px 12px',
+    backgroundColor: '#fff2f0',
+    border: '1px solid #ffccc7',
+    borderRadius: 4,
+    fontSize: 13,
+    color: '#f44336',
+  },
+  content: {
+    flex: 1,
+    overflow: 'auto',
+    padding: 16,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 14,
+  },
+  summaryCard: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: '14px 18px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+  },
+  scoreCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: '50%',
+    border: '3px solid',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
   summaryText: { fontSize: 15, fontWeight: 600, color: '#333' },
-  section: { backgroundColor: '#fff', borderRadius: 8, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },
+  section: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: '12px 16px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+  },
   sectionTitle: { fontSize: 13, fontWeight: 'bold', color: '#555', marginBottom: 10 },
   vitalsGrid: { display: 'flex', flexWrap: 'wrap', gap: 8 },
-  vitalChip: { border: '1px solid', borderRadius: 6, padding: '6px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 70 },
+  vitalChip: {
+    border: '1px solid',
+    borderRadius: 6,
+    padding: '6px 10px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    minWidth: 70,
+  },
   issueList: { display: 'flex', flexDirection: 'column', gap: 4 },
-  issueItem: { fontSize: 13, color: '#444', padding: '4px 12px', backgroundColor: '#fff8e1', borderRadius: 4, borderLeft: '3px solid #ff9800' },
+  issueItem: {
+    fontSize: 13,
+    color: '#444',
+    padding: '4px 12px',
+    backgroundColor: '#fff8e1',
+    borderRadius: 4,
+    borderLeft: '3px solid #ff9800',
+  },
   recList: { display: 'flex', flexDirection: 'column', gap: 8 },
   recItem: { display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#333' },
-  recNum: { width: 20, height: 20, borderRadius: '50%', backgroundColor: '#7c4dff', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 },
+  recNum: {
+    width: 20,
+    height: 20,
+    borderRadius: '50%',
+    backgroundColor: '#7c4dff',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 11,
+    fontWeight: 'bold',
+    flexShrink: 0,
+  },
   statsRow: { display: 'flex', gap: 10, flexWrap: 'wrap' },
-  statChip: { padding: '6px 12px', backgroundColor: '#f5f5f5', borderRadius: 6, fontSize: 13, color: '#555' },
+  statChip: {
+    padding: '6px 12px',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    fontSize: 13,
+    color: '#555',
+  },
 };

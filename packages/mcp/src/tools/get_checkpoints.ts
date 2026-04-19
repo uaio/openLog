@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 
-
 export const getCheckpoints = {
   name: 'get_checkpoints',
   description: `读取设备上由 AI 埋入的 @openlog[checkpoint] 日志，验证关键开发节点是否已执行。
@@ -25,18 +24,18 @@ checkpoint 日志格式约定：
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，不填则自动选择最近活跃设备）'
+        description: '设备 ID（可选，不填则自动选择最近活跃设备）',
       },
       feature: {
         type: 'string' as const,
-        description: '只查看特定功能的 checkpoint，例如 "login"（可选，不填则返回全部）'
+        description: '只查看特定功能的 checkpoint，例如 "login"（可选，不填则返回全部）',
       },
       limit: {
         type: 'number' as const,
-        description: '最多返回条数，默认 100'
-      }
+        description: '最多返回条数，默认 100',
+      },
     },
-    required: []
+    required: [],
   },
 
   async execute(args: { deviceId?: string; feature?: string; limit?: number }): Promise<unknown> {
@@ -58,9 +57,7 @@ checkpoint 日志格式约定：
     // 如果指定了 feature，进一步过滤
     const filtered = args.feature
       ? checkpoints.filter((log: any) => {
-          const text = Array.isArray(log.args)
-            ? log.args[0] ?? ''
-            : log.message ?? '';
+          const text = Array.isArray(log.args) ? (log.args[0] ?? '') : (log.message ?? '');
           return String(text).toLowerCase().includes(args.feature!.toLowerCase());
         })
       : checkpoints;
@@ -76,7 +73,7 @@ checkpoint 日志格式约定：
         description: match ? match[2].trim() : text,
         data: args_arr.length > 1 ? args_arr.slice(1) : undefined,
         timestamp: log.timestamp,
-        level: log.level
+        level: log.level,
       };
     });
 
@@ -85,9 +82,10 @@ checkpoint 日志格式约定：
       total: result.length,
       feature: args.feature ?? 'all',
       checkpoints: result,
-      summary: result.length === 0
-        ? '⚠️ 未发现任何 @openlog[checkpoint] 日志，请确认代码中已埋点且用户已执行相关操作'
-        : `✅ 共发现 ${result.length} 个检测点：${[...new Set(result.map(r => r.node))].join(' → ')}`
+      summary:
+        result.length === 0
+          ? '⚠️ 未发现任何 @openlog[checkpoint] 日志，请确认代码中已埋点且用户已执行相关操作'
+          : `✅ 共发现 ${result.length} 个检测点：${[...new Set(result.map((r) => r.node))].join(' → ')}`,
     };
-  }
+  },
 };

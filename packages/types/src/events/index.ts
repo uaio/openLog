@@ -168,12 +168,12 @@ export interface PerfRunPayload {
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 export type LifecycleEvent =
-  | 'connect'       // SDK 建立 WebSocket 连接
-  | 'disconnect'    // WebSocket 断开
-  | 'page_show'     // 页面可见（visibilitychange / pageshow）
-  | 'page_hide'     // 页面隐藏
-  | 'page_load'     // DOMContentLoaded
-  | 'page_unload';  // beforeunload
+  | 'connect' // SDK 建立 WebSocket 连接
+  | 'disconnect' // WebSocket 断开
+  | 'page_show' // 页面可见（visibilitychange / pageshow）
+  | 'page_hide' // 页面隐藏
+  | 'page_load' // DOMContentLoaded
+  | 'page_unload'; // beforeunload
 
 export interface LifecyclePayload {
   event: LifecycleEvent;

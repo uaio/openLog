@@ -29,12 +29,23 @@ export function useStorage(deviceId?: string) {
     fetchStorage();
   }, [fetchStorage]);
 
-  const handleMessage = useCallback((message: any) => {
-    if (message.type === 'event' && message.envelope?.type === 'storage' && message.deviceId === deviceId) {
-      const envelope = message.envelope;
-      setSnapshot({ deviceId: envelope.device.deviceId, tabId: envelope.tabId, ...envelope.data });
-    }
-  }, [deviceId]);
+  const handleMessage = useCallback(
+    (message: any) => {
+      if (
+        message.type === 'event' &&
+        message.envelope?.type === 'storage' &&
+        message.deviceId === deviceId
+      ) {
+        const envelope = message.envelope;
+        setSnapshot({
+          deviceId: envelope.device.deviceId,
+          tabId: envelope.tabId,
+          ...envelope.data,
+        });
+      }
+    },
+    [deviceId],
+  );
 
   useWebSocket(handleMessage);
 

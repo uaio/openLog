@@ -1,0 +1,6 @@
+dist
+node_modules
+coverage
+packages/eruda
+pnpm-lock.yaml
+*.min.js

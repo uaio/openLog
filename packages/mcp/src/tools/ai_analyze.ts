@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 
-
 export const aiAnalyze = {
   name: 'ai_analyze',
   description: `对设备当前状态进行综合 AI 分析，汇总 console 错误、性能数据、Web Vitals、健康检查结果，
@@ -10,18 +9,20 @@ export const aiAnalyze = {
     type: 'object' as const,
     properties: {
       deviceId: { type: 'string' as const, description: '设备 ID（可选）' },
-      logLimit: { type: 'number' as const, description: '拉取最近日志条数，默认 50' }
+      logLimit: { type: 'number' as const, description: '拉取最近日志条数，默认 50' },
     },
-    required: []
+    required: [],
   },
   async execute(args: { deviceId?: string; logLimit?: number }): Promise<any> {
     const id = await deviceSelector.selectDevice(args.deviceId);
     const limit = args.logLimit ?? 50;
 
     const [logsRes, perfRes, healthRes] = await Promise.allSettled([
-      fetch(`${API_BASE_URL}/api/devices/${id}/logs?limit=${limit}&level=error`).then(r => r.json()),
-      fetch(`${API_BASE_URL}/api/devices/${id}/performance`).then(r => r.json()),
-      fetch(`${API_BASE_URL}/api/devices/${id}/health`).then(r => r.json()),
+      fetch(`${API_BASE_URL}/api/devices/${id}/logs?limit=${limit}&level=error`).then((r) =>
+        r.json(),
+      ),
+      fetch(`${API_BASE_URL}/api/devices/${id}/performance`).then((r) => r.json()),
+      fetch(`${API_BASE_URL}/api/devices/${id}/health`).then((r) => r.json()),
     ]);
 
     const errors = logsRes.status === 'fulfilled' ? logsRes.value : [];
@@ -42,7 +43,9 @@ export const aiAnalyze = {
     if (perf?.vitals?.length) {
       const poorVitals = perf.vitals.filter((v: any) => v.rating === 'poor');
       if (poorVitals.length > 0) {
-        issues.push(`${poorVitals.length} 个 Web Vitals 指标较差: ${poorVitals.map((v: any) => v.name).join(', ')}`);
+        issues.push(
+          `${poorVitals.length} 个 Web Vitals 指标较差: ${poorVitals.map((v: any) => v.name).join(', ')}`,
+        );
         recommendations.push('重点优化 LCP/CLS/INP 等核心 Web Vitals 指标');
       }
     }
@@ -63,9 +66,10 @@ export const aiAnalyze = {
     }
 
     const overallScore = health?.score ?? 100;
-    const summary = issues.length === 0
-      ? '✅ 设备状态良好，未发现明显问题'
-      : `⚠️ 发现 ${issues.length} 个问题，健康分 ${overallScore}/100`;
+    const summary =
+      issues.length === 0
+        ? '✅ 设备状态良好，未发现明显问题'
+        : `⚠️ 发现 ${issues.length} 个问题，健康分 ${overallScore}/100`;
 
     return {
       deviceId: id,
@@ -79,7 +83,7 @@ export const aiAnalyze = {
         perfVitals: perf?.vitals ?? [],
         longTaskCount: perf?.longTasks?.length ?? 0,
         health,
-      }
+      },
     };
-  }
+  },
 };

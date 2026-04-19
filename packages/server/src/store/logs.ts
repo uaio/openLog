@@ -31,7 +31,7 @@ export class LogStore {
     let logs = this.logs.get(deviceId) || [];
 
     if (level) {
-      logs = logs.filter(l => l.level === level);
+      logs = logs.filter((l) => l.level === level);
     }
 
     if (limit) {
@@ -51,10 +51,13 @@ export class LogStore {
     this.cancelCleanup(deviceId);
 
     // 当设备断开 30 分钟后清理
-    const timer = setTimeout(() => {
-      this.logs.delete(deviceId);
-      this.cleanupTimers.delete(deviceId);
-    }, 30 * 60 * 1000);
+    const timer = setTimeout(
+      () => {
+        this.logs.delete(deviceId);
+        this.cleanupTimers.delete(deviceId);
+      },
+      30 * 60 * 1000,
+    );
 
     this.cleanupTimers.set(deviceId, timer);
   }

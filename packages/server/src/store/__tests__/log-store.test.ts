@@ -56,7 +56,7 @@ describe('LogStore', () => {
 
     const errors = store.get('d1', undefined, 'error');
     expect(errors).toHaveLength(2);
-    expect(errors.every(l => l.level === 'error')).toBe(true);
+    expect(errors.every((l) => l.level === 'error')).toBe(true);
   });
 
   it('get with level filter - warn only', () => {

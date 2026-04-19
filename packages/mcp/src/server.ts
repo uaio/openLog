@@ -1,7 +1,46 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema, ListPromptsRequestSchema, GetPromptRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { listDevices, getConsoleLogs, getNetworkRequests, watchLogs, getStorage, getPageContext, executeJs, takeScreenshot, reloadPage, setStorage, clearStorage, highlightElement, zenMode, networkThrottle, addMock, removeMock, clearMocks, healthCheck, aiAnalyze, startPerfRun, stopPerfRun, getPerfReport, verifyCheckpoint, startMonitor, pollMonitor, stopMonitor, listMonitors, focusDevice, initDevSession, startOpenlog, stopOpenlog, getCheckpoints, ensureSdk } from './tools/index.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import {
+  listDevices,
+  getConsoleLogs,
+  getNetworkRequests,
+  watchLogs,
+  getStorage,
+  getPageContext,
+  executeJs,
+  takeScreenshot,
+  reloadPage,
+  setStorage,
+  clearStorage,
+  highlightElement,
+  zenMode,
+  networkThrottle,
+  addMock,
+  removeMock,
+  clearMocks,
+  healthCheck,
+  aiAnalyze,
+  startPerfRun,
+  stopPerfRun,
+  getPerfReport,
+  verifyCheckpoint,
+  startMonitor,
+  pollMonitor,
+  stopMonitor,
+  listMonitors,
+  focusDevice,
+  initDevSession,
+  startOpenlog,
+  stopOpenlog,
+  getCheckpoints,
+  ensureSdk,
+} from './tools/index.js';
 import { startEmbeddedServer, stopEmbeddedServer, type EmbeddedServerConfig } from './launcher.js';
 import { wsClient } from './ws-client.js';
 import { API_BASE_URL } from './config.js';
@@ -53,7 +92,13 @@ function setupGlobalErrorHandlers(server: Server): void {
 
   // 处理未处理的 Promise 拒绝
   process.on('unhandledRejection', (reason, promise) => {
-    console.error('[unhandledRejection]', 'Unhandled Promise Rejection at:', promise, 'reason:', reason);
+    console.error(
+      '[unhandledRejection]',
+      'Unhandled Promise Rejection at:',
+      promise,
+      'reason:',
+      reason,
+    );
     gracefulShutdown(server, 'unhandledRejection').catch(() => {
       process.exit(1);
     });
@@ -80,14 +125,14 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
   const server = new Server(
     {
       name: 'openlog-mcp',
-      version: '0.1.0'
+      version: '0.1.0',
     },
     {
       capabilities: {
         tools: {},
-        prompts: {}
-      }
-    }
+        prompts: {},
+      },
+    },
   );
 
   // 设置全局错误处理器
@@ -99,169 +144,169 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
         {
           name: listDevices.name,
           description: listDevices.description,
-          inputSchema: listDevices.inputSchema
+          inputSchema: listDevices.inputSchema,
         },
         {
           name: focusDevice.name,
           description: focusDevice.description,
-          inputSchema: focusDevice.inputSchema
+          inputSchema: focusDevice.inputSchema,
         },
         {
           name: getConsoleLogs.name,
           description: getConsoleLogs.description,
-          inputSchema: getConsoleLogs.inputSchema
+          inputSchema: getConsoleLogs.inputSchema,
         },
         {
           name: getNetworkRequests.name,
           description: getNetworkRequests.description,
-          inputSchema: getNetworkRequests.inputSchema
+          inputSchema: getNetworkRequests.inputSchema,
         },
         {
           name: watchLogs.name,
           description: watchLogs.description,
-          inputSchema: watchLogs.inputSchema
+          inputSchema: watchLogs.inputSchema,
         },
         {
           name: getStorage.name,
           description: getStorage.description,
-          inputSchema: getStorage.inputSchema
+          inputSchema: getStorage.inputSchema,
         },
         {
           name: getPageContext.name,
           description: getPageContext.description,
-          inputSchema: getPageContext.inputSchema
+          inputSchema: getPageContext.inputSchema,
         },
         {
           name: executeJs.name,
           description: executeJs.description,
-          inputSchema: executeJs.inputSchema
+          inputSchema: executeJs.inputSchema,
         },
         {
           name: takeScreenshot.name,
           description: takeScreenshot.description,
-          inputSchema: takeScreenshot.inputSchema
+          inputSchema: takeScreenshot.inputSchema,
         },
         {
           name: reloadPage.name,
           description: reloadPage.description,
-          inputSchema: reloadPage.inputSchema
+          inputSchema: reloadPage.inputSchema,
         },
         {
           name: setStorage.name,
           description: setStorage.description,
-          inputSchema: setStorage.inputSchema
+          inputSchema: setStorage.inputSchema,
         },
         {
           name: clearStorage.name,
           description: clearStorage.description,
-          inputSchema: clearStorage.inputSchema
+          inputSchema: clearStorage.inputSchema,
         },
         {
           name: highlightElement.name,
           description: highlightElement.description,
-          inputSchema: highlightElement.inputSchema
+          inputSchema: highlightElement.inputSchema,
         },
         {
           name: zenMode.name,
           description: zenMode.description,
-          inputSchema: zenMode.inputSchema
+          inputSchema: zenMode.inputSchema,
         },
         {
           name: networkThrottle.name,
           description: networkThrottle.description,
-          inputSchema: networkThrottle.inputSchema
+          inputSchema: networkThrottle.inputSchema,
         },
         {
           name: addMock.name,
           description: addMock.description,
-          inputSchema: addMock.inputSchema
+          inputSchema: addMock.inputSchema,
         },
         {
           name: clearMocks.name,
           description: clearMocks.description,
-          inputSchema: clearMocks.inputSchema
+          inputSchema: clearMocks.inputSchema,
         },
         {
           name: removeMock.name,
           description: removeMock.description,
-          inputSchema: removeMock.inputSchema
+          inputSchema: removeMock.inputSchema,
         },
         {
           name: startPerfRun.name,
           description: startPerfRun.description,
-          inputSchema: startPerfRun.inputSchema
+          inputSchema: startPerfRun.inputSchema,
         },
         {
           name: stopPerfRun.name,
           description: stopPerfRun.description,
-          inputSchema: stopPerfRun.inputSchema
+          inputSchema: stopPerfRun.inputSchema,
         },
         {
           name: getPerfReport.name,
           description: getPerfReport.description,
-          inputSchema: getPerfReport.inputSchema
+          inputSchema: getPerfReport.inputSchema,
         },
         {
           name: healthCheck.name,
           description: healthCheck.description,
-          inputSchema: healthCheck.inputSchema
+          inputSchema: healthCheck.inputSchema,
         },
         {
           name: aiAnalyze.name,
           description: aiAnalyze.description,
-          inputSchema: aiAnalyze.inputSchema
+          inputSchema: aiAnalyze.inputSchema,
         },
         {
           name: verifyCheckpoint.name,
           description: verifyCheckpoint.description,
-          inputSchema: verifyCheckpoint.inputSchema
+          inputSchema: verifyCheckpoint.inputSchema,
         },
         {
           name: startMonitor.name,
           description: startMonitor.description,
-          inputSchema: startMonitor.inputSchema
+          inputSchema: startMonitor.inputSchema,
         },
         {
           name: pollMonitor.name,
           description: pollMonitor.description,
-          inputSchema: pollMonitor.inputSchema
+          inputSchema: pollMonitor.inputSchema,
         },
         {
           name: stopMonitor.name,
           description: stopMonitor.description,
-          inputSchema: stopMonitor.inputSchema
+          inputSchema: stopMonitor.inputSchema,
         },
         {
           name: listMonitors.name,
           description: listMonitors.description,
-          inputSchema: listMonitors.inputSchema
+          inputSchema: listMonitors.inputSchema,
         },
         {
           name: initDevSession.name,
           description: initDevSession.description,
-          inputSchema: initDevSession.inputSchema
+          inputSchema: initDevSession.inputSchema,
         },
         {
           name: startOpenlog.name,
           description: startOpenlog.description,
-          inputSchema: startOpenlog.inputSchema
+          inputSchema: startOpenlog.inputSchema,
         },
         {
           name: stopOpenlog.name,
           description: stopOpenlog.description,
-          inputSchema: stopOpenlog.inputSchema
+          inputSchema: stopOpenlog.inputSchema,
         },
         {
           name: getCheckpoints.name,
           description: getCheckpoints.description,
-          inputSchema: getCheckpoints.inputSchema
+          inputSchema: getCheckpoints.inputSchema,
         },
         {
           name: ensureSdk.name,
           description: ensureSdk.description,
-          inputSchema: ensureSdk.inputSchema
-        }
-      ]
+          inputSchema: ensureSdk.inputSchema,
+        },
+      ],
     };
   });
 
@@ -271,16 +316,17 @@ export async function startMCPServer(config?: EmbeddedServerConfig): Promise<voi
       prompts: [
         {
           name: 'openlog_dev_workflow',
-          description: 'openLog H5 开发自动验证工作流 SOP。开始开发 H5 功能时自动参考此流程。'
-        }
-      ]
+          description: 'openLog H5 开发自动验证工作流 SOP。开始开发 H5 功能时自动参考此流程。',
+        },
+      ],
     };
   });
 
-   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     if (request.params.name === 'openlog_dev_workflow') {
       return {
-        description: 'openLog H5 development workflow — auto-detection + checkpoint verification SOP',
+        description:
+          'openLog H5 development workflow — auto-detection + checkpoint verification SOP',
         messages: [
           {
             role: 'user' as const,
@@ -398,10 +444,10 @@ Rules:
 - **Device must be on same WiFi** — if list_devices is empty, remind user
 - **All tools accept optional deviceId** — omit it to auto-select (or use focus_device)
 - **execute_js is powerful** — use it to read DOM, trigger clicks, check JS state remotely
-- **Screenshots return base64** — useful when you need to "see" the page`
-            }
-          }
-        ]
+- **Screenshots return base64** — useful when you need to "see" the page`,
+            },
+          },
+        ],
       };
     }
     throw new Error(`Prompt not found: ${request.params.name}`);
@@ -413,10 +459,24 @@ Rules:
     try {
       switch (name) {
         case 'list_devices':
-          return { content: [{ type: 'text', text: JSON.stringify(await listDevices.execute(args || {}), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await listDevices.execute(args || {}), null, 2),
+              },
+            ],
+          };
 
         case 'focus_device':
-          return { content: [{ type: 'text', text: JSON.stringify(await focusDevice.execute(args as any || {}), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await focusDevice.execute((args as any) || {}), null, 2),
+              },
+            ],
+          };
 
         case 'get_console_logs': {
           if (!args) {
@@ -430,11 +490,20 @@ Rules:
           const logsArgs: GetConsoleLogsArgs = {
             deviceId: args.deviceId,
             limit: typeof args.limit === 'number' ? args.limit : undefined,
-            level: typeof args.level === 'string' && ['log', 'warn', 'error', 'info'].includes(args.level)
-              ? args.level as 'log' | 'warn' | 'error' | 'info'
-              : undefined
+            level:
+              typeof args.level === 'string' &&
+              ['log', 'warn', 'error', 'info'].includes(args.level)
+                ? (args.level as 'log' | 'warn' | 'error' | 'info')
+                : undefined,
           };
-          return { content: [{ type: 'text', text: JSON.stringify(await getConsoleLogs.execute(logsArgs), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await getConsoleLogs.execute(logsArgs), null, 2),
+              },
+            ],
+          };
         }
 
         case 'get_network_requests': {
@@ -443,9 +512,16 @@ Rules:
             limit: typeof args?.limit === 'number' ? args.limit : undefined,
             method: typeof args?.method === 'string' ? args.method : undefined,
             urlPattern: typeof args?.urlPattern === 'string' ? args.urlPattern : undefined,
-            status: typeof args?.status === 'number' ? args.status : undefined
+            status: typeof args?.status === 'number' ? args.status : undefined,
           };
-          return { content: [{ type: 'text', text: JSON.stringify(await getNetworkRequests.execute(networkArgs), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await getNetworkRequests.execute(networkArgs), null, 2),
+              },
+            ],
+          };
         }
 
         case 'watch_logs': {
@@ -453,8 +529,9 @@ Rules:
           let levels: ('log' | 'warn' | 'error' | 'info')[] | undefined;
           if (Array.isArray(args?.levels)) {
             const validLevels = ['log', 'warn', 'error', 'info'];
-            levels = args.levels.filter((l: unknown): l is 'log' | 'warn' | 'error' | 'info' =>
-              typeof l === 'string' && validLevels.includes(l)
+            levels = args.levels.filter(
+              (l: unknown): l is 'log' | 'warn' | 'error' | 'info' =>
+                typeof l === 'string' && validLevels.includes(l),
             );
             if (levels.length === 0) levels = undefined;
           }
@@ -463,17 +540,31 @@ Rules:
             deviceId: typeof args?.deviceId === 'string' ? args.deviceId : undefined,
             levels,
             since: typeof args?.since === 'number' ? args.since : undefined,
-            limit: typeof args?.limit === 'number' ? args.limit : undefined
+            limit: typeof args?.limit === 'number' ? args.limit : undefined,
           };
-          return { content: [{ type: 'text', text: JSON.stringify(await watchLogs.execute(watchArgs), null, 2) }] };
+          return {
+            content: [
+              { type: 'text', text: JSON.stringify(await watchLogs.execute(watchArgs), null, 2) },
+            ],
+          };
         }
 
         case 'get_storage': {
           const storageArgs = {
             deviceId: typeof args?.deviceId === 'string' ? args.deviceId : undefined,
-            type: typeof args?.type === 'string' ? args.type as 'all' | 'localStorage' | 'sessionStorage' | 'cookies' : undefined
+            type:
+              typeof args?.type === 'string'
+                ? (args.type as 'all' | 'localStorage' | 'sessionStorage' | 'cookies')
+                : undefined,
           };
-          return { content: [{ type: 'text', text: JSON.stringify(await getStorage.execute(storageArgs), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await getStorage.execute(storageArgs), null, 2),
+              },
+            ],
+          };
         }
 
         case 'get_page_context': {
@@ -481,9 +572,17 @@ Rules:
             deviceId: typeof args?.deviceId === 'string' ? args.deviceId : undefined,
             logLimit: typeof args?.logLimit === 'number' ? args.logLimit : undefined,
             requestLimit: typeof args?.requestLimit === 'number' ? args.requestLimit : undefined,
-            includeStorage: typeof args?.includeStorage === 'boolean' ? args.includeStorage : undefined
+            includeStorage:
+              typeof args?.includeStorage === 'boolean' ? args.includeStorage : undefined,
           };
-          return { content: [{ type: 'text', text: JSON.stringify(await getPageContext.execute(ctxArgs), null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(await getPageContext.execute(ctxArgs), null, 2),
+              },
+            ],
+          };
         }
 
         case 'execute_js': {
@@ -496,7 +595,18 @@ Rules:
         case 'take_screenshot': {
           const ssArgs = args as { deviceId?: string };
           const ssResult = await takeScreenshot.execute(ssArgs);
-          return { content: [{ type: 'text', text: JSON.stringify({ ...ssResult, dataUrl: ssResult.dataUrl.slice(0, 80) + '...' }, null, 2) }] };
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  { ...ssResult, dataUrl: ssResult.dataUrl.slice(0, 80) + '...' },
+                  null,
+                  2,
+                ),
+              },
+            ],
+          };
         }
 
         case 'reload_page': {
@@ -505,7 +615,12 @@ Rules:
         }
 
         case 'set_storage': {
-          const sa = args as { key: string; value?: string; storageType?: string; deviceId?: string };
+          const sa = args as {
+            key: string;
+            value?: string;
+            storageType?: string;
+            deviceId?: string;
+          };
           if (!sa?.key) throw new Error('set_storage requires key argument');
           const r = await setStorage.execute(sa);
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
@@ -525,7 +640,8 @@ Rules:
 
         case 'zen_mode': {
           const za = args as { enabled: boolean; deviceId?: string };
-          if (typeof za?.enabled !== 'boolean') throw new Error('zen_mode requires enabled (boolean)');
+          if (typeof za?.enabled !== 'boolean')
+            throw new Error('zen_mode requires enabled (boolean)');
           const r = await zenMode.execute(za);
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
@@ -536,7 +652,15 @@ Rules:
         }
 
         case 'add_mock': {
-          const r = await addMock.execute(args as { pattern: string; body: string; method?: string; status?: number; deviceId?: string });
+          const r = await addMock.execute(
+            args as {
+              pattern: string;
+              body: string;
+              method?: string;
+              status?: number;
+              deviceId?: string;
+            },
+          );
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 
@@ -576,18 +700,22 @@ Rules:
         }
 
         case 'verify_checkpoint': {
-          const r = await verifyCheckpoint.execute(args as {
-            checkpoint: string;
-            triggerJs?: string;
-            waitMs?: number;
-            expects?: import('./tools/verify_checkpoint.js').CheckpointExpect;
-            deviceId?: string;
-          });
+          const r = await verifyCheckpoint.execute(
+            args as {
+              checkpoint: string;
+              triggerJs?: string;
+              waitMs?: number;
+              expects?: import('./tools/verify_checkpoint.js').CheckpointExpect;
+              deviceId?: string;
+            },
+          );
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 
         case 'start_monitor': {
-          const r = await startMonitor.execute(args as { type: 'error' | 'log'; deviceId?: string });
+          const r = await startMonitor.execute(
+            args as { type: 'error' | 'log'; deviceId?: string },
+          );
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 
@@ -622,12 +750,16 @@ Rules:
         }
 
         case 'get_checkpoints': {
-          const r = await getCheckpoints.execute(args as { deviceId?: string; feature?: string; limit?: number });
+          const r = await getCheckpoints.execute(
+            args as { deviceId?: string; feature?: string; limit?: number },
+          );
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 
         case 'ensure_sdk': {
-          const r = await ensureSdk.execute(args as { projectDir?: string; mode?: 'check' | 'inject' | 'auto'; server?: string });
+          const r = await ensureSdk.execute(
+            args as { projectDir?: string; mode?: 'check' | 'inject' | 'auto'; server?: string },
+          );
           return { content: [{ type: 'text', text: JSON.stringify(r, null, 2) }] };
         }
 
@@ -639,8 +771,10 @@ Rules:
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`[Tool Error] ${name}:`, errorMessage);
       return {
-        content: [{ type: 'text', text: JSON.stringify({ error: errorMessage, tool: name }, null, 2) }],
-        isError: true
+        content: [
+          { type: 'text', text: JSON.stringify({ error: errorMessage, tool: name }, null, 2) },
+        ],
+        isError: true,
       };
     }
   });

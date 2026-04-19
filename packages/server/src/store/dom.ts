@@ -35,10 +35,13 @@ export class DOMStore {
   }
 
   cleanup(deviceId: string): void {
-    const timer = setTimeout(() => {
-      this.snapshots.delete(deviceId);
-      this.cleanupTimers.delete(deviceId);
-    }, 30 * 60 * 1000);
+    const timer = setTimeout(
+      () => {
+        this.snapshots.delete(deviceId);
+        this.cleanupTimers.delete(deviceId);
+      },
+      30 * 60 * 1000,
+    );
     this.cleanupTimers.set(deviceId, timer);
   }
 

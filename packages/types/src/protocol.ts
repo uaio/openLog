@@ -74,9 +74,7 @@ export interface ViewerRegisterMessage {
 /** PC Panel 向特定设备发送指令（透传） */
 export type ViewerCommandMessage = ServerToDeviceCommand & { deviceId: string };
 
-export type ViewerToServerMessage =
-  | ViewerRegisterMessage
-  | ViewerCommandMessage;
+export type ViewerToServerMessage = ViewerRegisterMessage | ViewerCommandMessage;
 
 // ─── Server → PC Viewer（推送）────────────────────────────────────────────────
 
@@ -93,9 +91,7 @@ export interface ServerEventPush {
   envelope: AnyEnvelope;
 }
 
-export type ServerToViewerMessage =
-  | ServerDeviceListPush
-  | ServerEventPush;
+export type ServerToViewerMessage = ServerDeviceListPush | ServerEventPush;
 
 // ─── 设备在线信息（REST API 响应）─────────────────────────────────────────────
 

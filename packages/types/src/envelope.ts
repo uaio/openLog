@@ -17,11 +17,11 @@ import type { EventType, EventPayloadMap } from './events/index.js';
 // ─── 平台标识 ──────────────────────────────────────────────────────────────
 
 export type Platform =
-  | 'web'           // 浏览器 H5（当前主要平台）
-  | 'react-native'  // React Native
-  | 'flutter'       // Flutter WebView / Dart
-  | 'miniprogram'   // 微信/支付宝小程序
-  | 'unknown';      // 未知平台（保留兼容）
+  | 'web' // 浏览器 H5（当前主要平台）
+  | 'react-native' // React Native
+  | 'flutter' // Flutter WebView / Dart
+  | 'miniprogram' // 微信/支付宝小程序
+  | 'unknown'; // 未知平台（保留兼容）
 
 // ─── 设备上下文（每条 Envelope 都携带） ──────────────────────────────────────
 
@@ -78,7 +78,7 @@ export type EnvelopeOf<T extends EventType> = OpenLogEnvelope<T>;
 /** 判断是否是某类 Envelope（类型守卫） */
 export function isEnvelope<T extends EventType>(
   env: AnyEnvelope,
-  type: T
+  type: T,
 ): env is OpenLogEnvelope<T> {
   return env.type === type;
 }

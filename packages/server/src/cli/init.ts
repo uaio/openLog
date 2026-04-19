@@ -16,17 +16,16 @@ interface AIToolConfig {
 function getNetworkIp(): string {
   const iface = Object.values(networkInterfaces())
     .flat()
-    .find(i => i?.family === 'IPv4' && !i.internal);
+    .find((i) => i?.family === 'IPv4' && !i.internal);
   return iface?.address ?? 'localhost';
 }
 
 function getAllIpv4(): { name: string; address: string }[] {
-  return Object.entries(networkInterfaces())
-    .flatMap(([name, ifaces]) =>
-      (ifaces ?? [])
-        .filter(i => i.family === 'IPv4' && !i.internal)
-        .map(i => ({ name, address: i.address }))
-    );
+  return Object.entries(networkInterfaces()).flatMap(([name, ifaces]) =>
+    (ifaces ?? [])
+      .filter((i) => i.family === 'IPv4' && !i.internal)
+      .map((i) => ({ name, address: i.address })),
+  );
 }
 
 function getMcpEntry(port: number) {
@@ -34,8 +33,8 @@ function getMcpEntry(port: number) {
     command: 'npx',
     args: ['-y', '@openlog/mcp'],
     env: {
-      OPENLOG_API_BASE_URL: `http://localhost:${port}`
-    }
+      OPENLOG_API_BASE_URL: `http://localhost:${port}`,
+    },
   };
 }
 
@@ -138,25 +137,26 @@ function writeClaudeCommands(): void {
     writeFileSync(join(commandsDir, filename), content, 'utf-8');
   }
   console.log(`  ✅ 已写入 ~/.claude/commands/openlog/ (7 个命令)`);
-  console.log(`     /openlog:start  /openlog:stop  /openlog:status  /openlog:logs  /openlog:screenshot  /openlog:clean  /openlog:setup`);
+  console.log(
+    `     /openlog:start  /openlog:stop  /openlog:status  /openlog:logs  /openlog:screenshot  /openlog:clean  /openlog:setup`,
+  );
 }
 
 const AI_TOOLS: AIToolConfig[] = [
   {
     name: 'Claude Code',
     configPath: '.claude.json',
-    detect: () => existsSync(join(process.cwd(), '.claude.json')) || existsSync(join(process.cwd(), '.claude')),
+    detect: () =>
+      existsSync(join(process.cwd(), '.claude.json')) || existsSync(join(process.cwd(), '.claude')),
     write(mcpEntry, port) {
       const configFile = join(process.cwd(), '.claude.json');
-      const config = existsSync(configFile)
-        ? JSON.parse(readFileSync(configFile, 'utf-8'))
-        : {};
+      const config = existsSync(configFile) ? JSON.parse(readFileSync(configFile, 'utf-8')) : {};
       config.mcpServers = config.mcpServers ?? {};
       config.mcpServers.openlog = mcpEntry;
       writeFileSync(configFile, JSON.stringify(config, null, 2));
       console.log(`  ✅ 已写入 .claude.json`);
       writeClaudeCommands();
-    }
+    },
   },
   {
     name: 'Cursor',
@@ -166,14 +166,12 @@ const AI_TOOLS: AIToolConfig[] = [
       const configDir = join(process.cwd(), '.cursor');
       const configFile = join(configDir, 'mcp.json');
       mkdirSync(configDir, { recursive: true });
-      const config = existsSync(configFile)
-        ? JSON.parse(readFileSync(configFile, 'utf-8'))
-        : {};
+      const config = existsSync(configFile) ? JSON.parse(readFileSync(configFile, 'utf-8')) : {};
       config.mcpServers = config.mcpServers ?? {};
       config.mcpServers.openlog = mcpEntry;
       writeFileSync(configFile, JSON.stringify(config, null, 2));
       console.log(`  ✅ 已写入 .cursor/mcp.json`);
-    }
+    },
   },
   {
     name: 'Windsurf',
@@ -186,15 +184,13 @@ const AI_TOOLS: AIToolConfig[] = [
       const home = process.env.HOME ?? process.env.USERPROFILE ?? '';
       const configFile = join(home, '.codeium', 'windsurf', 'mcp_config.json');
       mkdirSync(join(home, '.codeium', 'windsurf'), { recursive: true });
-      const config = existsSync(configFile)
-        ? JSON.parse(readFileSync(configFile, 'utf-8'))
-        : {};
+      const config = existsSync(configFile) ? JSON.parse(readFileSync(configFile, 'utf-8')) : {};
       config.mcpServers = config.mcpServers ?? {};
       config.mcpServers.openlog = mcpEntry;
       writeFileSync(configFile, JSON.stringify(config, null, 2));
       console.log(`  ✅ 已写入 ~/.codeium/windsurf/mcp_config.json`);
-    }
-  }
+    },
+  },
 ];
 
 export async function init(options: InitOptions = {}) {
@@ -209,22 +205,22 @@ export async function init(options: InitOptions = {}) {
 
   if (options.forTool) {
     const name = options.forTool.toLowerCase();
-    const found = AI_TOOLS.find(t => t.name.toLowerCase().includes(name));
+    const found = AI_TOOLS.find((t) => t.name.toLowerCase().includes(name));
     if (!found) {
       console.error(`  ❌ 未知 AI 工具: ${options.forTool}`);
-      console.log(`  支持: ${AI_TOOLS.map(t => t.name).join(' | ')}`);
+      console.log(`  支持: ${AI_TOOLS.map((t) => t.name).join(' | ')}`);
       process.exit(1);
     }
     targets = [found];
   } else {
     // 自动检测
-    targets = AI_TOOLS.filter(t => t.detect());
+    targets = AI_TOOLS.filter((t) => t.detect());
     if (targets.length === 0) {
       console.log('  ⚠️  未检测到已安装的 AI 工具，将显示手动配置方法。\n');
       printManualConfig(mcpEntry, port);
       return;
     }
-    console.log(`  检测到: ${targets.map(t => t.name).join(', ')}\n`);
+    console.log(`  检测到: ${targets.map((t) => t.name).join(', ')}\n`);
   }
 
   // 写入配置
@@ -236,9 +232,12 @@ export async function init(options: InitOptions = {}) {
   // 列出所有可用网卡地址
   const allIps = getAllIpv4();
   const primaryIp = allIps[0]?.address ?? 'localhost';
-  const networkIpLines = allIps.length > 0
-    ? allIps.map(({ name, address }) => `    ${name.padEnd(12)} ws://${address}:${port}`).join('\n')
-    : '    （未检测到局域网地址）';
+  const networkIpLines =
+    allIps.length > 0
+      ? allIps
+          .map(({ name, address }) => `    ${name.padEnd(12)} ws://${address}:${port}`)
+          .join('\n')
+      : '    （未检测到局域网地址）';
 
   // 输出 SDK snippet
   console.log(`
@@ -279,9 +278,12 @@ ${networkIpLines}
 function printManualConfig(mcpEntry: object, port: number) {
   const allIps = getAllIpv4();
   const primaryIp = allIps[0]?.address ?? 'localhost';
-  const networkIpLines = allIps.length > 0
-    ? allIps.map(({ name, address }) => `    ${name.padEnd(12)} ws://${address}:${port}`).join('\n')
-    : '    （未检测到局域网地址）';
+  const networkIpLines =
+    allIps.length > 0
+      ? allIps
+          .map(({ name, address }) => `    ${name.padEnd(12)} ws://${address}:${port}`)
+          .join('\n')
+      : '    （未检测到局域网地址）';
 
   console.log(`手动配置 MCP（将以下内容加入你的 AI 工具 MCP 配置文件）：
 

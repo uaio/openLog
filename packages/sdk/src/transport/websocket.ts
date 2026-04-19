@@ -71,7 +71,7 @@ export class WebSocketTransport {
         onError: (error: Error) => {
           this.state = 'error';
           this.events.onError?.(error);
-        }
+        },
       });
     } catch (error) {
       this.state = 'error';

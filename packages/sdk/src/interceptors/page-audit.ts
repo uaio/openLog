@@ -6,10 +6,10 @@
 export interface AuditItem {
   id: string;
   title: string;
-  score: number;        // 0-100, 100=pass
+  score: number; // 0-100, 100=pass
   rating: 'good' | 'needs-improvement' | 'poor';
-  value: string;        // 人类可读的值描述
-  details?: any;        // 结构化细节供 AI 分析
+  value: string; // 人类可读的值描述
+  details?: any; // 结构化细节供 AI 分析
 }
 
 export interface PageAuditReport {
@@ -43,7 +43,7 @@ function auditDOMSize(): AuditItem {
 
   // 计算最大子节点宽度
   let maxWidth = 0;
-  allElements.forEach(el => {
+  allElements.forEach((el) => {
     if (el.children.length > maxWidth) maxWidth = el.children.length;
   });
 
@@ -68,7 +68,7 @@ function auditRenderBlocking(): AuditItem {
   const blockingResources: { tag: string; url: string }[] = [];
 
   // 检测同步 script（无 async/defer）
-  document.querySelectorAll('script[src]').forEach(el => {
+  document.querySelectorAll('script[src]').forEach((el) => {
     const script = el as HTMLScriptElement;
     if (!script.async && !script.defer && script.type !== 'module') {
       blockingResources.push({ tag: 'script', url: script.src });
@@ -76,7 +76,7 @@ function auditRenderBlocking(): AuditItem {
   });
 
   // 检测 render-blocking CSS（非 media=print 的 link stylesheet）
-  document.querySelectorAll('link[rel="stylesheet"]').forEach(el => {
+  document.querySelectorAll('link[rel="stylesheet"]').forEach((el) => {
     const link = el as HTMLLinkElement;
     if (link.media !== 'print' && !link.disabled) {
       blockingResources.push({ tag: 'link/css', url: link.href });
@@ -104,7 +104,7 @@ function auditRenderBlocking(): AuditItem {
 function auditImages(): AuditItem {
   const issues: { src: string; problem: string; naturalSize?: string; displaySize?: string }[] = [];
 
-  document.querySelectorAll('img').forEach(el => {
+  document.querySelectorAll('img').forEach((el) => {
     const img = el as HTMLImageElement;
     if (!img.src || img.src.startsWith('data:')) return;
 
@@ -131,7 +131,12 @@ function auditImages(): AuditItem {
     }
 
     // 检测缺少尺寸属性（会导致 CLS）
-    if (!img.hasAttribute('width') && !img.hasAttribute('height') && !img.style.width && !img.style.height) {
+    if (
+      !img.hasAttribute('width') &&
+      !img.hasAttribute('height') &&
+      !img.style.width &&
+      !img.style.height
+    ) {
       const computedStyle = getComputedStyle(img);
       if (computedStyle.width === 'auto' || computedStyle.height === 'auto') {
         issues.push({
@@ -169,7 +174,8 @@ function auditResourceSize(): AuditItem {
   for (const entry of entries) {
     const sizeKB = Math.round(entry.transferSize / 1024);
     totalTransferKB += sizeKB;
-    if (entry.transferSize > 100 * 1024) { // > 100KB
+    if (entry.transferSize > 100 * 1024) {
+      // > 100KB
       largeResources.push({
         url: entry.name.slice(0, 100),
         sizeKB,
@@ -241,12 +247,14 @@ function auditCompression(): AuditItem {
 /** 字体加载检测 */
 function auditFonts(): AuditItem {
   const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-  const fonts = entries.filter(e => e.initiatorType === 'css' && /\.(woff2?|ttf|otf|eot)(\?|$)/i.test(e.name));
+  const fonts = entries.filter(
+    (e) => e.initiatorType === 'css' && /\.(woff2?|ttf|otf|eot)(\?|$)/i.test(e.name),
+  );
 
   const issues: string[] = [];
 
   // 检测字体文件大小
-  const largeFonts = fonts.filter(f => f.transferSize > 100 * 1024);
+  const largeFonts = fonts.filter((f) => f.transferSize > 100 * 1024);
   if (largeFonts.length > 0) {
     issues.push(`${largeFonts.length} 个字体文件 >100KB`);
   }
@@ -264,9 +272,13 @@ function auditFonts(): AuditItem {
             }
           }
         }
-      } catch { /* cross-origin stylesheet */ }
+      } catch {
+        /* cross-origin stylesheet */
+      }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   if (missingFontDisplay > 0) {
     issues.push(`${missingFontDisplay} 个 @font-face 缺少 font-display: swap`);
@@ -300,9 +312,9 @@ export function runPageAudit(): PageAuditReport {
   ];
 
   const summary = {
-    good: audits.filter(a => a.rating === 'good').length,
-    warning: audits.filter(a => a.rating === 'needs-improvement').length,
-    poor: audits.filter(a => a.rating === 'poor').length,
+    good: audits.filter((a) => a.rating === 'good').length,
+    warning: audits.filter((a) => a.rating === 'needs-improvement').length,
+    poor: audits.filter((a) => a.rating === 'poor').length,
   };
 
   return {

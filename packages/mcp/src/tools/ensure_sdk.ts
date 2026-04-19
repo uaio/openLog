@@ -18,8 +18,8 @@ type EnsureSdkMode = 'check' | 'inject' | 'auto';
 function getAllLanIps(): string[] {
   return Object.values(networkInterfaces())
     .flat()
-    .filter(i => i && i.family === 'IPv4' && !i.internal)
-    .map(i => i!.address);
+    .filter((i) => i && i.family === 'IPv4' && !i.internal)
+    .map((i) => i!.address);
 }
 
 function getPort(): number {
@@ -58,42 +58,50 @@ function findEntryFile(projectDir: string, framework: EnsureSdkResult['framework
       break;
     case 'react':
       candidates.push(
-        'src/main.tsx', 'src/main.ts', 'src/main.jsx', 'src/main.js',
-        'src/index.tsx', 'src/index.ts', 'src/index.jsx', 'src/index.js',
-        'public/index.html', 'index.html'
+        'src/main.tsx',
+        'src/main.ts',
+        'src/main.jsx',
+        'src/main.js',
+        'src/index.tsx',
+        'src/index.ts',
+        'src/index.jsx',
+        'src/index.js',
+        'public/index.html',
+        'index.html',
       );
       break;
     case 'vue':
-      candidates.push(
-        'src/main.ts', 'src/main.js',
-        'public/index.html', 'index.html'
-      );
+      candidates.push('src/main.ts', 'src/main.js', 'public/index.html', 'index.html');
       break;
     case 'next':
       candidates.push(
-        'src/app/layout.tsx', 'src/app/layout.js', 'app/layout.tsx', 'app/layout.js',
-        'src/pages/_app.tsx', 'src/pages/_app.js', 'pages/_app.tsx', 'pages/_app.js'
+        'src/app/layout.tsx',
+        'src/app/layout.js',
+        'app/layout.tsx',
+        'app/layout.js',
+        'src/pages/_app.tsx',
+        'src/pages/_app.js',
+        'pages/_app.tsx',
+        'pages/_app.js',
       );
       break;
     case 'nuxt':
-      candidates.push(
-        'app.vue', 'layouts/default.vue',
-        'plugins/openlog.ts', 'plugins/openlog.js'
-      );
+      candidates.push('app.vue', 'layouts/default.vue', 'plugins/openlog.ts', 'plugins/openlog.js');
       break;
     case 'svelte':
-      candidates.push(
-        'src/main.ts', 'src/main.js',
-        'src/routes/+layout.svelte'
-      );
+      candidates.push('src/main.ts', 'src/main.js', 'src/routes/+layout.svelte');
       break;
     case 'angular':
       candidates.push('src/main.ts', 'src/main.js');
       break;
     default:
       candidates.push(
-        'src/main.ts', 'src/main.js', 'src/index.ts', 'src/index.js',
-        'index.html', 'public/index.html'
+        'src/main.ts',
+        'src/main.js',
+        'src/index.ts',
+        'src/index.js',
+        'index.html',
+        'public/index.html',
       );
   }
 
@@ -191,19 +199,20 @@ export const ensureSdk = {
     properties: {
       projectDir: {
         type: 'string' as const,
-        description: 'Absolute path to the user project directory (defaults to cwd)'
+        description: 'Absolute path to the user project directory (defaults to cwd)',
       },
       mode: {
         type: 'string' as const,
         enum: ['check', 'inject', 'auto'],
-        description: 'check = only detect; inject = detect and auto-inject into HTML files; auto = detect and return injection guidance (default)'
+        description:
+          'check = only detect; inject = detect and auto-inject into HTML files; auto = detect and return injection guidance (default)',
       },
       server: {
         type: 'string' as const,
-        description: 'WebSocket server address (defaults to auto-detected LAN IP)'
-      }
+        description: 'WebSocket server address (defaults to auto-detected LAN IP)',
+      },
     },
-    required: []
+    required: [],
   },
 
   async execute(args: {
@@ -215,7 +224,7 @@ export const ensureSdk = {
     const mode = args.mode || 'auto';
     const port = getPort();
     const lanIps = getAllLanIps();
-    const serverAddresses = lanIps.map(ip => `ws://${ip}:${port}`);
+    const serverAddresses = lanIps.map((ip) => `ws://${ip}:${port}`);
     const wsAddress = args.server || serverAddresses[0] || `ws://localhost:${port}`;
 
     const framework = detectFramework(projectDir);
@@ -231,7 +240,7 @@ export const ensureSdk = {
         injected: false,
         injectionCode: '',
         instructions: 'openLog SDK is already integrated in this project. Ready to use.',
-        serverAddresses
+        serverAddresses,
       };
     }
 
@@ -250,7 +259,7 @@ export const ensureSdk = {
         injected: false,
         injectionCode,
         instructions: buildInstructions(framework, entryFile, wsAddress, false),
-        serverAddresses
+        serverAddresses,
       };
     }
 
@@ -266,7 +275,7 @@ export const ensureSdk = {
         instructions: injected
           ? `✅ openLog SDK has been injected into ${entryFile}. Reload the page on your mobile device to connect.`
           : buildInstructions(framework, entryFile, wsAddress, false),
-        serverAddresses
+        serverAddresses,
       };
     }
 
@@ -278,16 +287,16 @@ export const ensureSdk = {
       injected: false,
       injectionCode,
       instructions: buildInstructions(framework, entryFile, wsAddress, true),
-      serverAddresses
+      serverAddresses,
     };
-  }
+  },
 };
 
 function buildInstructions(
   framework: EnsureSdkResult['framework'],
   entryFile: string | null,
   wsAddress: string,
-  isAuto: boolean
+  isAuto: boolean,
 ): string {
   const lines: string[] = [];
 
@@ -295,7 +304,9 @@ function buildInstructions(
 
   switch (framework) {
     case 'html':
-      lines.push(`\nAdd the following CDN snippet to ${entryFile || 'index.html'} before </head> or </body>:`);
+      lines.push(
+        `\nAdd the following CDN snippet to ${entryFile || 'index.html'} before </head> or </body>:`,
+      );
       lines.push(generateCdnSnippet(wsAddress));
       if (isAuto) lines.push(`\nTip: Call ensure_sdk with mode="inject" to auto-inject.`);
       break;
@@ -308,14 +319,19 @@ function buildInstructions(
       lines.push(`  npm install @openlog/sdk`);
       lines.push(`\nStep 2: Add the following to ${entryFile || 'your entry file'}:`);
       lines.push(generateNpmSnippet(wsAddress));
-      if (isAuto) lines.push(`\nAs the AI agent, you should insert this code into the entry file directly.`);
+      if (isAuto)
+        lines.push(`\nAs the AI agent, you should insert this code into the entry file directly.`);
       break;
 
     case 'next':
       lines.push(`\nStep 1: Install the SDK`);
       lines.push(`  npm install @openlog/sdk`);
-      lines.push(`\nStep 2: For Next.js, add the SDK in your root layout (${entryFile || 'app/layout.tsx'}):`);
-      lines.push(`  - Import dynamically: const OpenLog = dynamic(() => import('@openlog/sdk'), { ssr: false })`);
+      lines.push(
+        `\nStep 2: For Next.js, add the SDK in your root layout (${entryFile || 'app/layout.tsx'}):`,
+      );
+      lines.push(
+        `  - Import dynamically: const OpenLog = dynamic(() => import('@openlog/sdk'), { ssr: false })`,
+      );
       lines.push(`  - Or use a client component wrapper to call OpenLog.init()`);
       lines.push(generateNpmSnippet(wsAddress));
       break;
@@ -324,7 +340,9 @@ function buildInstructions(
       lines.push(`\nStep 1: Install the SDK`);
       lines.push(`  npm install @openlog/sdk`);
       lines.push(`\nStep 2: Create a Nuxt plugin at plugins/openlog.client.ts:`);
-      lines.push(`  export default defineNuxtPlugin(() => {\n    ${generateNpmSnippet(wsAddress).replace(/\n/g, '\n    ')}\n  })`);
+      lines.push(
+        `  export default defineNuxtPlugin(() => {\n    ${generateNpmSnippet(wsAddress).replace(/\n/g, '\n    ')}\n  })`,
+      );
       break;
 
     default:
@@ -339,7 +357,7 @@ function buildInstructions(
   const ips = getAllLanIps();
   const port = getPort();
   if (ips.length > 0) {
-    ips.forEach(ip => lines.push(`  ws://${ip}:${port}`));
+    ips.forEach((ip) => lines.push(`  ws://${ip}:${port}`));
   } else {
     lines.push(`  ws://localhost:${port}`);
   }

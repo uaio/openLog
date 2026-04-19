@@ -7,9 +7,23 @@ export type DOMReportCallback = (snapshot: Omit<DOMSnapshot, 'deviceId' | 'tabId
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'SVG', 'CANVAS']);
 
 /** 忽略的属性名前缀/名称 */
-const SKIP_ATTRS = new Set(['onclick', 'onload', 'onerror', 'onchange', 'onsubmit', 'onfocus',
-  'onblur', 'onkeydown', 'onkeyup', 'onkeypress', 'onmousedown', 'onmouseup',
-  'onmouseover', 'onmouseout', 'onmousemove']);
+const SKIP_ATTRS = new Set([
+  'onclick',
+  'onload',
+  'onerror',
+  'onchange',
+  'onsubmit',
+  'onfocus',
+  'onblur',
+  'onkeydown',
+  'onkeyup',
+  'onkeypress',
+  'onmousedown',
+  'onmouseup',
+  'onmouseover',
+  'onmouseout',
+  'onmousemove',
+]);
 
 const MAX_DEPTH = 8;
 const MAX_CHILDREN = 30;
@@ -95,7 +109,7 @@ export class DOMCollector {
         timestamp: Date.now(),
         url: window.location.href,
         title: document.title,
-        dom
+        dom,
       });
     } catch (err) {
       console.warn('[openLog] DOM 快照采集失败', err);

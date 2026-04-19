@@ -70,7 +70,7 @@ describe('NetworkStore', () => {
 
     const result = store.get('d1', { method: 'get' });
     expect(result).toHaveLength(2);
-    expect(result.every(r => r.method.toUpperCase() === 'GET')).toBe(true);
+    expect(result.every((r) => r.method.toUpperCase() === 'GET')).toBe(true);
   });
 
   it('get with method filter - POST', () => {

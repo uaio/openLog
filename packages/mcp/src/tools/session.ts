@@ -5,20 +5,31 @@ import { ensureSdk } from './ensure_sdk.js';
 
 export const startOpenlog = {
   name: 'start_openlog',
-  description: 'Start the openLog monitoring server, establish WebSocket connection, and auto-detect whether the user project has the SDK integrated. Returns server addresses and SDK status.',
+  description:
+    'Start the openLog monitoring server, establish WebSocket connection, and auto-detect whether the user project has the SDK integrated. Returns server addresses and SDK status.',
   inputSchema: {
     type: 'object' as const,
     properties: {
       port: { type: 'number' as const, description: 'Server port (default 38291)' },
-      openBrowser: { type: 'boolean' as const, description: 'Auto-open browser panel (default true)' },
-      projectDir: { type: 'string' as const, description: 'User project directory to check for SDK (defaults to cwd)' }
+      openBrowser: {
+        type: 'boolean' as const,
+        description: 'Auto-open browser panel (default true)',
+      },
+      projectDir: {
+        type: 'string' as const,
+        description: 'User project directory to check for SDK (defaults to cwd)',
+      },
     },
-    required: []
+    required: [],
   },
-  async execute(args: { port?: number; openBrowser?: boolean; projectDir?: string }): Promise<unknown> {
+  async execute(args: {
+    port?: number;
+    openBrowser?: boolean;
+    projectDir?: string;
+  }): Promise<unknown> {
     const { url } = await startEmbeddedServer({
       port: args.port,
-      openBrowser: args.openBrowser ?? true
+      openBrowser: args.openBrowser ?? true,
     });
 
     wsClient.connect(API_BASE_URL);
@@ -26,7 +37,7 @@ export const startOpenlog = {
     // Auto-detect SDK status in the user's project
     const sdkStatus = await ensureSdk.execute({
       projectDir: args.projectDir,
-      mode: 'auto'
+      mode: 'auto',
     });
 
     return {
@@ -35,9 +46,9 @@ export const startOpenlog = {
       sdkStatus,
       message: sdkStatus.detected
         ? `openLog server started at ${url}. SDK is already integrated. Use list_devices to check connected devices.`
-        : `openLog server started at ${url}. SDK is NOT yet integrated in the project. Follow the instructions in sdkStatus to inject it.`
+        : `openLog server started at ${url}. SDK is NOT yet integrated in the project. Follow the instructions in sdkStatus to inject it.`,
     };
-  }
+  },
 };
 
 export const stopOpenlog = {
@@ -46,7 +57,7 @@ export const stopOpenlog = {
   inputSchema: {
     type: 'object' as const,
     properties: {},
-    required: []
+    required: [],
   },
   async execute(_args: Record<string, never>): Promise<unknown> {
     wsClient.disconnect();
@@ -54,7 +65,7 @@ export const stopOpenlog = {
 
     return {
       status: 'stopped',
-      message: 'openLog 服务已关闭，WebSocket 连接已断开。'
+      message: 'openLog 服务已关闭，WebSocket 连接已断开。',
     };
-  }
+  },
 };

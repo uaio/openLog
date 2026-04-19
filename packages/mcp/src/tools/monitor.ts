@@ -2,7 +2,6 @@ import { wsClient } from '../ws-client.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 import { randomUUID } from 'crypto';
 
-
 // MCP 进程内全局 watcher 注册表
 const watcherRegistry = new Map<string, WatcherEntry>();
 
@@ -63,14 +62,14 @@ type:
       type: {
         type: 'string' as const,
         enum: ['error', 'log'],
-        description: '"error" 只监听报错；"log" 监听全部日志'
+        description: '"error" 只监听报错；"log" 监听全部日志',
       },
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，默认自动选择最近活跃设备）'
-      }
+        description: '设备 ID（可选，默认自动选择最近活跃设备）',
+      },
     },
-    required: ['type'] as const
+    required: ['type'] as const,
   },
 
   async execute(args: { type: MonitorType; deviceId?: string }): Promise<{
@@ -90,16 +89,16 @@ type:
       cursor: now,
       createdAt: now,
       lastPollAt: now,
-      totalSeen: 0
+      totalSeen: 0,
     });
 
     return {
       monitorId,
       type: args.type,
       deviceId,
-      message: `✅ 监听器已启动。将此 monitorId 交给子代理，让其循环调用 poll_monitor("${monitorId}") 消费事件。`
+      message: `✅ 监听器已启动。将此 monitorId 交给子代理，让其循环调用 poll_monitor("${monitorId}") 消费事件。`,
     };
-  }
+  },
 };
 
 // ─────────────────────────────────────────────
@@ -125,16 +124,18 @@ hasAlert 为 true 的条件：
     properties: {
       monitorId: {
         type: 'string' as const,
-        description: 'start_monitor 返回的 monitorId'
-      }
+        description: 'start_monitor 返回的 monitorId',
+      },
     },
-    required: ['monitorId'] as const
+    required: ['monitorId'] as const,
   },
 
   async execute(args: { monitorId: string }): Promise<PollResult> {
     const entry = watcherRegistry.get(args.monitorId);
     if (!entry) {
-      throw new Error(`监听器 ${args.monitorId} 不存在或已被停止。请先调用 start_monitor 创建新监听器。`);
+      throw new Error(
+        `监听器 ${args.monitorId} 不存在或已被停止。请先调用 start_monitor 创建新监听器。`,
+      );
     }
 
     const { deviceId, type, cursor } = entry;
@@ -144,19 +145,20 @@ hasAlert 为 true 的条件：
     if (type === 'error') {
       // error monitor 只关心 error 级别
     }
-    const newRaw = allLogs.filter((l: any) => l.timestamp > cursor && (type === 'log' || l.level === 'error'));
+    const newRaw = allLogs.filter(
+      (l: any) => l.timestamp > cursor && (type === 'log' || l.level === 'error'),
+    );
 
     const newEvents: MonitorEvent[] = newRaw.map((l: any) => ({
       timestamp: l.timestamp,
       level: l.level,
       message: extractMessage(l),
-      stack: l.stack
+      stack: l.stack,
     }));
 
     // 更新游标
-    const newCursor = newEvents.length > 0
-      ? Math.max(...newEvents.map(e => e.timestamp))
-      : cursor;
+    const newCursor =
+      newEvents.length > 0 ? Math.max(...newEvents.map((e) => e.timestamp)) : cursor;
 
     entry.cursor = newCursor;
     entry.lastPollAt = Date.now();
@@ -168,12 +170,18 @@ hasAlert 为 true 的条件：
 
     if (type === 'error' && newEvents.length > 0) {
       hasAlert = true;
-      alertSummary = `🚨 发现 ${newEvents.length} 条新报错：${newEvents.slice(0, 2).map(e => e.message.slice(0, 80)).join(' | ')}`;
+      alertSummary = `🚨 发现 ${newEvents.length} 条新报错：${newEvents
+        .slice(0, 2)
+        .map((e) => e.message.slice(0, 80))
+        .join(' | ')}`;
     } else if (type === 'log') {
-      const alertEvents = newEvents.filter(e => e.level === 'error' || e.level === 'warn');
+      const alertEvents = newEvents.filter((e) => e.level === 'error' || e.level === 'warn');
       if (alertEvents.length > 0) {
         hasAlert = true;
-        alertSummary = `⚠️ 发现 ${alertEvents.length} 条 warn/error：${alertEvents.slice(0, 2).map(e => e.message.slice(0, 80)).join(' | ')}`;
+        alertSummary = `⚠️ 发现 ${alertEvents.length} 条 warn/error：${alertEvents
+          .slice(0, 2)
+          .map((e) => e.message.slice(0, 80))
+          .join(' | ')}`;
       } else if (newEvents.length > 20) {
         hasAlert = true;
         alertSummary = `📊 日志突增：${newEvents.length} 条新日志`;
@@ -188,9 +196,9 @@ hasAlert 为 true 的条件：
       totalSeen: entry.totalSeen,
       cursor: newCursor,
       hasAlert,
-      alertSummary
+      alertSummary,
     };
-  }
+  },
 };
 
 // ─────────────────────────────────────────────
@@ -205,10 +213,10 @@ export const stopMonitor = {
     properties: {
       monitorId: {
         type: 'string' as const,
-        description: 'start_monitor 返回的 monitorId'
-      }
+        description: 'start_monitor 返回的 monitorId',
+      },
     },
-    required: ['monitorId'] as const
+    required: ['monitorId'] as const,
   },
 
   async execute(args: { monitorId: string }): Promise<{ ok: boolean; message: string }> {
@@ -217,9 +225,9 @@ export const stopMonitor = {
       ok: existed,
       message: existed
         ? `✅ 监听器 ${args.monitorId} 已停止`
-        : `⚠️ 监听器 ${args.monitorId} 不存在（可能已停止）`
+        : `⚠️ 监听器 ${args.monitorId} 不存在（可能已停止）`,
     };
-  }
+  },
 };
 
 // ─────────────────────────────────────────────
@@ -232,7 +240,7 @@ export const listMonitors = {
   inputSchema: {
     type: 'object' as const,
     properties: {},
-    required: []
+    required: [],
   },
 
   async execute(_args: Record<string, never>): Promise<{
@@ -247,16 +255,16 @@ export const listMonitors = {
     }>;
   }> {
     const now = Date.now();
-    const monitors = Array.from(watcherRegistry.values()).map(e => ({
+    const monitors = Array.from(watcherRegistry.values()).map((e) => ({
       monitorId: e.monitorId,
       type: e.type,
       deviceId: e.deviceId,
       totalSeen: e.totalSeen,
       runningMs: now - e.createdAt,
-      lastPollAgo: now - e.lastPollAt
+      lastPollAgo: now - e.lastPollAt,
     }));
     return { count: monitors.length, monitors };
-  }
+  },
 };
 
 // ─────────────────────────────────────────────

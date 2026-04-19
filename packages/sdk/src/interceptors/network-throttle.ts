@@ -31,13 +31,16 @@ export class NetworkThrottle {
     this.active = true;
     this.originalFetch = window.fetch.bind(window);
     const self = this;
-    window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    window.fetch = async function (
+      input: RequestInfo | URL,
+      init?: RequestInit,
+    ): Promise<Response> {
       const config = PRESETS[self.preset];
       if (config.downloadKbps === 0) {
         throw new TypeError('Failed to fetch: Network offline (throttled)');
       }
       if (config.latency > 0) {
-        await new Promise(r => setTimeout(r, config.latency));
+        await new Promise((r) => setTimeout(r, config.latency));
       }
       return self.originalFetch!(input, init);
     };

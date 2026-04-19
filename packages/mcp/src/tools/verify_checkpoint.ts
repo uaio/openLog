@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 
-
 export interface CheckpointExpect {
   /** 不能有 error 级日志（默认 true） */
   noErrors?: boolean;
@@ -10,7 +9,11 @@ export interface CheckpointExpect {
   /** 期望发出的网络请求 */
   network?: { urlPattern: string; method?: string; status?: number }[];
   /** 期望 storage 中存在的 key（可选校验 value 子串） */
-  storage?: { key: string; storageType?: 'localStorage' | 'sessionStorage' | 'cookies'; contains?: string }[];
+  storage?: {
+    key: string;
+    storageType?: 'localStorage' | 'sessionStorage' | 'cookies';
+    contains?: string;
+  }[];
   /** 在设备上执行 JS 断言，返回 truthy 视为通过 */
   js?: { code: string; description: string }[];
 }
@@ -52,15 +55,16 @@ export const verifyCheckpoint = {
     properties: {
       checkpoint: {
         type: 'string' as const,
-        description: '节点描述，例如「用户点击登录按钮后接口被调用」'
+        description: '节点描述，例如「用户点击登录按钮后接口被调用」',
       },
       triggerJs: {
         type: 'string' as const,
-        description: '触发操作的 JS 代码，验证前在设备上执行，例如 document.querySelector("#login-btn").click()'
+        description:
+          '触发操作的 JS 代码，验证前在设备上执行，例如 document.querySelector("#login-btn").click()',
       },
       waitMs: {
         type: 'number' as const,
-        description: '触发后等待毫秒数（等待异步操作），默认 800ms'
+        description: '触发后等待毫秒数（等待异步操作），默认 800ms',
       },
       expects: {
         type: 'object' as const,
@@ -68,7 +72,7 @@ export const verifyCheckpoint = {
         properties: {
           noErrors: {
             type: 'boolean' as const,
-            description: '不能出现 error 级别日志，默认 true'
+            description: '不能出现 error 级别日志，默认 true',
           },
           logs: {
             type: 'array' as const,
@@ -76,10 +80,10 @@ export const verifyCheckpoint = {
               type: 'object' as const,
               properties: {
                 contains: { type: 'string' as const },
-                level: { type: 'string' as const, enum: ['log', 'warn', 'error', 'info'] }
+                level: { type: 'string' as const, enum: ['log', 'warn', 'error', 'info'] },
               },
-              required: ['contains']
-            }
+              required: ['contains'],
+            },
           },
           network: {
             type: 'array' as const,
@@ -88,10 +92,10 @@ export const verifyCheckpoint = {
               properties: {
                 urlPattern: { type: 'string' as const },
                 method: { type: 'string' as const },
-                status: { type: 'number' as const }
+                status: { type: 'number' as const },
               },
-              required: ['urlPattern']
-            }
+              required: ['urlPattern'],
+            },
           },
           storage: {
             type: 'array' as const,
@@ -99,11 +103,14 @@ export const verifyCheckpoint = {
               type: 'object' as const,
               properties: {
                 key: { type: 'string' as const },
-                storageType: { type: 'string' as const, enum: ['localStorage', 'sessionStorage', 'cookies'] },
-                contains: { type: 'string' as const }
+                storageType: {
+                  type: 'string' as const,
+                  enum: ['localStorage', 'sessionStorage', 'cookies'],
+                },
+                contains: { type: 'string' as const },
               },
-              required: ['key']
-            }
+              required: ['key'],
+            },
           },
           js: {
             type: 'array' as const,
@@ -111,19 +118,19 @@ export const verifyCheckpoint = {
               type: 'object' as const,
               properties: {
                 code: { type: 'string' as const },
-                description: { type: 'string' as const }
+                description: { type: 'string' as const },
               },
-              required: ['code', 'description']
-            }
-          }
-        }
+              required: ['code', 'description'],
+            },
+          },
+        },
       },
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，不填则自动选择最近活跃设备）'
-      }
+        description: '设备 ID（可选，不填则自动选择最近活跃设备）',
+      },
     },
-    required: ['checkpoint'] as const
+    required: ['checkpoint'] as const,
   },
 
   async execute(args: {
@@ -144,7 +151,7 @@ export const verifyCheckpoint = {
       await fetch(`${API_BASE_URL}/api/devices/${deviceId}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: args.triggerJs })
+        body: JSON.stringify({ code: args.triggerJs }),
       });
       await sleep(waitMs);
     }
@@ -157,14 +164,20 @@ export const verifyCheckpoint = {
 
     const [logsData, networkData, storageData] = await Promise.all([
       needLogs
-        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/logs?limit=100`).then(r => r.json()).catch(() => [])
+        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/logs?limit=100`)
+            .then((r) => r.json())
+            .catch(() => [])
         : Promise.resolve([]),
       needNetwork
-        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/network?limit=50`).then(r => r.json()).catch(() => [])
+        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/network?limit=50`)
+            .then((r) => r.json())
+            .catch(() => [])
         : Promise.resolve([]),
       needStorage
-        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/storage`).then(r => r.json()).catch(() => ({}))
-        : Promise.resolve({})
+        ? fetch(`${API_BASE_URL}/api/devices/${deviceId}/storage`)
+            .then((r) => r.json())
+            .catch(() => ({}))
+        : Promise.resolve({}),
     ]);
 
     // 只取触发后的日志和请求
@@ -186,13 +199,16 @@ export const verifyCheckpoint = {
         passed_checks.push('noErrors: 无 JS 错误日志');
       } else {
         failed_checks.push(
-          `noErrors: 发现 ${errors.length} 条错误 — ${errors.slice(0, 2).map((e: any) => String(e.message ?? e.args?.[0] ?? '').slice(0, 80)).join(' | ')}`
+          `noErrors: 发现 ${errors.length} 条错误 — ${errors
+            .slice(0, 2)
+            .map((e: any) => String(e.message ?? e.args?.[0] ?? '').slice(0, 80))
+            .join(' | ')}`,
         );
       }
     }
 
     // 4. logs 检查
-    for (const expectLog of (expects.logs ?? [])) {
+    for (const expectLog of expects.logs ?? []) {
       const allLogs: any[] = needLogs ? logsData : [];
       const matched = allLogs.some((l: any) => {
         const text = JSON.stringify(l.args ?? l.message ?? '');
@@ -208,11 +224,12 @@ export const verifyCheckpoint = {
     }
 
     // 5. network 检查
-    for (const expectNet of (expects.network ?? [])) {
+    for (const expectNet of expects.network ?? []) {
       const pattern = new RegExp(expectNet.urlPattern, 'i');
       const matched = recentNetwork.find((n: any) => {
         const urlMatch = pattern.test(n.url ?? '');
-        const methodMatch = !expectNet.method || (n.method ?? '').toUpperCase() === expectNet.method.toUpperCase();
+        const methodMatch =
+          !expectNet.method || (n.method ?? '').toUpperCase() === expectNet.method.toUpperCase();
         const statusMatch = !expectNet.status || n.status === expectNet.status;
         return urlMatch && methodMatch && statusMatch;
       });
@@ -225,7 +242,7 @@ export const verifyCheckpoint = {
     }
 
     // 6. storage 检查
-    for (const expectStorage of (expects.storage ?? [])) {
+    for (const expectStorage of expects.storage ?? []) {
       const stType = expectStorage.storageType ?? 'localStorage';
       const store: Record<string, string> = storageData?.[stType] ?? {};
       const value = store[expectStorage.key];
@@ -233,15 +250,19 @@ export const verifyCheckpoint = {
       if (value === undefined) {
         failed_checks.push(`${label}: key 不存在`);
       } else if (expectStorage.contains && !value.includes(expectStorage.contains)) {
-        failed_checks.push(`${label}: 值 "${value.slice(0, 50)}" 不含期望子串 "${expectStorage.contains}"`);
+        failed_checks.push(
+          `${label}: 值 "${value.slice(0, 50)}" 不含期望子串 "${expectStorage.contains}"`,
+        );
       } else {
-        passed_checks.push(`${label}: 值存在${expectStorage.contains ? ` 且含 "${expectStorage.contains}"` : ''}`);
+        passed_checks.push(
+          `${label}: 值存在${expectStorage.contains ? ` 且含 "${expectStorage.contains}"` : ''}`,
+        );
       }
     }
 
     // 7. JS 断言检查
     if (needJs) {
-      for (const jsAssert of (expects.js ?? [])) {
+      for (const jsAssert of expects.js ?? []) {
         try {
           // 用 execute 触发，然后读最新日志判断返回值
           const marker = `__openlog_assert_${Date.now()}`;
@@ -249,12 +270,18 @@ export const verifyCheckpoint = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              code: `(function(){ const r = (${jsAssert.code}); console.log('${marker}', JSON.stringify(!!r)); })()`
-            })
+              code: `(function(){ const r = (${jsAssert.code}); console.log('${marker}', JSON.stringify(!!r)); })()`,
+            }),
           });
           await sleep(300);
-          const assertLogs: any[] = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/logs?limit=20`).then(r => r.json()).catch(() => []);
-          const resultLog = assertLogs.reverse().find((l: any) => JSON.stringify(l.args ?? '').includes(marker));
+          const assertLogs: any[] = await fetch(
+            `${API_BASE_URL}/api/devices/${deviceId}/logs?limit=20`,
+          )
+            .then((r) => r.json())
+            .catch(() => []);
+          const resultLog = assertLogs
+            .reverse()
+            .find((l: any) => JSON.stringify(l.args ?? '').includes(marker));
           const passed = resultLog && JSON.stringify(resultLog.args ?? '').includes('true');
           if (passed) {
             passed_checks.push(`js: ${jsAssert.description}`);
@@ -282,11 +309,11 @@ export const verifyCheckpoint = {
       passed_checks,
       failed_checks,
       skipped_checks,
-      summary
+      summary,
     };
-  }
+  },
 };
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

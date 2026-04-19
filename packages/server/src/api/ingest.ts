@@ -28,9 +28,16 @@ import { broadcastToViewers } from '../ws/handlers.js';
 
 // 支持接入的 Event 类型（PC 面板可展示的类型）
 const SUPPORTED_TYPES = new Set([
-  'console', 'network', 'storage', 'dom',
-  'performance', 'error', 'screenshot', 'perf_run',
-  'lifecycle', 'custom'
+  'console',
+  'network',
+  'storage',
+  'dom',
+  'performance',
+  'error',
+  'screenshot',
+  'perf_run',
+  'lifecycle',
+  'custom',
 ]);
 
 interface IngestContext {
@@ -47,7 +54,8 @@ interface IngestContext {
  */
 function validateEnvelope(env: any): { valid: boolean; error?: string } {
   if (!env || typeof env !== 'object') return { valid: false, error: 'envelope must be an object' };
-  if (env.v !== '1') return { valid: false, error: `unsupported schema version: "${env.v}", expected "1"` };
+  if (env.v !== '1')
+    return { valid: false, error: `unsupported schema version: "${env.v}", expected "1"` };
   if (!env.platform) return { valid: false, error: 'missing field: platform' };
   if (!env.device?.deviceId) return { valid: false, error: 'missing field: device.deviceId' };
   if (!env.device?.projectId) return { valid: false, error: 'missing field: device.projectId' };
@@ -90,7 +98,8 @@ function routeToStore(env: any, ctx: IngestContext): void {
         tabId,
         timestamp: ts,
         level: type === 'error' ? 'error' : (data.level ?? 'log'),
-        message: data.message ?? (Array.isArray(data.args) ? data.args.join(' ') : JSON.stringify(data)),
+        message:
+          data.message ?? (Array.isArray(data.args) ? data.args.join(' ') : JSON.stringify(data)),
         stack: data.stack,
       });
       break;
@@ -173,7 +182,9 @@ export function createIngestRoute(ctx: IngestContext) {
     }
 
     if (envelopes.length > 500) {
-      res.status(400).json({ ok: false, error: 'batch too large, max 500 per request', ts: Date.now() });
+      res
+        .status(400)
+        .json({ ok: false, error: 'batch too large, max 500 per request', ts: Date.now() });
       return;
     }
 

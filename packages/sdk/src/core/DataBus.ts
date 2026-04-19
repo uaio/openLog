@@ -50,10 +50,7 @@ export class DataBus {
   }
 
   /** 订阅事件，返回取消订阅函数 */
-  on<K extends keyof DataBusEventMap>(
-    event: K,
-    cb: Listener<DataBusEventMap[K]>
-  ): () => void {
+  on<K extends keyof DataBusEventMap>(event: K, cb: Listener<DataBusEventMap[K]>): () => void {
     if (!this.listeners.has(event as string)) {
       this.listeners.set(event as string, new Set());
     }
@@ -61,10 +58,7 @@ export class DataBus {
     return () => this.off(event, cb);
   }
 
-  off<K extends keyof DataBusEventMap>(
-    event: K,
-    cb: Listener<DataBusEventMap[K]>
-  ): void {
+  off<K extends keyof DataBusEventMap>(event: K, cb: Listener<DataBusEventMap[K]>): void {
     this.listeners.get(event as string)?.delete(cb as Listener<unknown>);
   }
 

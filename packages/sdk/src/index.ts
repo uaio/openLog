@@ -129,7 +129,8 @@ export class OpenLog {
     const resolvedServer = options.server ?? resolveServerUrl(options.port);
 
     // 检查用户是否之前关闭了远程监控
-    const remoteDisabled = this.platform.storage.getItem(`openlog_remote_${this.projectId}`) === 'false';
+    const remoteDisabled =
+      this.platform.storage.getItem(`openlog_remote_${this.projectId}`) === 'false';
     if (!remoteDisabled) {
       this.reporter.connect(resolvedServer);
     }
@@ -158,15 +159,28 @@ export class OpenLog {
     this.initScreenshotCollector();
 
     // 注册跑分/Mock/节流相关回调
-    this.reporter.onStartPerfRun(() => { this.startPerfRun(); });
-    this.reporter.onStopPerfRun(() => { this.stopPerfRun(); });
-    this.reporter.onSetNetworkThrottle((preset) => { this.setNetworkThrottle(preset as ThrottlePreset); });
+    this.reporter.onStartPerfRun(() => {
+      this.startPerfRun();
+    });
+    this.reporter.onStopPerfRun(() => {
+      this.stopPerfRun();
+    });
+    this.reporter.onSetNetworkThrottle((preset) => {
+      this.setNetworkThrottle(preset as ThrottlePreset);
+    });
     this.reporter.onAddMock((rule) => {
-      if (!this.mockApi) { this.mockApi = new MockAPI(); this.mockApi.start(); }
+      if (!this.mockApi) {
+        this.mockApi = new MockAPI();
+        this.mockApi.start();
+      }
       this.mockApi.addRule(rule);
     });
-    this.reporter.onRemoveMock((id) => { this.removeMock(id); });
-    this.reporter.onClearMocks(() => { this.clearMocks(); });
+    this.reporter.onRemoveMock((id) => {
+      this.removeMock(id);
+    });
+    this.reporter.onClearMocks(() => {
+      this.clearMocks();
+    });
 
     // 标记实例存在
     (globalThis as Record<symbol, unknown>)[OPENLOG_INSTANCE_KEY] = this;
@@ -203,7 +217,7 @@ export class OpenLog {
             //   1. 数据双重采集
             //   2. DataBus emit 不再"第一时间"（Eruda 先于 DataBus 触发）
             overrideConsole: false,
-          }
+          },
         });
 
         // 绑定 ErudaPlugin：订阅 DataBus → 将日志推入 Eruda console 面板
@@ -224,13 +238,16 @@ export class OpenLog {
       log: console.log,
       warn: console.warn,
       error: console.error,
-      info: console.info
+      info: console.info,
     };
 
     const self = this;
 
     // 创建通用的 console 拦截处理函数
-    const createInterceptor = (level: 'log' | 'warn' | 'error' | 'info', originalFn: typeof console.log) => {
+    const createInterceptor = (
+      level: 'log' | 'warn' | 'error' | 'info',
+      originalFn: typeof console.log,
+    ) => {
       return function (...args: unknown[]) {
         // ① DataBus emit 在第一时间发生（先于原始 console 调用，先于 Eruda 面板展示）
         try {
@@ -239,8 +256,8 @@ export class OpenLog {
             timestamp: Date.now(),
             level,
             message,
-            args,  // 原始参数，供 ErudaPlugin 富文本渲染
-            ...(level === 'error' ? { stack: cleanStackTrace(new Error().stack) } : {})
+            args, // 原始参数，供 ErudaPlugin 富文本渲染
+            ...(level === 'error' ? { stack: cleanStackTrace(new Error().stack) } : {}),
           };
           self.dataBus.emit('console', entry);
         } catch {
@@ -261,10 +278,7 @@ export class OpenLog {
 
   private initNetworkInterceptor(config?: NetworkInterceptorConfig): void {
     const bus = this.dataBus;
-    this.networkInterceptor = new NetworkInterceptor(
-      (entry) => bus.emit('network', entry),
-      config
-    );
+    this.networkInterceptor = new NetworkInterceptor((entry) => bus.emit('network', entry), config);
     this.networkInterceptor.start();
   }
 
@@ -346,7 +360,13 @@ export class OpenLog {
 
   async stopPerfRun(): Promise<PerfRunSession | null> {
     if (!this.perfRunning) return null;
-    const snapshot = this.perfRunCollector?.getSnapshot() ?? { vitals: [], samples: [], longTasks: [], resources: [], interactions: [] };
+    const snapshot = this.perfRunCollector?.getSnapshot() ?? {
+      vitals: [],
+      samples: [],
+      longTasks: [],
+      resources: [],
+      interactions: [],
+    };
     this.perfRunCollector?.destroy();
     this.perfRunCollector = null;
     this.exitZenMode();
@@ -564,7 +584,14 @@ export class OpenLog {
 export default OpenLog;
 
 // 导出平台适配接口，供外部平台实现
-export type { PlatformAdapter, StorageAdapter, DeviceAdapter, TimerAdapter, WSConnection, WSEvents } from './platform/types.js';
+export type {
+  PlatformAdapter,
+  StorageAdapter,
+  DeviceAdapter,
+  TimerAdapter,
+  WSConnection,
+  WSEvents,
+} from './platform/types.js';
 export { BrowserAdapter } from './platform/browser/index.js';
 
 // ─────────────────────────────────────────────────────────────

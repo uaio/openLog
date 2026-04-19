@@ -17,9 +17,12 @@ export class DeviceStore {
 
   constructor() {
     // 每 1 分钟清理一次离线设备（更快响应）
-    this.cleanupTimer = setInterval(() => {
-      this.cleanup();
-    }, 1 * 60 * 1000);
+    this.cleanupTimer = setInterval(
+      () => {
+        this.cleanup();
+      },
+      1 * 60 * 1000,
+    );
   }
 
   register(deviceId: string, info: Omit<Device, 'deviceId' | 'online' | 'activeTabs'>): void {
@@ -28,7 +31,7 @@ export class DeviceStore {
       ...info,
       deviceId,
       online: true,
-      activeTabs: existing ? existing.activeTabs + 1 : 1
+      activeTabs: existing ? existing.activeTabs + 1 : 1,
     });
   }
 
@@ -50,7 +53,7 @@ export class DeviceStore {
   list(projectId?: string): Device[] {
     const all = Array.from(this.devices.values());
     if (projectId) {
-      return all.filter(d => d.projectId === projectId);
+      return all.filter((d) => d.projectId === projectId);
     }
     return all;
   }
@@ -77,7 +80,10 @@ export class DeviceStore {
 
     // 记录删除的设备
     if (deletedIds.length > 0) {
-      console.log(`[DeviceStore] 清理了 ${deletedIds.length} 个离线设备 (10分钟未活跃):`, deletedIds);
+      console.log(
+        `[DeviceStore] 清理了 ${deletedIds.length} 个离线设备 (10分钟未活跃):`,
+        deletedIds,
+      );
     }
   }
 

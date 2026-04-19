@@ -17,12 +17,24 @@ export class MockAPI {
     this.active = true;
     this.originalFetch = window.fetch.bind(window);
     const self = this;
-    window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+    window.fetch = async function (
+      input: RequestInfo | URL,
+      init?: RequestInit,
+    ): Promise<Response> {
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.href
+            : (input as Request).url;
       const method = (init?.method ?? 'GET').toUpperCase();
-      const matched = self.rules.find(r => {
+      const matched = self.rules.find((r) => {
         const patternMatch = (() => {
-          try { return new RegExp(r.pattern).test(url); } catch { return url.includes(r.pattern); }
+          try {
+            return new RegExp(r.pattern).test(url);
+          } catch {
+            return url.includes(r.pattern);
+          }
         })();
         const methodMatch = !r.method || r.method.toUpperCase() === method;
         return patternMatch && methodMatch;
@@ -53,7 +65,7 @@ export class MockAPI {
   }
 
   removeRule(id: string): void {
-    this.rules = this.rules.filter(r => r.id !== id);
+    this.rules = this.rules.filter((r) => r.id !== id);
   }
 
   clearRules(): void {

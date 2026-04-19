@@ -41,7 +41,7 @@ export class PerfRunStore {
   }
 
   get(deviceId: string, sessionId: string): PerfRunSession | undefined {
-    return this.sessions.get(deviceId)?.find(s => s.sessionId === sessionId);
+    return this.sessions.get(deviceId)?.find((s) => s.sessionId === sessionId);
   }
 
   clear(deviceId: string): void {

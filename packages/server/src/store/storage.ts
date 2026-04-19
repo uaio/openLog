@@ -42,10 +42,13 @@ export class StorageStore {
   /** 设备断开后延迟清理 */
   cleanup(deviceId: string): void {
     // 30 分钟后清理
-    const timer = setTimeout(() => {
-      this.snapshots.delete(deviceId);
-      this.cleanupTimers.delete(deviceId);
-    }, 30 * 60 * 1000);
+    const timer = setTimeout(
+      () => {
+        this.snapshots.delete(deviceId);
+        this.cleanupTimers.delete(deviceId);
+      },
+      30 * 60 * 1000,
+    );
 
     this.cleanupTimers.set(deviceId, timer);
   }

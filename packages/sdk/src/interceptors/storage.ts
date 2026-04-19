@@ -114,7 +114,7 @@ export class StorageReader {
       sessionStorage: sessionStorageData,
       cookies,
       localStorageSize,
-      sessionStorageSize
+      sessionStorageSize,
     };
   }
 
@@ -183,8 +183,9 @@ export class StorageReader {
       const self = this;
       // 优先尝试在 Document.prototype 上获取原始 descriptor
       const proto = Document.prototype;
-      const desc = Object.getOwnPropertyDescriptor(proto, 'cookie')
-        ?? Object.getOwnPropertyDescriptor(document, 'cookie');
+      const desc =
+        Object.getOwnPropertyDescriptor(proto, 'cookie') ??
+        Object.getOwnPropertyDescriptor(document, 'cookie');
 
       if (!desc || !desc.configurable || !desc.set) return;
 
@@ -199,7 +200,7 @@ export class StorageReader {
         set(val: string) {
           desc.set!.call(document, val);
           self.debouncedReport();
-        }
+        },
       });
     } catch {
       // cookie 拦截失败时静默降级，不影响其他功能

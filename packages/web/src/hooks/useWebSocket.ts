@@ -15,11 +15,11 @@ export type ConnectionState = 'connecting' | 'connected' | 'disconnected';
 
 export function useWebSocket(
   onMessage: (message: WebSocketMessage) => void,
-  _options: UseWebSocketOptions = {}
+  _options: UseWebSocketOptions = {},
 ) {
   const onMessageRef = useRef(onMessage);
   const [connectionState, setConnectionState] = useState<ConnectionState>(() =>
-    websocketManager.getConnectionState()
+    websocketManager.getConnectionState(),
   );
 
   // 更新 onMessage ref，避免依赖变化导致重连循环

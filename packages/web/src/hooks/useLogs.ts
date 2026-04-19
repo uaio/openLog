@@ -39,29 +39,32 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
     loadHistoricalLogs();
   }, [deviceId, maxLogs]);
 
-  const handleWebSocketMessage = useCallback((message: any) => {
-    if (message.type === 'event' && message.envelope?.type === 'console') {
-      const envelope = message.envelope;
-      if (deviceId && message.deviceId !== deviceId) return;
+  const handleWebSocketMessage = useCallback(
+    (message: any) => {
+      if (message.type === 'event' && message.envelope?.type === 'console') {
+        const envelope = message.envelope;
+        if (deviceId && message.deviceId !== deviceId) return;
 
-      const newLog: ConsoleLog = {
-        deviceId: envelope.device.deviceId,
-        tabId: envelope.tabId,
-        timestamp: envelope.ts,
-        level: envelope.data.level,
-        message: envelope.data.message,
-        stack: envelope.data.stack,
-      };
+        const newLog: ConsoleLog = {
+          deviceId: envelope.device.deviceId,
+          tabId: envelope.tabId,
+          timestamp: envelope.ts,
+          level: envelope.data.level,
+          message: envelope.data.message,
+          stack: envelope.data.stack,
+        };
 
-      logBufferRef.current.push(newLog);
-      if (logBufferRef.current.length >= 10) flushLogs();
-    }
-  }, [deviceId]);
+        logBufferRef.current.push(newLog);
+        if (logBufferRef.current.length >= 10) flushLogs();
+      }
+    },
+    [deviceId],
+  );
 
   const flushLogs = useCallback(() => {
     if (logBufferRef.current.length === 0) return;
     const logsToAdd = [...logBufferRef.current];
-    setLogs(prevLogs => [...logsToAdd, ...prevLogs].slice(0, maxLogs));
+    setLogs((prevLogs) => [...logsToAdd, ...prevLogs].slice(0, maxLogs));
     logBufferRef.current = [];
   }, [maxLogs]);
 
@@ -82,6 +85,6 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
     logs,
     clearLogs,
     loading,
-    hasMore
+    hasMore,
   };
 }

@@ -30,7 +30,11 @@ export class ErudaPlugin {
   private unsubscribers: Array<() => void> = [];
 
   /** 将 Eruda 实例与 DataBus 绑定（可在 Eruda 异步加载完成后调用） */
-  attach(eruda: ErudaInstance, bus: DataBus, openlog?: { startPerfRun(): void; stopPerfRun(): Promise<any> }): void {
+  attach(
+    eruda: ErudaInstance,
+    bus: DataBus,
+    openlog?: { startPerfRun(): void; stopPerfRun(): Promise<any> },
+  ): void {
     this.eruda = eruda;
     this.detach(); // 避免重复订阅
 
@@ -38,7 +42,7 @@ export class ErudaPlugin {
     this.unsubscribers.push(
       bus.on('console', (entry: DataBusConsoleEntry) => {
         this.forwardToEruda(entry);
-      })
+      }),
     );
 
     if (openlog && typeof document !== 'undefined') {
@@ -71,14 +75,21 @@ export class ErudaPlugin {
     }
   }
 
-  private injectPerfRunButton(openlog: { startPerfRun(): void; stopPerfRun(): Promise<any> }): void {
+  private injectPerfRunButton(openlog: {
+    startPerfRun(): void;
+    stopPerfRun(): Promise<any>;
+  }): void {
     const tryInject = () => {
       const toolbar = document.querySelector('.eruda-toolbar') as HTMLElement | null;
-      if (!toolbar) { setTimeout(tryInject, 500); return; }
+      if (!toolbar) {
+        setTimeout(tryInject, 500);
+        return;
+      }
       const btn = document.createElement('div');
       btn.className = 'eruda-tool-btn';
       btn.textContent = '🏁跑分';
-      btn.style.cssText = 'padding:4px 8px;cursor:pointer;font-size:12px;border:1px solid #ccc;border-radius:3px;background:#fff;margin-left:4px;';
+      btn.style.cssText =
+        'padding:4px 8px;cursor:pointer;font-size:12px;border:1px solid #ccc;border-radius:3px;background:#fff;margin-left:4px;';
       let running = false;
       btn.addEventListener('click', async () => {
         if (running) {

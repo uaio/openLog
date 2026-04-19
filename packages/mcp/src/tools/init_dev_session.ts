@@ -1,7 +1,6 @@
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 import { startMonitor } from './monitor.js';
 
-
 export const initDevSession = {
   name: 'init_dev_session',
   description: `【开发会话启动工具】在开始开发 H5 页面功能之前，自动调用此工具完成所有监控准备。
@@ -18,10 +17,10 @@ export const initDevSession = {
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，默认自动选择最近活跃设备）'
-      }
+        description: '设备 ID（可选，默认自动选择最近活跃设备）',
+      },
     },
-    required: []
+    required: [],
   },
 
   async execute(args: { deviceId?: string }): Promise<{
@@ -40,7 +39,7 @@ export const initDevSession = {
 
     const [errorResult, logResult] = await Promise.all([
       startMonitor.execute({ type: 'error', deviceId }),
-      startMonitor.execute({ type: 'log', deviceId })
+      startMonitor.execute({ type: 'log', deviceId }),
     ]);
 
     return {
@@ -61,7 +60,7 @@ export const initDevSession = {
 4. 收到主代理「继续」指令后恢复轮询
 5. 收到主代理「停止」指令后调用 stop_monitor("${errorResult.monitorId}") 退出`,
           pollIntervalMs: 3000,
-          alertCondition: 'hasAlert === true（任意新 error 日志）'
+          alertCondition: 'hasAlert === true（任意新 error 日志）',
         },
         logSubAgent: {
           role: '日志流子代理',
@@ -74,7 +73,7 @@ export const initDevSession = {
 4. 每次 poll 间隔 5000ms
 5. 收到主代理「停止」指令后调用 stop_monitor("${logResult.monitorId}") 退出`,
           pollIntervalMs: 5000,
-          alertCondition: 'hasAlert === true（warn/error 级别 或 单次 >20 条日志）'
+          alertCondition: 'hasAlert === true（warn/error 级别 或 单次 >20 条日志）',
         },
         mainAgent: {
           role: '主开发代理',
@@ -85,11 +84,11 @@ export const initDevSession = {
 4. verify_checkpoint 失败 → 修复代码，重新验证，不得跳过继续下一节点
 5. verify_checkpoint 通过 → 标注「✅ 节点已验证」，继续下一节点
 6. 整个功能完成后 → 调用 health_check 确认健康分 ≥ 80
-7. 会话结束 → 通知两个子代理停止`
-        }
-      }
+7. 会话结束 → 通知两个子代理停止`,
+        },
+      },
     };
-  }
+  },
 };
 
 interface SubAgentProtocol {

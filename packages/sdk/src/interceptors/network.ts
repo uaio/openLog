@@ -41,7 +41,9 @@ function headersToObject(headers: Headers): Record<string, string> {
   return result;
 }
 
-export type NetworkReportCallback = (entry: Omit<NetworkRequestEntry, 'deviceId' | 'tabId'>) => void;
+export type NetworkReportCallback = (
+  entry: Omit<NetworkRequestEntry, 'deviceId' | 'tabId'>,
+) => void;
 
 export class NetworkInterceptor {
   private config: Required<NetworkInterceptorConfig>;
@@ -49,7 +51,8 @@ export class NetworkInterceptor {
   private originalFetch: typeof fetch | null = null;
   private originalXhrOpen: typeof XMLHttpRequest.prototype.open | null = null;
   private originalXhrSend: typeof XMLHttpRequest.prototype.send | null = null;
-  private originalXhrSetRequestHeader: typeof XMLHttpRequest.prototype.setRequestHeader | null = null;
+  private originalXhrSetRequestHeader: typeof XMLHttpRequest.prototype.setRequestHeader | null =
+    null;
 
   constructor(onReport: NetworkReportCallback, config?: NetworkInterceptorConfig) {
     this.onReport = onReport;
@@ -57,7 +60,7 @@ export class NetworkInterceptor {
       enabled: config?.enabled ?? true,
       maxRequestBodySize: config?.maxRequestBodySize ?? 10240,
       maxResponseBodySize: config?.maxResponseBodySize ?? 10240,
-      ignoreUrls: config?.ignoreUrls ?? []
+      ignoreUrls: config?.ignoreUrls ?? [],
     };
   }
 
@@ -134,7 +137,10 @@ export class NetworkInterceptor {
             requestBody = '[FormData]';
           } else {
             try {
-              requestBody = truncateToSize(JSON.stringify(init.body), self.config.maxRequestBodySize);
+              requestBody = truncateToSize(
+                JSON.stringify(init.body),
+                self.config.maxRequestBodySize,
+              );
             } catch {
               requestBody = '[Body]';
             }
@@ -142,7 +148,8 @@ export class NetworkInterceptor {
         }
       }
 
-      return self.originalFetch!.call(window, input, init)
+      return self
+        .originalFetch!.call(window, input, init)
         .then(async (response) => {
           const duration = Date.now() - startTime;
 
@@ -177,7 +184,7 @@ export class NetworkInterceptor {
             responseHeaders,
             responseBody,
             duration,
-            type: 'fetch'
+            type: 'fetch',
           });
 
           return response;
@@ -194,7 +201,7 @@ export class NetworkInterceptor {
             requestBody,
             duration,
             type: 'fetch',
-            error: error.message
+            error: error.message,
           });
 
           throw error;
@@ -212,23 +219,32 @@ export class NetworkInterceptor {
     this.originalXhrSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
     // XHR 上下文数据存储
-    const xhrContextMap = new WeakMap<XMLHttpRequest, {
-      requestId: string;
-      startTime: number;
-      method: string;
-      url: string;
-      requestHeaders: Record<string, string>;
-      requestBody?: string;
-    }>();
+    const xhrContextMap = new WeakMap<
+      XMLHttpRequest,
+      {
+        requestId: string;
+        startTime: number;
+        method: string;
+        url: string;
+        requestHeaders: Record<string, string>;
+        requestBody?: string;
+      }
+    >();
 
     // 拦截 open
-    XMLHttpRequest.prototype.open = function (method: string, url: string | URL, async: boolean = true, username?: string | null, password?: string | null) {
+    XMLHttpRequest.prototype.open = function (
+      method: string,
+      url: string | URL,
+      async: boolean = true,
+      username?: string | null,
+      password?: string | null,
+    ) {
       const context = {
         requestId: generateRequestId(),
         startTime: 0,
         method: method.toUpperCase(),
         url: typeof url === 'string' ? url : url.toString(),
-        requestHeaders: {}
+        requestHeaders: {},
       };
       xhrContextMap.set(this, context);
       return self.originalXhrOpen!.call(this, method, url, async, username as any, password as any);
@@ -265,7 +281,10 @@ export class NetworkInterceptor {
           context.requestBody = '[FormData]';
         } else {
           try {
-            context.requestBody = truncateToSize(JSON.stringify(body), self.config.maxRequestBodySize);
+            context.requestBody = truncateToSize(
+              JSON.stringify(body),
+              self.config.maxRequestBodySize,
+            );
           } catch {
             context.requestBody = '[Body]';
           }
@@ -282,7 +301,7 @@ export class NetworkInterceptor {
           const headerStr = this.getAllResponseHeaders();
           if (headerStr) {
             const headers: Record<string, string> = {};
-            headerStr.split('\r\n').forEach(line => {
+            headerStr.split('\r\n').forEach((line) => {
               const [key, value] = line.split(': ');
               if (key && value) {
                 headers[key] = value;
@@ -319,7 +338,7 @@ export class NetworkInterceptor {
           responseHeaders,
           responseBody,
           duration,
-          type: 'xhr'
+          type: 'xhr',
         });
       };
 
@@ -335,7 +354,7 @@ export class NetworkInterceptor {
           requestBody: context.requestBody,
           duration,
           type: 'xhr',
-          error: 'Network error'
+          error: 'Network error',
         });
       };
 

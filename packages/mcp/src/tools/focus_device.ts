@@ -16,10 +16,10 @@ export const focusDevice = {
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '要聚焦的设备 ID（从 list_devices 获取）。传空字符串或不传则取消聚焦。'
-      }
+        description: '要聚焦的设备 ID（从 list_devices 获取）。传空字符串或不传则取消聚焦。',
+      },
     },
-    required: [] as const
+    required: [] as const,
   },
 
   async execute(args: { deviceId?: string }): Promise<{
@@ -32,9 +32,11 @@ export const focusDevice = {
     if (targetId) {
       // 验证设备存在
       const devices = await sharedDeviceSelector.listDevices(true);
-      const device = devices.find(d => d.deviceId === targetId);
+      const device = devices.find((d) => d.deviceId === targetId);
       if (!device) {
-        const available = devices.map(d => `  - ${d.deviceId} (${d.ua}, ${d.online ? '🟢 在线' : '⚫ 离线'})`).join('\n');
+        const available = devices
+          .map((d) => `  - ${d.deviceId} (${d.ua}, ${d.online ? '🟢 在线' : '⚫ 离线'})`)
+          .join('\n');
         throw new Error(`设备 ${targetId} 不存在。\n可用设备:\n${available || '  无设备连接'}`);
       }
 
@@ -43,15 +45,15 @@ export const focusDevice = {
       return {
         focused: true,
         deviceId: targetId,
-        message: `🎯 已锁定设备: ${targetId}\n设备信息: ${device.ua}\n状态: ${device.online ? '🟢 在线' : '⚫ 离线'}\n\n后续所有操作将自动使用此设备。`
+        message: `🎯 已锁定设备: ${targetId}\n设备信息: ${device.ua}\n状态: ${device.online ? '🟢 在线' : '⚫ 离线'}\n\n后续所有操作将自动使用此设备。`,
       };
     } else {
       sharedDeviceSelector.setFocusedDevice(null);
       return {
         focused: false,
         deviceId: null,
-        message: '🔓 已取消设备锁定，恢复自动选择最近活跃设备。'
+        message: '🔓 已取消设备锁定，恢复自动选择最近活跃设备。',
       };
     }
-  }
+  },
 };

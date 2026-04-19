@@ -48,7 +48,7 @@ export class ErrorInterceptor {
         timestamp: Date.now(),
         level: 'error',
         message: `[Uncaught Error] ${event.message}`,
-        stack
+        stack,
       });
     };
 

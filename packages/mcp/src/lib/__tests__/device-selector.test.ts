@@ -202,10 +202,7 @@ describe('DeviceSelector', () => {
 
   describe('listDevices error handling', () => {
     it('throws on non-ok response', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({ ok: false, status: 500 }),
-      );
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }));
 
       await expect(selector.listDevices()).rejects.toThrow('500');
     });
@@ -226,19 +223,13 @@ describe('DeviceSelector', () => {
     });
 
     it('returns null on 404', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({ ok: false, status: 404 }),
-      );
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404 }));
 
       expect(await selector.getDevice('missing')).toBeNull();
     });
 
     it('throws on other HTTP errors', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({ ok: false, status: 500 }),
-      );
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }));
 
       await expect(selector.getDevice('dev-1')).rejects.toThrow('500');
     });

@@ -22,7 +22,9 @@ let isShuttingDown = false;
 /**
  * 启动内嵌的 openLog Server
  */
-export async function startEmbeddedServer(config: EmbeddedServerConfig = {}): Promise<{ port: number; url: string }> {
+export async function startEmbeddedServer(
+  config: EmbeddedServerConfig = {},
+): Promise<{ port: number; url: string }> {
   const port = config.port || parseInt(process.env.OPENLOG_PORT || '38291', 10);
   const shouldStartServer = config.startServer !== false;
   const shouldOpenBrowser = config.openBrowser !== false;
@@ -35,7 +37,9 @@ export async function startEmbeddedServer(config: EmbeddedServerConfig = {}): Pr
   }
 
   if (!shouldStartServer) {
-    throw new Error(`openLog Server is not running at http://localhost:${port}. Please start it manually with 'npx openlog'`);
+    throw new Error(
+      `openLog Server is not running at http://localhost:${port}. Please start it manually with 'npx openlog'`,
+    );
   }
 
   // 启动服务器进程
@@ -47,9 +51,9 @@ export async function startEmbeddedServer(config: EmbeddedServerConfig = {}): Pr
     env: {
       ...process.env,
       PORT: String(port),
-      OPENLOG_EMBEDDED: 'true'
+      OPENLOG_EMBEDDED: 'true',
     },
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
 
   // 转发服务器输出到 stderr
@@ -122,7 +126,7 @@ export async function stopEmbeddedServer(): Promise<void> {
 async function checkServerRunning(port: number): Promise<boolean> {
   try {
     const response = await fetch(`http://localhost:${port}/api/devices`, {
-      method: 'HEAD'
+      method: 'HEAD',
     });
     return response.ok;
   } catch {
@@ -140,7 +144,7 @@ async function waitForServer(port: number, timeout: number): Promise<void> {
     if (await checkServerRunning(port)) {
       return;
     }
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
   }
 
   throw new Error(`Server did not start within ${timeout}ms`);

@@ -9,7 +9,10 @@ export function useDOM(deviceId?: string) {
   const [loading, setLoading] = useState(false);
 
   const fetchDOM = useCallback(async () => {
-    if (!deviceId) { setSnapshot(null); return; }
+    if (!deviceId) {
+      setSnapshot(null);
+      return;
+    }
     setLoading(true);
     try {
       const data = await api.getDOM(deviceId);
@@ -21,14 +24,27 @@ export function useDOM(deviceId?: string) {
     }
   }, [deviceId]);
 
-  useEffect(() => { fetchDOM(); }, [fetchDOM]);
+  useEffect(() => {
+    fetchDOM();
+  }, [fetchDOM]);
 
-  const handleMessage = useCallback((message: any) => {
-    if (message.type === 'event' && message.envelope?.type === 'dom' && message.deviceId === deviceId) {
-      const envelope = message.envelope;
-      setSnapshot({ deviceId: envelope.device.deviceId, tabId: envelope.tabId, ...envelope.data });
-    }
-  }, [deviceId]);
+  const handleMessage = useCallback(
+    (message: any) => {
+      if (
+        message.type === 'event' &&
+        message.envelope?.type === 'dom' &&
+        message.deviceId === deviceId
+      ) {
+        const envelope = message.envelope;
+        setSnapshot({
+          deviceId: envelope.device.deviceId,
+          tabId: envelope.tabId,
+          ...envelope.data,
+        });
+      }
+    },
+    [deviceId],
+  );
 
   useWebSocket(handleMessage);
 

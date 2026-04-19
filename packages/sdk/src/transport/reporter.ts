@@ -1,4 +1,11 @@
-import type { DeviceInfo, ConsoleLogEntry, NetworkRequestEntry, StorageSnapshot, DOMSnapshot, PerformanceReport } from '../types/index.js';
+import type {
+  DeviceInfo,
+  ConsoleLogEntry,
+  NetworkRequestEntry,
+  StorageSnapshot,
+  DOMSnapshot,
+  PerformanceReport,
+} from '../types/index.js';
 import type { PlatformAdapter } from '../platform/types.js';
 import type { DataBus } from '../core/DataBus.js';
 import { WebSocketTransport } from './websocket.js';
@@ -60,20 +67,31 @@ export class Reporter {
             this.runCode(data.code, this.executeJsBus);
           }
           if (data.type === 'reload_page') {
-            try { window.location.reload(); } catch { /* ignore */ }
+            try {
+              window.location.reload();
+            } catch {
+              /* ignore */
+            }
           }
           if (data.type === 'set_storage') {
             try {
               const store = data.storageType === 'session' ? sessionStorage : localStorage;
               store.setItem(data.key, data.value ?? '');
-            } catch { /* ignore */ }
+            } catch {
+              /* ignore */
+            }
           }
           if (data.type === 'clear_storage') {
             try {
               if (data.storageType === 'session') sessionStorage.clear();
               else if (data.storageType === 'local') localStorage.clear();
-              else { localStorage.clear(); sessionStorage.clear(); }
-            } catch { /* ignore */ }
+              else {
+                localStorage.clear();
+                sessionStorage.clear();
+              }
+            } catch {
+              /* ignore */
+            }
           }
           if (data.type === 'highlight_element' && data.selector) {
             this.highlightElement(data.selector, data.duration ?? 3000);
@@ -99,9 +117,9 @@ export class Reporter {
           if (data.type === 'clear_mocks') {
             this.onClearMocksCallback?.();
           }
-        }
+        },
       },
-      this.platform
+      this.platform,
     );
 
     this.transport.connect();
@@ -123,12 +141,24 @@ export class Reporter {
     this.onZenModeCallback = callback;
   }
 
-  onStartPerfRun(callback: () => void): void { this.onStartPerfRunCallback = callback; }
-  onStopPerfRun(callback: () => void): void { this.onStopPerfRunCallback = callback; }
-  onSetNetworkThrottle(callback: (preset: string) => void): void { this.onSetNetworkThrottleCallback = callback; }
-  onAddMock(callback: (rule: any) => void): void { this.onAddMockCallback = callback; }
-  onRemoveMock(callback: (id: string) => void): void { this.onRemoveMockCallback = callback; }
-  onClearMocks(callback: () => void): void { this.onClearMocksCallback = callback; }
+  onStartPerfRun(callback: () => void): void {
+    this.onStartPerfRunCallback = callback;
+  }
+  onStopPerfRun(callback: () => void): void {
+    this.onStopPerfRunCallback = callback;
+  }
+  onSetNetworkThrottle(callback: (preset: string) => void): void {
+    this.onSetNetworkThrottleCallback = callback;
+  }
+  onAddMock(callback: (rule: any) => void): void {
+    this.onAddMockCallback = callback;
+  }
+  onRemoveMock(callback: (id: string) => void): void {
+    this.onRemoveMockCallback = callback;
+  }
+  onClearMocks(callback: () => void): void {
+    this.onClearMocksCallback = callback;
+  }
 
   reportPerfRun(session: import('../types/index.js').PerfRunSession): void {
     if (!this.remoteEnabled || !this.transport) return;
@@ -172,18 +202,18 @@ export class Reporter {
       timestamp: Date.now(),
       level: 'log',
       message: `▶ ${code}`,
-      args: [`▶ ${code}`]
+      args: [`▶ ${code}`],
     });
 
     try {
       // eslint-disable-next-line no-eval
-      const result = (0, eval)(code);  // indirect eval：在全局作用域运行，不影响当前 scope
+      const result = (0, eval)(code); // indirect eval：在全局作用域运行，不影响当前 scope
       const display = result === undefined ? '← undefined' : `← ${serializeArgs([result])}`;
       bus.emit('console', {
         timestamp: Date.now(),
         level: 'log',
         message: display,
-        args: result === undefined ? ['← undefined'] : ['←', result]
+        args: result === undefined ? ['← undefined'] : ['←', result],
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -191,7 +221,7 @@ export class Reporter {
         timestamp: Date.now(),
         level: 'error',
         message: `← Error: ${msg}`,
-        args: [`← Error: ${msg}`]
+        args: [`← Error: ${msg}`],
       });
     }
   }
@@ -210,7 +240,9 @@ export class Reporter {
         el.style.outline = prev;
         el.style.backgroundColor = prevBg;
       }, duration);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   enableRemote(): void {
@@ -273,7 +305,7 @@ export class Reporter {
     this.send({
       type: 'heartbeat',
       deviceId: this.deviceInfo.deviceId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -286,8 +318,8 @@ export class Reporter {
         ua: this.deviceInfo.ua,
         screen: this.deviceInfo.screen,
         pixelRatio: this.deviceInfo.pixelRatio,
-        language: this.deviceInfo.language
-      }
+        language: this.deviceInfo.language,
+      },
     });
   }
 

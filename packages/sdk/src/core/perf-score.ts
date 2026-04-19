@@ -1,4 +1,11 @@
-import type { PerfRunScore, PerfScoreItem, PerformanceReport, LongTask, ResourceTiming, PerformanceSample } from '../types/index.js';
+import type {
+  PerfRunScore,
+  PerfScoreItem,
+  PerformanceReport,
+  LongTask,
+  ResourceTiming,
+  PerformanceSample,
+} from '../types/index.js';
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * Math.max(0, Math.min(1, t));
@@ -76,8 +83,10 @@ function rating(score: number): 'good' | 'needs-improvement' | 'poor' {
   return 'poor';
 }
 
-export function scorePerfRun(snapshot: Omit<PerformanceReport, 'deviceId' | 'tabId'>): PerfRunScore {
-  const vitalsMap = new Map(snapshot.vitals.map(v => [v.name, v.value]));
+export function scorePerfRun(
+  snapshot: Omit<PerformanceReport, 'deviceId' | 'tabId'>,
+): PerfRunScore {
+  const vitalsMap = new Map(snapshot.vitals.map((v) => [v.name, v.value]));
 
   const fpsData = scoreFPS(snapshot.samples);
   const lcpScore = scoreLCP(vitalsMap.get('LCP') ?? null);
@@ -89,14 +98,74 @@ export function scorePerfRun(snapshot: Omit<PerformanceReport, 'deviceId' | 'tab
   const resScore = scoreResources(snapshot.resources);
 
   const items: PerfScoreItem[] = [
-    { name: 'FPS', score: Math.round(fpsData.score), weight: 0.20, value: fpsData.value >= 0 ? fpsData.value : null, unit: 'fps', rating: rating(fpsData.score) },
-    { name: 'LCP', score: Math.round(lcpScore), weight: 0.15, value: vitalsMap.get('LCP') ?? null, unit: 'ms', rating: rating(lcpScore) },
-    { name: 'CLS', score: Math.round(clsScore), weight: 0.10, value: vitalsMap.get('CLS') ?? null, unit: '', rating: rating(clsScore) },
-    { name: 'FCP', score: Math.round(fcpScore), weight: 0.10, value: vitalsMap.get('FCP') ?? null, unit: 'ms', rating: rating(fcpScore) },
-    { name: 'TTFB', score: Math.round(ttfbScore), weight: 0.10, value: vitalsMap.get('TTFB') ?? null, unit: 'ms', rating: rating(ttfbScore) },
-    { name: 'INP', score: Math.round(inpScore), weight: 0.10, value: vitalsMap.get('INP') ?? null, unit: 'ms', rating: rating(inpScore) },
-    { name: 'LongTasks', score: Math.round(ltScore), weight: 0.15, value: snapshot.longTasks.length, unit: '次', rating: rating(ltScore) },
-    { name: 'Resources', score: Math.round(resScore), weight: 0.10, value: snapshot.resources.length ? Math.round(snapshot.resources.reduce((s, r) => s + r.duration, 0) / snapshot.resources.length) : null, unit: 'ms', rating: rating(resScore) },
+    {
+      name: 'FPS',
+      score: Math.round(fpsData.score),
+      weight: 0.2,
+      value: fpsData.value >= 0 ? fpsData.value : null,
+      unit: 'fps',
+      rating: rating(fpsData.score),
+    },
+    {
+      name: 'LCP',
+      score: Math.round(lcpScore),
+      weight: 0.15,
+      value: vitalsMap.get('LCP') ?? null,
+      unit: 'ms',
+      rating: rating(lcpScore),
+    },
+    {
+      name: 'CLS',
+      score: Math.round(clsScore),
+      weight: 0.1,
+      value: vitalsMap.get('CLS') ?? null,
+      unit: '',
+      rating: rating(clsScore),
+    },
+    {
+      name: 'FCP',
+      score: Math.round(fcpScore),
+      weight: 0.1,
+      value: vitalsMap.get('FCP') ?? null,
+      unit: 'ms',
+      rating: rating(fcpScore),
+    },
+    {
+      name: 'TTFB',
+      score: Math.round(ttfbScore),
+      weight: 0.1,
+      value: vitalsMap.get('TTFB') ?? null,
+      unit: 'ms',
+      rating: rating(ttfbScore),
+    },
+    {
+      name: 'INP',
+      score: Math.round(inpScore),
+      weight: 0.1,
+      value: vitalsMap.get('INP') ?? null,
+      unit: 'ms',
+      rating: rating(inpScore),
+    },
+    {
+      name: 'LongTasks',
+      score: Math.round(ltScore),
+      weight: 0.15,
+      value: snapshot.longTasks.length,
+      unit: '次',
+      rating: rating(ltScore),
+    },
+    {
+      name: 'Resources',
+      score: Math.round(resScore),
+      weight: 0.1,
+      value: snapshot.resources.length
+        ? Math.round(
+            snapshot.resources.reduce((s, r) => s + r.duration, 0) / snapshot.resources.length,
+          )
+        : null,
+      unit: 'ms',
+      rating: rating(resScore),
+    },
   ];
 
   const total = Math.round(items.reduce((s, i) => s + i.score * i.weight, 0));
@@ -113,7 +182,7 @@ export function scorePerfRun(snapshot: Omit<PerformanceReport, 'deviceId' | 'tab
     B: '性能良好，有优化空间',
     C: '性能一般，建议优化',
     D: '性能较差，需要优化',
-    F: '性能极差，亟需修复'
+    F: '性能极差，亟需修复',
   };
 
   const issues: string[] = [];
@@ -126,7 +195,8 @@ export function scorePerfRun(snapshot: Omit<PerformanceReport, 'deviceId' | 'tab
       if (item.name === 'TTFB') issues.push(`TTFB 过高 (${item.value}ms)，服务器响应慢`);
       if (item.name === 'INP') issues.push(`INP 过高 (${item.value}ms)，交互响应慢`);
       if (item.name === 'LongTasks') issues.push(`长任务过多 (${item.value} 个)，主线程长期阻塞`);
-      if (item.name === 'Resources') issues.push(`资源加载慢 (均值 ${item.value}ms)，建议启用缓存/CDN`);
+      if (item.name === 'Resources')
+        issues.push(`资源加载慢 (均值 ${item.value}ms)，建议启用缓存/CDN`);
     } else if (item.rating === 'needs-improvement') {
       if (item.name === 'FPS') issues.push(`FPS 偏低 (均值 ${item.value} fps)，建议优化渲染`);
       if (item.name === 'LCP') issues.push(`LCP 需改善 (${item.value}ms)，建议优化关键资源`);

@@ -52,16 +52,18 @@ export class DeviceSelector {
 
     // 用户指定了设备 ID
     if (deviceId) {
-      const device = devices.find(d => d.deviceId === deviceId);
+      const device = devices.find((d) => d.deviceId === deviceId);
       if (!device) {
-        throw new Error(`设备 ${deviceId} 不存在。当前设备: ${devices.map(d => d.deviceId).join(', ') || '无'}`);
+        throw new Error(
+          `设备 ${deviceId} 不存在。当前设备: ${devices.map((d) => d.deviceId).join(', ') || '无'}`,
+        );
       }
       return deviceId;
     }
 
     // 有聚焦设备时优先使用
     if (this.focusedDeviceId) {
-      const focused = devices.find(d => d.deviceId === this.focusedDeviceId);
+      const focused = devices.find((d) => d.deviceId === this.focusedDeviceId);
       if (focused && focused.online) {
         return this.focusedDeviceId;
       }
@@ -80,7 +82,7 @@ export class DeviceSelector {
     }
 
     // 多个设备，优先选择在线且最近活跃的
-    const onlineDevices = devices.filter(d => d.online);
+    const onlineDevices = devices.filter((d) => d.online);
     if (onlineDevices.length > 0) {
       // 按最后活跃时间排序，选择最近的
       onlineDevices.sort((a, b) => b.lastActiveTime - a.lastActiveTime);
@@ -99,7 +101,11 @@ export class DeviceSelector {
     const now = Date.now();
 
     // 使用缓存
-    if (!forceRefresh && this.cachedDevices.length > 0 && (now - this.lastFetchTime) < this.cacheTTL) {
+    if (
+      !forceRefresh &&
+      this.cachedDevices.length > 0 &&
+      now - this.lastFetchTime < this.cacheTTL
+    ) {
       return this.cachedDevices;
     }
 

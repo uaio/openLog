@@ -1,8 +1,26 @@
 import { Request, Response } from 'express';
-import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
+import {
+  DeviceStore,
+  LogStore,
+  NetworkStore,
+  StorageStore,
+  DOMStore,
+  PerformanceStore,
+  ScreenshotStore,
+  PerfRunStore,
+} from '../store/index.js';
 import { sendToDevice } from '../ws/handlers.js';
 
-export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore, networkStore: NetworkStore, storageStore: StorageStore, domStore: DOMStore, performanceStore: PerformanceStore, screenshotStore: ScreenshotStore, perfRunStore: PerfRunStore) {
+export function createDeviceRoutes(
+  deviceStore: DeviceStore,
+  logStore: LogStore,
+  networkStore: NetworkStore,
+  storageStore: StorageStore,
+  domStore: DOMStore,
+  performanceStore: PerformanceStore,
+  screenshotStore: ScreenshotStore,
+  perfRunStore: PerfRunStore,
+) {
   return {
     listDevices: (req: Request, res: Response) => {
       const projectId = req.query.projectId as string;
@@ -28,9 +46,10 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
       // 验证 level 参数（白名单检查）
       const validLevels = ['log', 'warn', 'error', 'info'];
       const level = req.query.level as string;
-      const validatedLevel = level && validLevels.includes(level)
-        ? (level as 'log' | 'warn' | 'error' | 'info')
-        : undefined;
+      const validatedLevel =
+        level && validLevels.includes(level)
+          ? (level as 'log' | 'warn' | 'error' | 'info')
+          : undefined;
 
       const logs = logStore.get(deviceId, limit, validatedLevel);
 
@@ -78,7 +97,7 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
 
       res.json({
         success: true,
-        count
+        count,
       });
     },
 
@@ -172,7 +191,8 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
     getScreenshot: (req: Request, res: Response) => {
       const { deviceId } = req.params;
       const snapshot = screenshotStore.get(deviceId);
-      if (!snapshot) return res.status(404).json({ error: 'No screenshot available for this device' });
+      if (!snapshot)
+        return res.status(404).json({ error: 'No screenshot available for this device' });
       res.json(snapshot);
     },
 
@@ -186,11 +206,20 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
 
     setStorage: (req: Request, res: Response) => {
       const { deviceId } = req.params;
-      const { key, value, storageType } = req.body as { key?: string; value?: string; storageType?: string };
+      const { key, value, storageType } = req.body as {
+        key?: string;
+        value?: string;
+        storageType?: string;
+      };
       if (!key) return res.status(400).json({ error: 'key is required' });
       const device = deviceStore.get(deviceId);
       if (!device) return res.status(404).json({ error: 'Device not found' });
-      sendToDevice(deviceId, { type: 'set_storage', key, value: value ?? '', storageType: storageType || 'local' });
+      sendToDevice(deviceId, {
+        type: 'set_storage',
+        key,
+        value: value ?? '',
+        storageType: storageType || 'local',
+      });
       res.json({ ok: true });
     },
 
@@ -295,10 +324,13 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
       const logs = logStore.get(deviceId) ?? [];
       const now = Date.now();
       const fiveMinAgo = now - 5 * 60 * 1000;
-      const recentErrors = logs.filter((l: any) => l.level === 'error' && l.timestamp > fiveMinAgo).length;
+      const recentErrors = logs.filter(
+        (l: any) => l.level === 'error' && l.timestamp > fiveMinAgo,
+      ).length;
 
       const perfReport = performanceStore.get(deviceId);
-      const longTaskDuration = (perfReport as any)?.longTasks?.reduce((s: number, t: any) => s + t.duration, 0) ?? 0;
+      const longTaskDuration =
+        (perfReport as any)?.longTasks?.reduce((s: number, t: any) => s + t.duration, 0) ?? 0;
       const latestSample = (perfReport as any)?.samples?.[(perfReport as any)?.samples?.length - 1];
       const memoryMB = latestSample?.heapUsed ?? null;
 
@@ -312,10 +344,10 @@ export function createDeviceRoutes(deviceStore: DeviceStore, logStore: LogStore,
         return acc;
       }, {});
 
-      const score = Math.max(0, 100
-        - recentErrors * 5
-        - Math.min(50, longTaskDuration / 100)
-        - (uncompressedResources * 3));
+      const score = Math.max(
+        0,
+        100 - recentErrors * 5 - Math.min(50, longTaskDuration / 100) - uncompressedResources * 3,
+      );
 
       res.json({
         deviceId,

@@ -10,9 +10,9 @@ export const listDevices = {
     properties: {
       projectId: {
         type: 'string' as const,
-        description: '项目 ID，用于过滤设备'
-      }
-    }
+        description: '项目 ID，用于过滤设备',
+      },
+    },
   },
 
   async execute(args: { projectId?: string }): Promise<{
@@ -36,7 +36,7 @@ export const listDevices = {
     return {
       devices,
       focusedDeviceId,
-      count: devices.length
+      count: devices.length,
     };
-  }
+  },
 };

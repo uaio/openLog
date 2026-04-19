@@ -2,22 +2,22 @@ import { wsClient } from '../ws-client.js';
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector } from '../lib/device-selector.js';
 
-
 export const startPerfRun = {
   name: 'start_perf_run',
-  description: '在手机端启动性能跑分。自动进入禅模式（屏蔽干扰采集），开始记录 FPS / Web Vitals / 长任务等数据。',
+  description:
+    '在手机端启动性能跑分。自动进入禅模式（屏蔽干扰采集），开始记录 FPS / Web Vitals / 长任务等数据。',
   inputSchema: {
     type: 'object' as const,
     properties: {
-      deviceId: { type: 'string' as const, description: '设备 ID（可选）' }
+      deviceId: { type: 'string' as const, description: '设备 ID（可选）' },
     },
-    required: []
+    required: [],
   },
   async execute(args: { deviceId?: string }): Promise<{ ok: boolean }> {
     const id = await deviceSelector.selectDevice(args.deviceId);
     wsClient.sendCommand(id, { type: 'start_perf_run' });
     return { ok: true };
-  }
+  },
 };
 
 export const stopPerfRun = {
@@ -26,15 +26,15 @@ export const stopPerfRun = {
   inputSchema: {
     type: 'object' as const,
     properties: {
-      deviceId: { type: 'string' as const, description: '设备 ID（可选）' }
+      deviceId: { type: 'string' as const, description: '设备 ID（可选）' },
     },
-    required: []
+    required: [],
   },
   async execute(args: { deviceId?: string }): Promise<{ ok: boolean }> {
     const id = await deviceSelector.selectDevice(args.deviceId);
     wsClient.sendCommand(id, { type: 'stop_perf_run' });
     return { ok: true };
-  }
+  },
 };
 
 export const getPerfReport = {
@@ -44,9 +44,12 @@ export const getPerfReport = {
     type: 'object' as const,
     properties: {
       deviceId: { type: 'string' as const, description: '设备 ID（可选）' },
-      sessionId: { type: 'string' as const, description: '跑分会话 ID（可选，不填则返回所有历史）' }
+      sessionId: {
+        type: 'string' as const,
+        description: '跑分会话 ID（可选，不填则返回所有历史）',
+      },
     },
-    required: []
+    required: [],
   },
   async execute(args: { deviceId?: string; sessionId?: string }): Promise<any> {
     const id = await deviceSelector.selectDevice(args.deviceId);
@@ -57,6 +60,5 @@ export const getPerfReport = {
     const res = await fetch(`${API_BASE_URL}${path}`);
     if (!res.ok) throw new Error(`get_perf_report failed: ${res.statusText}`);
     return res.json();
-  }
+  },
 };
-

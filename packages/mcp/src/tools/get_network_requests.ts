@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector, type Device } from '../lib/device-selector.js';
 
-
 export interface NetworkRequest {
   deviceId: string;
   tabId: string;
@@ -22,31 +21,32 @@ export interface NetworkRequest {
 
 export const getNetworkRequests = {
   name: 'get_network_requests',
-  description: '获取设备的网络请求记录，用于分析 API 调用、调试请求问题。如果不指定 deviceId，会自动选择唯一或最近活跃的设备。',
+  description:
+    '获取设备的网络请求记录，用于分析 API 调用、调试请求问题。如果不指定 deviceId，会自动选择唯一或最近活跃的设备。',
   inputSchema: {
     type: 'object' as const,
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，不填则自动选择）'
+        description: '设备 ID（可选，不填则自动选择）',
       },
       limit: {
         type: 'number' as const,
-        description: '返回条数限制，默认 50'
+        description: '返回条数限制，默认 50',
       },
       method: {
         type: 'string' as const,
-        description: 'HTTP 方法过滤 (GET/POST/PUT/DELETE 等)'
+        description: 'HTTP 方法过滤 (GET/POST/PUT/DELETE 等)',
       },
       urlPattern: {
         type: 'string' as const,
-        description: 'URL 匹配模式（正则表达式）'
+        description: 'URL 匹配模式（正则表达式）',
       },
       status: {
         type: 'number' as const,
-        description: '状态码过滤（如 200, 404, 500）'
-      }
-    }
+        description: '状态码过滤（如 200, 404, 500）',
+      },
+    },
   },
 
   async execute(args: {
@@ -77,5 +77,5 @@ export const getNetworkRequests = {
     const requests = await response.json();
 
     return { device, requests };
-  }
+  },
 };

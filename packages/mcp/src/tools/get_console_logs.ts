@@ -9,19 +9,19 @@ export const getConsoleLogs = {
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID'
+        description: '设备 ID',
       },
       limit: {
         type: 'number' as const,
-        description: '返回的日志条数限制'
+        description: '返回的日志条数限制',
       },
       level: {
         type: 'string' as const,
         enum: ['log', 'warn', 'error', 'info'],
-        description: '日志级别过滤'
-      }
+        description: '日志级别过滤',
+      },
     },
-    required: ['deviceId'] as const
+    required: ['deviceId'] as const,
   },
 
   async execute(args: {
@@ -41,5 +41,5 @@ export const getConsoleLogs = {
     }
 
     return await response.json();
-  }
+  },
 };

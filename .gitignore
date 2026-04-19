@@ -29,3 +29,6 @@ coverage/
 
 # Build artifacts
 *.tgz
+
+# Project memory (dev-only notes)
+memory/

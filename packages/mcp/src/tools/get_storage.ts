@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config.js';
 import { sharedDeviceSelector as deviceSelector, type Device } from '../lib/device-selector.js';
 
-
 export interface StorageSnapshot {
   deviceId: string;
   tabId: string;
@@ -15,26 +14,30 @@ export interface StorageSnapshot {
 
 export const getStorage = {
   name: 'get_storage',
-  description: '获取设备的本地存储信息（localStorage、sessionStorage、cookies）。如果不指定 deviceId，会自动选择唯一或最近活跃的设备。注意：首次调用可能返回空数据，需要等待移动端上报。',
+  description:
+    '获取设备的本地存储信息（localStorage、sessionStorage、cookies）。如果不指定 deviceId，会自动选择唯一或最近活跃的设备。注意：首次调用可能返回空数据，需要等待移动端上报。',
   inputSchema: {
     type: 'object' as const,
     properties: {
       deviceId: {
         type: 'string' as const,
-        description: '设备 ID（可选，不填则自动选择）'
+        description: '设备 ID（可选，不填则自动选择）',
       },
       type: {
         type: 'string' as const,
         enum: ['all', 'localStorage', 'sessionStorage', 'cookies'],
-        description: '存储类型，默认 all'
-      }
-    }
+        description: '存储类型，默认 all',
+      },
+    },
   },
 
   async execute(args: {
     deviceId?: string;
     type?: 'all' | 'localStorage' | 'sessionStorage' | 'cookies';
-  }): Promise<{ device: Device | null; storage: StorageSnapshot | Partial<StorageSnapshot> | null }> {
+  }): Promise<{
+    device: Device | null;
+    storage: StorageSnapshot | Partial<StorageSnapshot> | null;
+  }> {
     // 智能选择设备
     const selectedDeviceId = await deviceSelector.selectDevice(args.deviceId);
     const device = await deviceSelector.getDevice(selectedDeviceId);
@@ -59,8 +62,8 @@ export const getStorage = {
           deviceId: snapshot.deviceId,
           timestamp: snapshot.timestamp,
           localStorage: snapshot.localStorage,
-          localStorageSize: snapshot.localStorageSize
-        }
+          localStorageSize: snapshot.localStorageSize,
+        },
       };
     }
 
@@ -71,8 +74,8 @@ export const getStorage = {
           deviceId: snapshot.deviceId,
           timestamp: snapshot.timestamp,
           sessionStorage: snapshot.sessionStorage,
-          sessionStorageSize: snapshot.sessionStorageSize
-        }
+          sessionStorageSize: snapshot.sessionStorageSize,
+        },
       };
     }
 
@@ -82,11 +85,11 @@ export const getStorage = {
         storage: {
           deviceId: snapshot.deviceId,
           timestamp: snapshot.timestamp,
-          cookies: snapshot.cookies
-        }
+          cookies: snapshot.cookies,
+        },
       };
     }
 
     return { device, storage: snapshot };
-  }
+  },
 };

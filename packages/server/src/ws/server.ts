@@ -1,7 +1,22 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { Server as HTTPServer } from 'http';
-import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
-import { handlers, type MessageContext, registerPCClient, registerDeviceClient, sendToDevice } from './handlers.js';
+import {
+  DeviceStore,
+  LogStore,
+  NetworkStore,
+  StorageStore,
+  DOMStore,
+  PerformanceStore,
+  ScreenshotStore,
+  PerfRunStore,
+} from '../store/index.js';
+import {
+  handlers,
+  type MessageContext,
+  registerPCClient,
+  registerDeviceClient,
+  sendToDevice,
+} from './handlers.js';
 
 export function createWebSocketServer(httpServer: HTTPServer) {
   const deviceStore = new DeviceStore();
@@ -47,13 +62,25 @@ export function createWebSocketServer(httpServer: HTTPServer) {
             sendToDevice(message.deviceId, { type: 'reload_page' });
           }
           if (message.type === 'set_storage' && message.deviceId && message.key !== undefined) {
-            sendToDevice(message.deviceId, { type: 'set_storage', storageType: message.storageType || 'local', key: message.key, value: message.value ?? '' });
+            sendToDevice(message.deviceId, {
+              type: 'set_storage',
+              storageType: message.storageType || 'local',
+              key: message.key,
+              value: message.value ?? '',
+            });
           }
           if (message.type === 'clear_storage' && message.deviceId) {
-            sendToDevice(message.deviceId, { type: 'clear_storage', storageType: message.storageType || 'all' });
+            sendToDevice(message.deviceId, {
+              type: 'clear_storage',
+              storageType: message.storageType || 'all',
+            });
           }
           if (message.type === 'highlight_element' && message.deviceId && message.selector) {
-            sendToDevice(message.deviceId, { type: 'highlight_element', selector: message.selector, duration: message.duration ?? 3000 });
+            sendToDevice(message.deviceId, {
+              type: 'highlight_element',
+              selector: message.selector,
+              duration: message.duration ?? 3000,
+            });
           }
           if (message.type === 'zen_mode' && message.deviceId) {
             sendToDevice(message.deviceId, { type: 'zen_mode', enabled: !!message.enabled });
@@ -65,7 +92,10 @@ export function createWebSocketServer(httpServer: HTTPServer) {
             sendToDevice(message.deviceId, { type: 'stop_perf_run' });
           }
           if (message.type === 'set_network_throttle' && message.deviceId) {
-            sendToDevice(message.deviceId, { type: 'set_network_throttle', preset: message.preset });
+            sendToDevice(message.deviceId, {
+              type: 'set_network_throttle',
+              preset: message.preset,
+            });
           }
           if (message.type === 'add_mock' && message.deviceId) {
             sendToDevice(message.deviceId, { type: 'add_mock', rule: message.rule });
@@ -92,7 +122,7 @@ export function createWebSocketServer(httpServer: HTTPServer) {
             performanceStore,
             screenshotStore,
             perfRunStore,
-            deviceIds
+            deviceIds,
           };
           handler(message, context);
         }
@@ -119,7 +149,17 @@ export function createWebSocketServer(httpServer: HTTPServer) {
     });
   });
 
-  return { wss, deviceStore, logStore, networkStore, storageStore, domStore, performanceStore, screenshotStore, perfRunStore };
+  return {
+    wss,
+    deviceStore,
+    logStore,
+    networkStore,
+    storageStore,
+    domStore,
+    performanceStore,
+    screenshotStore,
+    perfRunStore,
+  };
 }
 
 // P0-2: 导出清理函数，用于服务器关闭时清理资源
@@ -128,7 +168,7 @@ export function cleanupWebSocketServer(
   logStore: LogStore,
   networkStore: NetworkStore,
   storageStore: StorageStore,
-  wss: WebSocketServer
+  wss: WebSocketServer,
 ): void {
   // 关闭 WebSocket 服务器
   wss.close((err) => {

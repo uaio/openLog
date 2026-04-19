@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { DeviceStore, type Device } from '../devices.js';
 
-function makeDeviceInfo(overrides: Partial<Omit<Device, 'deviceId' | 'online' | 'activeTabs'>> = {}) {
+function makeDeviceInfo(
+  overrides: Partial<Omit<Device, 'deviceId' | 'online' | 'activeTabs'>> = {},
+) {
   return {
     projectId: 'proj-1',
     ua: 'Mozilla/5.0',
@@ -94,7 +96,7 @@ describe('DeviceStore', () => {
 
     const p1Devices = store.list('p1');
     expect(p1Devices).toHaveLength(2);
-    expect(p1Devices.every(d => d.projectId === 'p1')).toBe(true);
+    expect(p1Devices.every((d) => d.projectId === 'p1')).toBe(true);
 
     const p2Devices = store.list('p2');
     expect(p2Devices).toHaveLength(1);

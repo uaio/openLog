@@ -1,4 +1,10 @@
-import type { Device, ConsoleLog, StorageSnapshot, DOMSnapshot, PerformanceReport } from '../types/index.js';
+import type {
+  Device,
+  ConsoleLog,
+  StorageSnapshot,
+  DOMSnapshot,
+  PerformanceReport,
+} from '../types/index.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:38291/api';
 
@@ -68,7 +74,7 @@ export const api = {
   async deleteLogs(deviceId: string): Promise<{ success: boolean; count: number }> {
     const url = `${API_BASE}/devices/${deviceId}/logs`;
     const res = await fetch(url, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
     return handleResponse(res, url);
   },
@@ -122,7 +128,7 @@ export const api = {
     const url = path.startsWith('http') ? path : `${API_BASE.replace('/api', '')}${path}`;
     const res = await fetch(url, { method: 'DELETE' });
     return handleResponse(res, url);
-  }
+  },
 };
 
 export { ApiClientError };

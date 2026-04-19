@@ -31,7 +31,16 @@ class OpenLogWsClient {
   private devices: any[] = [];
 
   private makeBuffer(): EventBuffer {
-    return { console: [], network: [], storage: null, dom: null, performance: null, screenshot: null, perf_run: [], error: [] };
+    return {
+      console: [],
+      network: [],
+      storage: null,
+      dom: null,
+      performance: null,
+      screenshot: null,
+      perf_run: [],
+      error: [],
+    };
   }
 
   private getBuffer(deviceId: string): EventBuffer {
@@ -79,7 +88,9 @@ class OpenLogWsClient {
       try {
         const msg = JSON.parse(raw.toString());
         this._handleMessage(msg);
-      } catch { /* ignore malformed */ }
+      } catch {
+        /* ignore malformed */
+      }
     });
 
     this.ws.on('close', () => {
@@ -121,7 +132,12 @@ class OpenLogWsClient {
       } else if (evType === 'performance') {
         buf.performance = { ...envelope.data, deviceId, tabId: envelope.tabId };
       } else if (evType === 'screenshot') {
-        buf.screenshot = { ...envelope.data, deviceId, tabId: envelope.tabId, timestamp: envelope.ts };
+        buf.screenshot = {
+          ...envelope.data,
+          deviceId,
+          tabId: envelope.tabId,
+          timestamp: envelope.ts,
+        };
       }
     }
   }
@@ -136,14 +152,16 @@ class OpenLogWsClient {
 
   // ── 数据读取 ────────────────────────────────────────────────────
 
-  getDevices(): any[] { return this.devices; }
+  getDevices(): any[] {
+    return this.devices;
+  }
 
   getLogs(deviceId: string, limit = 200): any[] {
-    return (this.getBuffer(deviceId).console).slice(-limit);
+    return this.getBuffer(deviceId).console.slice(-limit);
   }
 
   getNetwork(deviceId: string, limit = 100): any[] {
-    return (this.getBuffer(deviceId).network).slice(-limit);
+    return this.getBuffer(deviceId).network.slice(-limit);
   }
 
   getStorage(deviceId: string): any | null {
@@ -177,7 +195,9 @@ class OpenLogWsClient {
     this.ws.send(JSON.stringify({ ...command, deviceId }));
   }
 
-  isReady(): boolean { return this.ready; }
+  isReady(): boolean {
+    return this.ready;
+  }
 }
 
 export const wsClient = new OpenLogWsClient();

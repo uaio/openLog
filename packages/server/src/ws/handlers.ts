@@ -1,5 +1,14 @@
 import { WebSocket } from 'ws';
-import { DeviceStore, LogStore, NetworkStore, StorageStore, DOMStore, PerformanceStore, ScreenshotStore, PerfRunStore } from '../store/index.js';
+import {
+  DeviceStore,
+  LogStore,
+  NetworkStore,
+  StorageStore,
+  DOMStore,
+  PerformanceStore,
+  ScreenshotStore,
+  PerfRunStore,
+} from '../store/index.js';
 
 export interface MessageContext {
   ws: WebSocket;
@@ -36,14 +45,14 @@ export const handlers: Record<string, MessageHandler> = {
       ua: String(deviceInfo.ua || ''),
       screen: String(deviceInfo.screen || ''),
       pixelRatio: Number(deviceInfo.pixelRatio) || 1,
-      language: String(deviceInfo.language || '')
+      language: String(deviceInfo.language || ''),
     };
 
     deviceStore.register(deviceId, {
       projectId,
       ...validatedDeviceInfo,
       connectTime: Date.now(),
-      lastActiveTime: Date.now()
+      lastActiveTime: Date.now(),
     });
 
     deviceIds.set(ws, deviceId);
@@ -185,10 +194,13 @@ export function registerPCClient(ws: WebSocket): void {
 }
 
 // 定期清理无效的 PC 客户端连接（每 5 分钟）
-setInterval(() => {
-  for (const client of pcClients) {
-    if (client.readyState !== WebSocket.OPEN) {
-      pcClients.delete(client);
+setInterval(
+  () => {
+    for (const client of pcClients) {
+      if (client.readyState !== WebSocket.OPEN) {
+        pcClients.delete(client);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  },
+  5 * 60 * 1000,
+);

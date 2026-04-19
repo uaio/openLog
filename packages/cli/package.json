@@ -1,6 +1,16 @@
 {
   "name": "@openlog/cli",
   "version": "0.1.0",
+  "description": "CLI for openLog — start server, configure AI tools, one-command setup",
+  "keywords": ["openlog", "cli", "mobile-debugging", "mcp", "claude", "cursor", "devtools"],
+  "author": "openLog Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uaio/openLog.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/uaio/openLog/tree/main/packages/cli",
   "type": "module",
   "bin": {
     "openlog": "./bin/openlog.js"

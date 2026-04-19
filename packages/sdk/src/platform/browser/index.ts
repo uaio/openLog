@@ -36,7 +36,7 @@ export class BrowserAdapter implements PlatformAdapter {
     },
     setItem(key: string, value: string): void {
       localStorage.setItem(key, value);
-    }
+    },
   };
 
   device = {
@@ -54,7 +54,7 @@ export class BrowserAdapter implements PlatformAdapter {
     },
     getUrl(): string {
       return window.location.origin + window.location.pathname;
-    }
+    },
   };
 
   timer = {
@@ -69,7 +69,7 @@ export class BrowserAdapter implements PlatformAdapter {
     },
     clearInterval(id: number): void {
       window.clearInterval(id);
-    }
+    },
   };
 
   createWebSocket(url: string, events: WSEvents): WSConnection {

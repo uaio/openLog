@@ -31,8 +31,10 @@ export function getDeviceInfo(projectId: string, platform: PlatformAdapter): Dev
     pixelRatio: platform.device.getPixelRatio(),
     language: platform.device.getLanguage(),
     url: platform.device.getUrl(),
-    connectTime: isNew ? Date.now() : parseInt(platform.storage.getItem(`openlog_connect_time_${projectId}`) || '0'),
-    lastActiveTime: Date.now()
+    connectTime: isNew
+      ? Date.now()
+      : parseInt(platform.storage.getItem(`openlog_connect_time_${projectId}`) || '0'),
+    lastActiveTime: Date.now(),
   };
 }
 

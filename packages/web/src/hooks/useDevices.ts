@@ -27,13 +27,13 @@ export function useDevices(projectId?: string) {
     fetchInitialDevices();
   }, [projectId]);
 
-  const selectedDevice = devices.find(d => d.deviceId === selectedId);
+  const selectedDevice = devices.find((d) => d.deviceId === selectedId);
 
   return {
     devices,
     loading,
     selectedDevice,
     selectedId,
-    setSelectedId
+    setSelectedId,
   };
 }

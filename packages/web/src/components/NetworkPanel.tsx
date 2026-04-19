@@ -27,7 +27,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column' as const,
     height: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   header: {
     display: 'flex',
@@ -35,25 +35,25 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     padding: '16px 20px',
     borderBottom: '1px solid #e8e8e8',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   title: {
     margin: 0,
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   deviceId: {
     fontSize: '12px',
     color: '#999',
     padding: '4px 8px',
     backgroundColor: '#f0f0f0',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
   content: {
     flex: 1,
     overflow: 'auto',
-    padding: '20px'
+    padding: '20px',
   },
   placeholder: {
     display: 'flex',
@@ -61,19 +61,19 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    color: '#999'
+    color: '#999',
   },
   icon: {
     fontSize: '64px',
     marginBottom: '16px',
-    opacity: 0.5
+    opacity: 0.5,
   },
   text: {
     fontSize: '16px',
-    marginBottom: '8px'
+    marginBottom: '8px',
   },
   hint: {
     fontSize: '13px',
-    color: '#bbb'
-  }
+    color: '#bbb',
+  },
 };

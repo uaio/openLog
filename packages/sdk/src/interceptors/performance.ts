@@ -1,4 +1,11 @@
-import type { PerformanceSample, WebVital, PerformanceReport, LongTask, ResourceTiming, InteractionTiming } from '../types/index.js';
+import type {
+  PerformanceSample,
+  WebVital,
+  PerformanceReport,
+  LongTask,
+  ResourceTiming,
+  InteractionTiming,
+} from '../types/index.js';
 import type { DataBus } from '../core/DataBus.js';
 
 // Re-export for backward compatibility
@@ -21,9 +28,9 @@ declare global {
 }
 
 const SAMPLE_INTERVAL_MS = 3000;
-const MAX_SAMPLES = 120;      // 最多保留 6 分钟采样
-const MAX_LONG_TASKS = 100;   // 最多保留 100 条 long tasks
-const MAX_RESOURCES = 200;    // 最多保留 200 条资源
+const MAX_SAMPLES = 120; // 最多保留 6 分钟采样
+const MAX_LONG_TASKS = 100; // 最多保留 100 条 long tasks
+const MAX_RESOURCES = 200; // 最多保留 200 条资源
 const MAX_INTERACTIONS = 100; // 最多保留 100 次交互
 
 export class PerformanceCollector {
@@ -60,18 +67,20 @@ export class PerformanceCollector {
       const { onLCP, onCLS, onFCP, onTTFB, onINP } = await import('web-vitals');
 
       const report = (name: string, value: number, rating: WebVital['rating']) => {
-        const idx = this.vitals.findIndex(v => v.name === name);
+        const idx = this.vitals.findIndex((v) => v.name === name);
         const vital: WebVital = { name, value: Math.round(value * 100) / 100, rating };
         if (idx >= 0) this.vitals[idx] = vital;
         else this.vitals.push(vital);
         this.flush();
       };
 
-      onLCP(m => report('LCP', m.value, m.rating));
-      onCLS(m => report('CLS', m.value, m.rating));
-      onFCP(m => report('FCP', m.value, m.rating));
-      onTTFB(m => report('TTFB', m.value, m.rating));
-      try { onINP(m => report('INP', m.value, m.rating)); } catch {}
+      onLCP((m) => report('LCP', m.value, m.rating));
+      onCLS((m) => report('CLS', m.value, m.rating));
+      onFCP((m) => report('FCP', m.value, m.rating));
+      onTTFB((m) => report('TTFB', m.value, m.rating));
+      try {
+        onINP((m) => report('INP', m.value, m.rating));
+      } catch {}
     } catch (e) {
       console.warn('[openLog] web-vitals unavailable', e);
     }
@@ -140,7 +149,8 @@ export class PerformanceCollector {
             startTime: Math.round(e.startTime),
             target: (() => {
               const t = (e as any).target;
-              if (t instanceof Element) return `${t.tagName.toLowerCase()}${t.id ? '#' + t.id : ''}`;
+              if (t instanceof Element)
+                return `${t.tagName.toLowerCase()}${t.id ? '#' + t.id : ''}`;
               return undefined;
             })(),
           });
@@ -149,7 +159,11 @@ export class PerformanceCollector {
         this.flush();
       });
       // 只关注响应时间 >= 16ms 的交互，过滤噪音
-      observer.observe({ type: 'event', buffered: true, durationThreshold: 16 } as PerformanceObserverInit);
+      observer.observe({
+        type: 'event',
+        buffered: true,
+        durationThreshold: 16,
+      } as PerformanceObserverInit);
       this.observers.push(observer);
     } catch {
       // event timing 部分浏览器不支持，静默降级
@@ -176,7 +190,7 @@ export class PerformanceCollector {
 
       const sample: PerformanceSample = {
         timestamp: Date.now(),
-        fps: Math.min(fps, 120)
+        fps: Math.min(fps, 120),
       };
 
       if (performance.memory) {
@@ -227,7 +241,9 @@ export class PerformanceCollector {
     cancelAnimationFrame(this.rafHandle);
     if (this.intervalHandle) clearInterval(this.intervalHandle);
     for (const obs of this.observers) {
-      try { obs.disconnect(); } catch {}
+      try {
+        obs.disconnect();
+      } catch {}
     }
     this.observers = [];
   }

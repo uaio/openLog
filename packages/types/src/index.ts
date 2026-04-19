@@ -11,7 +11,13 @@
  */
 
 // ─── Envelope & Platform ──────────────────────────────────────────────────────
-export type { OpenLogEnvelope, AnyEnvelope, EnvelopeOf, Platform, DeviceContext } from './envelope.js';
+export type {
+  OpenLogEnvelope,
+  AnyEnvelope,
+  EnvelopeOf,
+  Platform,
+  DeviceContext,
+} from './envelope.js';
 export { isEnvelope } from './envelope.js';
 
 // ─── Event Payloads ───────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@ export function createEnvelope<T extends EventType>(
   ctx: EnvelopeFactoryContext,
   type: T,
   data: EventPayloadMap[T],
-  ts?: number
+  ts?: number,
 ): OpenLogEnvelope<T> {
   return {
     v: SCHEMA_VERSION,

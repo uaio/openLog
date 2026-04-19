@@ -61,7 +61,12 @@ export function SettingsPanel({ deviceId }: SettingsPanelProps) {
             </div>
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>GitHub:</span>
-              <a href="https://github.com/uaio/openLog" style={styles.link} target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/uaio/openLog"
+                style={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 github.com/uaio/openLog
               </a>
             </div>
@@ -77,7 +82,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column' as const,
     height: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   header: {
     display: 'flex',
@@ -85,72 +90,72 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     padding: '16px 20px',
     borderBottom: '1px solid #e8e8e8',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   title: {
     margin: 0,
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   deviceId: {
     fontSize: '12px',
     color: '#999',
     padding: '4px 8px',
     backgroundColor: '#f0f0f0',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
   content: {
     flex: 1,
     overflow: 'auto',
-    padding: '20px'
+    padding: '20px',
   },
   section: {
     marginBottom: '24px',
     padding: '16px',
     backgroundColor: '#fafafa',
     borderRadius: '8px',
-    border: '1px solid #e8e8e8'
+    border: '1px solid #e8e8e8',
   },
   sectionTitle: {
     margin: '0 0 12px 0',
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   info: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '8px'
+    gap: '8px',
   },
   infoItem: {
     display: 'flex',
     justifyContent: 'space-between',
     padding: '8px 0',
-    borderBottom: '1px solid #e8e8e8'
+    borderBottom: '1px solid #e8e8e8',
   },
   infoLabel: {
     fontSize: '13px',
     color: '#666',
-    fontWeight: '500'
+    fontWeight: '500',
   },
   infoValue: {
     fontSize: '13px',
     color: '#333',
-    fontFamily: 'monospace'
+    fontFamily: 'monospace',
   },
   link: {
     fontSize: '13px',
     color: '#1890ff',
-    textDecoration: 'none'
+    textDecoration: 'none',
   },
   empty: {
     fontSize: '13px',
     color: '#999',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
   },
   setting: {
-    padding: '8px 0'
+    padding: '8px 0',
   },
   settingLabel: {
     display: 'flex',
@@ -158,10 +163,10 @@ const styles: Record<string, CSSProperties> = {
     gap: '8px',
     fontSize: '13px',
     color: '#333',
-    cursor: 'pointer'
+    cursor: 'pointer',
   },
   checkbox: {
     margin: 0,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 };

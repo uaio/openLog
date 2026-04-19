@@ -30,11 +30,19 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
     if (!deviceId || !setKey.trim()) return;
     setSetLoading(true);
     try {
-      await api.post(`/api/devices/${deviceId}/storage/set`, { key: setKey.trim(), value: setValue, storageType });
+      await api.post(`/api/devices/${deviceId}/storage/set`, {
+        key: setKey.trim(),
+        value: setValue,
+        storageType,
+      });
       setTimeout(refresh, 300);
-      setSetKey(''); setSetValue('');
-    } catch { /* ignore */ }
-    finally { setSetLoading(false); }
+      setSetKey('');
+      setSetValue('');
+    } catch {
+      /* ignore */
+    } finally {
+      setSetLoading(false);
+    }
   }, [deviceId, setKey, setValue, storageType, refresh]);
 
   const handleClearStorage = useCallback(async () => {
@@ -43,7 +51,9 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
     try {
       await api.post(`/api/devices/${deviceId}/storage/clear`, { storageType });
       setTimeout(refresh, 300);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [deviceId, activeTab, storageType, refresh]);
 
   if (!deviceId) {
@@ -61,20 +71,18 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
     {
       id: 'localStorage',
       label: 'localStorage',
-      count: snapshot ? Object.keys(snapshot.localStorage).length : undefined
+      count: snapshot ? Object.keys(snapshot.localStorage).length : undefined,
     },
     {
       id: 'sessionStorage',
       label: 'sessionStorage',
-      count: snapshot ? Object.keys(snapshot.sessionStorage).length : undefined
+      count: snapshot ? Object.keys(snapshot.sessionStorage).length : undefined,
     },
     {
       id: 'cookies',
       label: 'Cookies',
-      count: snapshot?.cookies
-        ? snapshot.cookies.split(';').filter(Boolean).length
-        : undefined
-    }
+      count: snapshot?.cookies ? snapshot.cookies.split(';').filter(Boolean).length : undefined,
+    },
   ];
 
   const renderKVTable = (data: Record<string, string>, totalSize?: number) => {
@@ -126,11 +134,15 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
         </div>
       );
     }
-    const entries = raw.split(';').map(c => c.trim()).filter(Boolean).map(c => {
-      const idx = c.indexOf('=');
-      if (idx === -1) return { key: c, value: '' };
-      return { key: c.slice(0, idx).trim(), value: c.slice(idx + 1).trim() };
-    });
+    const entries = raw
+      .split(';')
+      .map((c) => c.trim())
+      .filter(Boolean)
+      .map((c) => {
+        const idx = c.indexOf('=');
+        if (idx === -1) return { key: c, value: '' };
+        return { key: c.slice(0, idx).trim(), value: c.slice(idx + 1).trim() };
+      });
     return (
       <div>
         <div style={styles.sizeBar}>
@@ -191,9 +203,7 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
         <h3 style={styles.title}>存储</h3>
         <div style={styles.headerRight}>
           {snapshot && (
-            <span style={styles.updateTime}>
-              更新于 {formatTime(snapshot.timestamp)}
-            </span>
+            <span style={styles.updateTime}>更新于 {formatTime(snapshot.timestamp)}</span>
           )}
           <button
             style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
@@ -207,21 +217,23 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
 
       {/* Sub-tabs */}
       <div style={styles.subTabs}>
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             style={{
               ...styles.subTab,
-              ...(activeTab === tab.id ? styles.subTabActive : {})
+              ...(activeTab === tab.id ? styles.subTabActive : {}),
             }}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
             {tab.count !== undefined && (
-              <span style={{
-                ...styles.badge,
-                ...(activeTab === tab.id ? styles.badgeActive : {})
-              }}>
+              <span
+                style={{
+                  ...styles.badge,
+                  ...(activeTab === tab.id ? styles.badgeActive : {}),
+                }}
+              >
                 {tab.count}
               </span>
             )}
@@ -236,17 +248,21 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
             style={styles.actionInput}
             placeholder="Key"
             value={setKey}
-            onChange={e => setSetKey(e.target.value)}
+            onChange={(e) => setSetKey(e.target.value)}
           />
           <input
             style={{ ...styles.actionInput, flex: 2 }}
             placeholder="Value"
             value={setValue}
-            onChange={e => setSetValue(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSetItem()}
+            onChange={(e) => setSetValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSetItem()}
           />
           <button
-            style={{ ...styles.btn, borderColor: '#1890ff', color: setLoading || !setKey.trim() ? '#999' : '#1890ff' }}
+            style={{
+              ...styles.btn,
+              borderColor: '#1890ff',
+              color: setLoading || !setKey.trim() ? '#999' : '#1890ff',
+            }}
             disabled={setLoading || !setKey.trim() || !deviceId}
             onClick={handleSetItem}
           >
@@ -264,9 +280,7 @@ export function StoragePanel({ deviceId }: StoragePanelProps) {
       )}
 
       {/* Content */}
-      <div style={styles.content}>
-        {renderContent()}
-      </div>
+      <div style={styles.content}>{renderContent()}</div>
     </div>
   );
 }
@@ -276,7 +290,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   header: {
     display: 'flex',
@@ -284,22 +298,22 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     padding: '12px 20px',
     borderBottom: '1px solid #e8e8e8',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   title: {
     margin: 0,
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   headerRight: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px'
+    gap: '12px',
   },
   updateTime: {
     fontSize: '12px',
-    color: '#999'
+    color: '#999',
   },
   btn: {
     padding: '5px 12px',
@@ -308,11 +322,11 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: '4px',
     backgroundColor: '#fff',
     cursor: 'pointer',
-    color: '#555'
+    color: '#555',
   },
   btnDisabled: {
     opacity: 0.5,
-    cursor: 'not-allowed'
+    cursor: 'not-allowed',
   },
   actionBar: {
     display: 'flex',
@@ -335,7 +349,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     borderBottom: '1px solid #e8e8e8',
     backgroundColor: '#fff',
-    padding: '0 20px'
+    padding: '0 20px',
   },
   subTab: {
     padding: '8px 14px',
@@ -348,12 +362,12 @@ const styles: Record<string, CSSProperties> = {
     marginRight: '4px',
     display: 'flex',
     alignItems: 'center',
-    gap: '6px'
+    gap: '6px',
   },
   subTabActive: {
     color: '#1890ff',
     borderBottomColor: '#1890ff',
-    fontWeight: 500
+    fontWeight: 500,
   },
   badge: {
     backgroundColor: '#e8e8e8',
@@ -361,20 +375,20 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: '10px',
     padding: '1px 6px',
     fontSize: '11px',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
   },
   badgeActive: {
     backgroundColor: '#e6f7ff',
-    color: '#1890ff'
+    color: '#1890ff',
   },
   content: {
     flex: 1,
-    overflow: 'auto'
+    overflow: 'auto',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    fontSize: '13px'
+    fontSize: '13px',
   },
   th: {
     textAlign: 'left',
@@ -385,23 +399,23 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     fontSize: '12px',
     position: 'sticky',
-    top: 0
+    top: 0,
   },
   tr: {
-    borderBottom: '1px solid #f5f5f5'
+    borderBottom: '1px solid #f5f5f5',
   },
   td: {
     padding: '7px 16px',
-    verticalAlign: 'top'
+    verticalAlign: 'top',
   },
   keyCell: {
     fontFamily: 'monospace',
     color: '#d56161',
     wordBreak: 'break-all',
-    fontSize: '12px'
+    fontSize: '12px',
   },
   valueCell: {
-    maxWidth: 0
+    maxWidth: 0,
   },
   valueText: {
     display: 'block',
@@ -411,7 +425,7 @@ const styles: Record<string, CSSProperties> = {
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
     maxHeight: '80px',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   sizeBar: {
     display: 'flex',
@@ -420,13 +434,13 @@ const styles: Record<string, CSSProperties> = {
     padding: '6px 16px',
     backgroundColor: '#f9f9f9',
     borderBottom: '1px solid #f0f0f0',
-    fontSize: '12px'
+    fontSize: '12px',
   },
   sizeLabel: {
-    color: '#888'
+    color: '#888',
   },
   countLabel: {
-    color: '#888'
+    color: '#888',
   },
   empty: {
     display: 'flex',
@@ -436,11 +450,11 @@ const styles: Record<string, CSSProperties> = {
     padding: '60px 20px',
     color: '#bbb',
     gap: '8px',
-    fontSize: '14px'
+    fontSize: '14px',
   },
   emptyIcon: {
     fontSize: '36px',
-    opacity: 0.5
+    opacity: 0.5,
   },
   placeholder: {
     display: 'flex',
@@ -449,14 +463,14 @@ const styles: Record<string, CSSProperties> = {
     justifyContent: 'center',
     height: '100%',
     color: '#bbb',
-    gap: '12px'
+    gap: '12px',
   },
   placeholderIcon: {
     fontSize: '48px',
-    opacity: 0.4
+    opacity: 0.4,
   },
   placeholderText: {
-    fontSize: '14px'
+    fontSize: '14px',
   },
   loadingWrap: {
     display: 'flex',
@@ -465,9 +479,9 @@ const styles: Record<string, CSSProperties> = {
     padding: '60px 20px',
     color: '#999',
     gap: '8px',
-    fontSize: '14px'
+    fontSize: '14px',
   },
   spinner: {
-    fontSize: '20px'
-  }
+    fontSize: '20px',
+  },
 };

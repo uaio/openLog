@@ -49,7 +49,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
     const code = jsInput.trim();
     if (!code || !deviceId) return;
     websocketManager.send({ type: 'execute_js', deviceId, code });
-    setJsHistory(prev => [code, ...prev.filter(h => h !== code)].slice(0, 50));
+    setJsHistory((prev) => [code, ...prev.filter((h) => h !== code)].slice(0, 50));
     setJsHistoryIndex(-1);
     setJsInput('');
   }, [jsInput, deviceId]);
@@ -60,7 +60,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
     try {
       await api.post(`/api/devices/${deviceId}/screenshot`);
       // wait a moment for the device to capture and send back
-      await new Promise(r => setTimeout(r, 2500));
+      await new Promise((r) => setTimeout(r, 2500));
       const result = await api.get(`/api/devices/${deviceId}/screenshot`);
       setScreenshotUrl(result.dataUrl || null);
     } catch {
@@ -75,13 +75,18 @@ export function LogPanel({ deviceId }: LogPanelProps) {
     api.post(`/api/devices/${deviceId}/reload`).catch(() => {});
   }, [deviceId]);
 
-  const handleNetworkThrottle = useCallback(async (preset: string) => {
-    if (!deviceId) return;
-    setNetworkThrottleState(preset);
-    try {
-      await api.post(`/api/devices/${deviceId}/network-throttle`, { preset });
-    } catch { /* ignore */ }
-  }, [deviceId]);
+  const handleNetworkThrottle = useCallback(
+    async (preset: string) => {
+      if (!deviceId) return;
+      setNetworkThrottleState(preset);
+      try {
+        await api.post(`/api/devices/${deviceId}/network-throttle`, { preset });
+      } catch {
+        /* ignore */
+      }
+    },
+    [deviceId],
+  );
 
   const handleJsKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -120,13 +125,15 @@ export function LogPanel({ deviceId }: LogPanelProps) {
     }
   };
 
-  const filteredLogs = useMemo(() =>
-    logs.filter(log => {
-      const levelMatch = filterLevel === 'all' || log.level === filterLevel;
-      const textMatch = !searchText || log.message.toLowerCase().includes(searchText.toLowerCase());
-      return levelMatch && textMatch;
-    }),
-    [logs, filterLevel, searchText]
+  const filteredLogs = useMemo(
+    () =>
+      logs.filter((log) => {
+        const levelMatch = filterLevel === 'all' || log.level === filterLevel;
+        const textMatch =
+          !searchText || log.message.toLowerCase().includes(searchText.toLowerCase());
+        return levelMatch && textMatch;
+      }),
+    [logs, filterLevel, searchText],
   );
 
   const handleExportLogs = useCallback(() => {
@@ -134,8 +141,10 @@ export function LogPanel({ deviceId }: LogPanelProps) {
     const blob = new Blob([JSON.stringify(filteredLogs, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `logs-${deviceId}-${Date.now()}.json`;
-    a.click(); URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = `logs-${deviceId}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }, [logs, filteredLogs, deviceId]);
 
   // 虚拟列表 — 只渲染视口中的行，日志量无上限也不卡顿
@@ -154,9 +163,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             控制台日志 {loading && <span style={styles.loadingText}> (加载中...)</span>}
           </div>
           {!loading && logs.length > 0 && (
-            <div style={styles.hint}>
-              已加载 {logs.length} 条历史日志
-            </div>
+            <div style={styles.hint}>已加载 {logs.length} 条历史日志</div>
           )}
         </div>
         <div style={styles.buttonGroup}>
@@ -198,12 +205,16 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           </button>
           <select
             value={networkThrottle}
-            onChange={e => handleNetworkThrottle(e.target.value)}
+            onChange={(e) => handleNetworkThrottle(e.target.value)}
             disabled={!deviceId}
             style={{
-              padding: '4px 8px', fontSize: 12, border: '1px solid #d9d9d9',
-              borderRadius: 2, backgroundColor: networkThrottle !== 'none' ? '#fff7e6' : '#fff',
-              color: networkThrottle !== 'none' ? '#fa8c16' : '#333', cursor: 'pointer'
+              padding: '4px 8px',
+              fontSize: 12,
+              border: '1px solid #d9d9d9',
+              borderRadius: 2,
+              backgroundColor: networkThrottle !== 'none' ? '#fff7e6' : '#fff',
+              color: networkThrottle !== 'none' ? '#fa8c16' : '#333',
+              cursor: 'pointer',
             }}
             title="网络节流"
           >
@@ -243,7 +254,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
             disabled={clearingHistory || !deviceId}
             style={{
               ...styles.clearHistoryButton,
-              ...(clearingHistory ? styles.buttonDisabled : {})
+              ...(clearingHistory ? styles.buttonDisabled : {}),
             }}
             onMouseEnter={(e) => {
               if (!clearingHistory) {
@@ -264,13 +275,13 @@ export function LogPanel({ deviceId }: LogPanelProps) {
       {/* 筛选工具栏 */}
       <div style={styles.toolbar}>
         <div style={styles.levelButtons}>
-          {(['all', 'log', 'warn', 'error', 'info'] as const).map(level => (
+          {(['all', 'log', 'warn', 'error', 'info'] as const).map((level) => (
             <button
               key={level}
               onClick={() => setFilterLevel(level)}
               style={{
                 ...styles.levelButton,
-                ...(filterLevel === level ? styles.levelButtonActive : {})
+                ...(filterLevel === level ? styles.levelButtonActive : {}),
               }}
             >
               {level === 'all' ? '全部' : level.toUpperCase()}
@@ -281,15 +292,12 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           type="text"
           placeholder="搜索日志..."
           value={searchText}
-          onChange={e => setSearchText(e.target.value)}
+          onChange={(e) => setSearchText(e.target.value)}
           style={styles.searchInput}
         />
       </div>
 
-      <div
-        ref={containerRef}
-        style={styles.logContainer}
-      >
+      <div ref={containerRef} style={styles.logContainer}>
         {loading ? (
           <div style={styles.empty}>
             <div style={styles.loadingIcon}>⏳</div>
@@ -298,9 +306,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
         ) : filteredLogs.length === 0 ? (
           <div style={styles.empty}>
             <div style={styles.emptyIcon}>{logs.length === 0 ? '📝' : '🔍'}</div>
-            <div style={styles.emptyText}>
-              {logs.length === 0 ? '暂无日志' : '没有匹配的日志'}
-            </div>
+            <div style={styles.emptyText}>{logs.length === 0 ? '暂无日志' : '没有匹配的日志'}</div>
             <div style={styles.emptyHint}>
               {logs.length === 0
                 ? '在移动设备上执行操作后，日志将自动显示在这里'
@@ -309,12 +315,18 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           </div>
         ) : (
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
-            {virtualizer.getVirtualItems().map(virtualRow => (
+            {virtualizer.getVirtualItems().map((virtualRow) => (
               <div
                 key={virtualRow.key}
                 data-index={virtualRow.index}
                 ref={virtualizer.measureElement}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${virtualRow.start}px)` }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
               >
                 <LogEntry log={filteredLogs[virtualRow.index]} />
               </div>
@@ -330,7 +342,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           ref={jsInputRef}
           type="text"
           value={jsInput}
-          onChange={e => setJsInput(e.target.value)}
+          onChange={(e) => setJsInput(e.target.value)}
           onKeyDown={handleJsKeyDown}
           placeholder={deviceId ? '输入 JS 代码，按 Enter 在手机端执行...' : '请先选择设备'}
           disabled={!deviceId}
@@ -343,7 +355,7 @@ export function LogPanel({ deviceId }: LogPanelProps) {
           disabled={!deviceId || !jsInput.trim()}
           style={{
             ...styles.jsRunButton,
-            ...(!deviceId || !jsInput.trim() ? styles.jsRunButtonDisabled : {})
+            ...(!deviceId || !jsInput.trim() ? styles.jsRunButtonDisabled : {}),
           }}
         >
           执行
@@ -353,15 +365,20 @@ export function LogPanel({ deviceId }: LogPanelProps) {
       {/* AI 分析模态框 */}
       {aiModal && (
         <div style={styles.screenshotOverlay} onClick={() => setAiModal(false)}>
-          <div style={{ ...styles.screenshotModal, minWidth: 400, maxWidth: 600 }} onClick={e => e.stopPropagation()}>
+          <div
+            style={{ ...styles.screenshotModal, minWidth: 400, maxWidth: 600 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={styles.screenshotHeader}>
               <span>🤖 AI 日志分析</span>
-              <button style={styles.screenshotClose} onClick={() => setAiModal(false)}>✕</button>
+              <button style={styles.screenshotClose} onClick={() => setAiModal(false)}>
+                ✕
+              </button>
             </div>
             <div style={{ padding: 16, color: '#e0e0e0', fontSize: 13 }}>
               {(() => {
-                const errors = filteredLogs.filter(l => l.level === 'error');
-                const warns = filteredLogs.filter(l => l.level === 'warn');
+                const errors = filteredLogs.filter((l) => l.level === 'error');
+                const warns = filteredLogs.filter((l) => l.level === 'warn');
                 const topErrors = errors.slice(-5).reverse();
                 return (
                   <div>
@@ -374,15 +391,30 @@ export function LogPanel({ deviceId }: LogPanelProps) {
                     </div>
                     {topErrors.length > 0 && (
                       <div>
-                        <div style={{ fontWeight: 'bold', marginBottom: 8, color: '#f44336' }}>最近错误:</div>
+                        <div style={{ fontWeight: 'bold', marginBottom: 8, color: '#f44336' }}>
+                          最近错误:
+                        </div>
                         {topErrors.map((l, i) => (
-                          <div key={i} style={{ marginBottom: 6, padding: '6px 8px', background: '#2d2d3f', borderRadius: 4, fontSize: 12, fontFamily: 'monospace', wordBreak: 'break-all' as const }}>
+                          <div
+                            key={i}
+                            style={{
+                              marginBottom: 6,
+                              padding: '6px 8px',
+                              background: '#2d2d3f',
+                              borderRadius: 4,
+                              fontSize: 12,
+                              fontFamily: 'monospace',
+                              wordBreak: 'break-all' as const,
+                            }}
+                          >
                             {l.message.slice(0, 200)}
                           </div>
                         ))}
                       </div>
                     )}
-                    {errors.length === 0 && <div style={{ color: '#4caf50' }}>✅ 未发现错误日志</div>}
+                    {errors.length === 0 && (
+                      <div style={{ color: '#4caf50' }}>✅ 未发现错误日志</div>
+                    )}
                   </div>
                 );
               })()}
@@ -393,14 +425,13 @@ export function LogPanel({ deviceId }: LogPanelProps) {
 
       {/* 截图预览模态框 */}
       {screenshotUrl && (
-        <div
-          style={styles.screenshotOverlay}
-          onClick={() => setScreenshotUrl(null)}
-        >
-          <div style={styles.screenshotModal} onClick={e => e.stopPropagation()}>
+        <div style={styles.screenshotOverlay} onClick={() => setScreenshotUrl(null)}>
+          <div style={styles.screenshotModal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.screenshotHeader}>
               <span>📷 手机截图</span>
-              <button style={styles.screenshotClose} onClick={() => setScreenshotUrl(null)}>✕</button>
+              <button style={styles.screenshotClose} onClick={() => setScreenshotUrl(null)}>
+                ✕
+              </button>
             </div>
             <img src={screenshotUrl} alt="screenshot" style={styles.screenshotImage} />
           </div>
@@ -418,7 +449,7 @@ const styles = {
     backgroundColor: '#fff',
     border: '1px solid #e0e0e0',
     borderRadius: '4px',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   header: {
     display: 'flex',
@@ -426,7 +457,7 @@ const styles = {
     alignItems: 'center',
     padding: '12px 16px',
     borderBottom: '1px solid #e0e0e0',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   toolbar: {
     display: 'flex',
@@ -434,11 +465,11 @@ const styles = {
     gap: '12px',
     padding: '8px 16px',
     borderBottom: '1px solid #e0e0e0',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   levelButtons: {
     display: 'flex',
-    gap: '4px'
+    gap: '4px',
   },
   levelButton: {
     padding: '4px 10px',
@@ -448,12 +479,12 @@ const styles = {
     backgroundColor: '#fff',
     color: '#666',
     cursor: 'pointer',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
   },
   levelButtonActive: {
     backgroundColor: '#1890ff',
     color: '#fff',
-    borderColor: '#1890ff'
+    borderColor: '#1890ff',
   },
   searchInput: {
     flex: 1,
@@ -462,30 +493,30 @@ const styles = {
     border: '1px solid #d9d9d9',
     borderRadius: '3px',
     outline: 'none',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   titleSection: {
     display: 'flex',
-    flexDirection: 'column' as const
+    flexDirection: 'column' as const,
   },
   title: {
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   loadingText: {
     fontSize: '12px',
     color: '#999',
-    fontWeight: 'normal' as const
+    fontWeight: 'normal' as const,
   },
   hint: {
     fontSize: '11px',
     color: '#999',
-    marginTop: '2px'
+    marginTop: '2px',
   },
   buttonGroup: {
     display: 'flex',
-    gap: '8px'
+    gap: '8px',
   },
   clearCurrentButton: {
     padding: '4px 12px',
@@ -495,7 +526,7 @@ const styles = {
     backgroundColor: '#fff',
     color: '#1890ff',
     cursor: 'pointer',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
   },
   clearHistoryButton: {
     padding: '4px 12px',
@@ -505,16 +536,16 @@ const styles = {
     backgroundColor: '#fff',
     color: '#ff4d4f',
     cursor: 'pointer',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
   },
   buttonDisabled: {
     opacity: 0.5,
-    cursor: 'not-allowed'
+    cursor: 'not-allowed',
   },
   logContainer: {
     flex: 1,
     overflowY: 'auto' as const,
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
   },
   empty: {
     display: 'flex',
@@ -523,26 +554,26 @@ const styles = {
     justifyContent: 'center',
     height: '100%',
     color: '#999',
-    fontSize: '14px'
+    fontSize: '14px',
   },
   loadingIcon: {
     fontSize: '32px',
-    marginBottom: '12px'
+    marginBottom: '12px',
   },
   emptyIcon: {
     fontSize: '48px',
     marginBottom: '12px',
-    opacity: 0.5
+    opacity: 0.5,
   },
   emptyText: {
     fontSize: '14px',
-    marginBottom: '8px'
+    marginBottom: '8px',
   },
   emptyHint: {
     fontSize: '12px',
     color: '#bbb',
     textAlign: 'center' as const,
-    maxWidth: '300px'
+    maxWidth: '300px',
   },
   jsConsole: {
     display: 'flex',
