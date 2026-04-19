@@ -304,23 +304,37 @@ export class Persistence {
       .prepare('SELECT * FROM network_requests WHERE device_id = ? ORDER BY timestamp DESC LIMIT ?')
       .all(deviceId, limit) as Array<Record<string, unknown>>;
     return rows
-      .map((r) => ({
-        id: r.id as string,
-        deviceId: r.device_id as string,
-        tabId: r.tab_id as string,
-        timestamp: r.timestamp as number,
-        method: r.method as string,
-        url: r.url as string,
-        status: (r.status as number) || undefined,
-        statusText: (r.status_text as string) || undefined,
-        requestHeaders: r.request_headers ? JSON.parse(r.request_headers as string) : undefined,
-        requestBody: (r.request_body as string) || undefined,
-        responseHeaders: r.response_headers ? JSON.parse(r.response_headers as string) : undefined,
-        responseBody: (r.response_body as string) || undefined,
-        duration: (r.duration as number) || undefined,
-        type: r.type as string,
-        error: (r.error as string) || undefined,
-      }))
+      .map((r) => {
+        let requestHeaders: Record<string, string> | undefined;
+        let responseHeaders: Record<string, string> | undefined;
+        try {
+          requestHeaders = r.request_headers ? JSON.parse(r.request_headers as string) : undefined;
+        } catch {
+          requestHeaders = undefined;
+        }
+        try {
+          responseHeaders = r.response_headers ? JSON.parse(r.response_headers as string) : undefined;
+        } catch {
+          responseHeaders = undefined;
+        }
+        return {
+          id: r.id as string,
+          deviceId: r.device_id as string,
+          tabId: r.tab_id as string,
+          timestamp: r.timestamp as number,
+          method: r.method as string,
+          url: r.url as string,
+          status: (r.status as number) || undefined,
+          statusText: (r.status_text as string) || undefined,
+          requestHeaders,
+          requestBody: (r.request_body as string) || undefined,
+          responseHeaders,
+          responseBody: (r.response_body as string) || undefined,
+          duration: (r.duration as number) || undefined,
+          type: r.type as string,
+          error: (r.error as string) || undefined,
+        };
+      })
       .reverse();
   }
 
@@ -368,16 +382,30 @@ export class Persistence {
       .prepare('SELECT * FROM perf_sessions WHERE device_id = ? ORDER BY end_time DESC LIMIT ?')
       .all(deviceId, limit) as Array<Record<string, unknown>>;
     return rows
-      .map((r) => ({
-        sessionId: r.session_id as string,
-        deviceId: r.device_id as string,
-        tabId: r.tab_id as string,
-        startTime: r.start_time as number,
-        endTime: r.end_time as number,
-        duration: r.duration as number,
-        snapshot: r.snapshot_json ? JSON.parse(r.snapshot_json as string) : null,
-        score: JSON.parse(r.score_json as string),
-      }))
+      .map((r) => {
+        let snapshot: unknown = null;
+        let score: unknown = {};
+        try {
+          snapshot = r.snapshot_json ? JSON.parse(r.snapshot_json as string) : null;
+        } catch {
+          snapshot = null;
+        }
+        try {
+          score = JSON.parse(r.score_json as string);
+        } catch {
+          score = {};
+        }
+        return {
+          sessionId: r.session_id as string,
+          deviceId: r.device_id as string,
+          tabId: r.tab_id as string,
+          startTime: r.start_time as number,
+          endTime: r.end_time as number,
+          duration: r.duration as number,
+          snapshot,
+          score,
+        };
+      })
       .reverse();
   }
 

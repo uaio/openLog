@@ -1,12 +1,44 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, useState, useEffect } from 'react';
 import { useI18n, type Lang } from '../i18n/index.js';
 
 interface SettingsPanelProps {
   deviceId?: string;
 }
 
+const SETTINGS_KEY = 'openlog-settings';
+
+interface Settings {
+  showTimestamp: boolean;
+  autoScroll: boolean;
+}
+
+function loadSettings(): Settings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return { showTimestamp: false, autoScroll: true };
+}
+
+function saveSettings(settings: Settings): void {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch { /* ignore */ }
+}
+
 export function SettingsPanel({ deviceId }: SettingsPanelProps) {
   const { t, lang, setLang } = useI18n();
+  const [settings, setSettings] = useState<Settings>(loadSettings);
+
+  useEffect(() => {
+    saveSettings(settings);
+    // Dispatch a custom event so other panels can react
+    window.dispatchEvent(new CustomEvent('openlog-settings-change', { detail: settings }));
+  }, [settings]);
+
+  const toggle = (key: keyof Settings) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <div style={styles.container}>
@@ -33,13 +65,23 @@ export function SettingsPanel({ deviceId }: SettingsPanelProps) {
           <h4 style={styles.sectionTitle}>{t.settings.display}</h4>
           <div style={styles.setting}>
             <label style={styles.settingLabel}>
-              <input type="checkbox" style={styles.checkbox} />
+              <input
+                type="checkbox"
+                style={styles.checkbox}
+                checked={settings.showTimestamp}
+                onChange={() => toggle('showTimestamp')}
+              />
               <span>{t.settings.showTimestamp}</span>
             </label>
           </div>
           <div style={styles.setting}>
             <label style={styles.settingLabel}>
-              <input type="checkbox" style={styles.checkbox} defaultChecked />
+              <input
+                type="checkbox"
+                style={styles.checkbox}
+                checked={settings.autoScroll}
+                onChange={() => toggle('autoScroll')}
+              />
               <span>{t.settings.autoScroll}</span>
             </label>
           </div>

@@ -42,6 +42,8 @@ interface OriginalConsole {
   warn: typeof console.warn;
   error: typeof console.error;
   info: typeof console.info;
+  debug: typeof console.debug;
+  trace: typeof console.trace;
 }
 
 export interface OpenLogOptions extends RemoteConfig {
@@ -239,6 +241,8 @@ export class OpenLog {
       warn: console.warn,
       error: console.error,
       info: console.info,
+      debug: console.debug,
+      trace: console.trace,
     };
 
     const self = this;
@@ -247,6 +251,7 @@ export class OpenLog {
     const createInterceptor = (
       level: 'log' | 'warn' | 'error' | 'info',
       originalFn: typeof console.log,
+      captureStack = false,
     ) => {
       return function (...args: unknown[]) {
         // ① DataBus emit 在第一时间发生（先于原始 console 调用，先于 Eruda 面板展示）
@@ -257,23 +262,25 @@ export class OpenLog {
             level,
             message,
             args, // 原始参数，供 ErudaPlugin 富文本渲染
-            ...(level === 'error' ? { stack: cleanStackTrace(new Error().stack) } : {}),
+            ...(captureStack ? { stack: cleanStackTrace(new Error().stack) } : {}),
           };
           self.dataBus.emit('console', entry);
         } catch {
           // 静默处理，避免影响原始 console 输出
         }
 
-        // ② 调用原始方法（浏览器 DevTools、Eruda 若在 overrideConsole 模式下也会在这里接管，
-        //    但我们已通过 overrideConsole:false 禁用了 Eruda 的 patch，所以这里是真正的原始 fn）
+        // ② 调用原始方法
         originalFn.apply(console, args);
       };
     };
 
     console.log = createInterceptor('log', this.originalConsole.log);
     console.warn = createInterceptor('warn', this.originalConsole.warn);
-    console.error = createInterceptor('error', this.originalConsole.error);
+    console.error = createInterceptor('error', this.originalConsole.error, true);
     console.info = createInterceptor('info', this.originalConsole.info);
+    // debug maps to 'log' level, trace maps to 'warn' with stack
+    console.debug = createInterceptor('log', this.originalConsole.debug);
+    console.trace = createInterceptor('warn', this.originalConsole.trace, true);
   }
 
   private initNetworkInterceptor(config?: NetworkInterceptorConfig): void {
@@ -513,6 +520,8 @@ export class OpenLog {
       console.warn = this.originalConsole.warn;
       console.error = this.originalConsole.error;
       console.info = this.originalConsole.info;
+      console.debug = this.originalConsole.debug;
+      console.trace = this.originalConsole.trace;
       this.originalConsole = null;
     }
 

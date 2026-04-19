@@ -15,6 +15,8 @@ const PRESETS: Record<ThrottlePreset, ThrottleConfig> = {
 export class NetworkThrottle {
   private preset: ThrottlePreset = 'none';
   private originalFetch: typeof fetch | null = null;
+  private originalXHROpen: typeof XMLHttpRequest.prototype.open | null = null;
+  private originalXHRSend: typeof XMLHttpRequest.prototype.send | null = null;
   private active = false;
 
   setPreset(preset: ThrottlePreset): void {
@@ -29,6 +31,11 @@ export class NetworkThrottle {
   start(): void {
     if (this.active || typeof window === 'undefined') return;
     this.active = true;
+    this.patchFetch();
+    this.patchXHR();
+  }
+
+  private patchFetch(): void {
     this.originalFetch = window.fetch.bind(window);
     const self = this;
     window.fetch = async function (
@@ -46,12 +53,48 @@ export class NetworkThrottle {
     };
   }
 
+  private patchXHR(): void {
+    const self = this;
+    this.originalXHROpen = XMLHttpRequest.prototype.open;
+    this.originalXHRSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.send = function (body?: Document | XMLHttpRequestBodyInit | null) {
+      const config = PRESETS[self.preset];
+      const xhr = this;
+
+      if (config.downloadKbps === 0) {
+        // Simulate offline
+        setTimeout(() => {
+          Object.defineProperty(xhr, 'status', { value: 0, writable: false });
+          xhr.dispatchEvent(new Event('error'));
+        }, 0);
+        return;
+      }
+
+      if (config.latency > 0) {
+        setTimeout(() => {
+          self.originalXHRSend!.call(xhr, body);
+        }, config.latency);
+      } else {
+        self.originalXHRSend!.call(xhr, body);
+      }
+    };
+  }
+
   stop(): void {
     if (!this.active || typeof window === 'undefined') return;
     this.active = false;
     if (this.originalFetch) {
       window.fetch = this.originalFetch;
       this.originalFetch = null;
+    }
+    if (this.originalXHROpen) {
+      XMLHttpRequest.prototype.open = this.originalXHROpen;
+      this.originalXHROpen = null;
+    }
+    if (this.originalXHRSend) {
+      XMLHttpRequest.prototype.send = this.originalXHRSend;
+      this.originalXHRSend = null;
     }
   }
 

@@ -174,8 +174,8 @@ export function createWebSocketServer(
           networkStore.cleanup(deviceId);
           storageStore.cleanup(deviceId);
           domStore.cleanup(deviceId);
-          performanceStore.clear(deviceId);
-          screenshotStore.clear(deviceId);
+          performanceStore.cleanup(deviceId);
+          screenshotStore.cleanup(deviceId);
           perfRunStore.clear(deviceId);
           mockStore.cleanup(deviceId);
           deviceIds.delete(ws);
