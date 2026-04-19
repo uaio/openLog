@@ -81,7 +81,7 @@ Returns structured health data for AI analysis:
 Health checks are computed server-side from collected data. The SDK itself doesn't expose a health check method — use the REST API or MCP tool.
 
 ```bash
-curl http://localhost:9898/api/devices/:id/health
+curl http://localhost:38291/api/devices/:id/health
 ```
 
 ## Tips

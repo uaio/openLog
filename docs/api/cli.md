@@ -22,7 +22,7 @@ openlog [options]
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
-| `--port` | `-p` | `9898` | Server port |
+| `--port` | `-p` | `38291` | Server port |
 | `--no-open` | | | Don't auto-open browser |
 | `--persist` | | `false` | Enable SQLite persistence |
 | `--db-path` | | `~/.openlog/data.db` | Database file location |

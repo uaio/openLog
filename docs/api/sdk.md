@@ -21,7 +21,7 @@ import { OpenLog } from '@openlog/sdk';
 
 const logger = new OpenLog({
   projectId: 'my-app',
-  server: 'ws://192.168.1.100:9898',
+  server: 'ws://192.168.1.100:38291',
 });
 ```
 
@@ -31,7 +31,7 @@ const logger = new OpenLog({
 <script>
   OpenLog.init({
     projectId: 'my-app',
-    server: 'ws://192.168.1.100:9898',
+    server: 'ws://192.168.1.100:38291',
   });
 </script>
 ```
@@ -43,7 +43,7 @@ interface OpenLogOptions {
   /** Required. Project identifier for device grouping */
   projectId: string;
 
-  /** WebSocket server URL (e.g., 'ws://192.168.1.100:9898') */
+  /** WebSocket server URL (e.g., 'ws://192.168.1.100:38291') */
   server?: string;
 
   /** Server port shorthand (alternative to server). SDK infers ws://[page hostname]:port */

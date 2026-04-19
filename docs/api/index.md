@@ -1,22 +1,15 @@
 # SDK API Reference
 
-## `init(config)`
+## `new OpenLog(config)`
 
 Initialize the openLog SDK.
 
 ```typescript
-import { init } from '@openlog/sdk';
+import OpenLog from '@openlog/sdk';
 
-const instance = init({
-  serverUrl: 'ws://localhost:9898',
+const logger = new OpenLog({
+  server: 'ws://localhost:38291',
   projectId: 'my-app',
-  console: true,
-  network: true,
-  performance: true,
-  storage: true,
-  error: true,
-  eruda: false,
-  rateLimit: 100,
 });
 ```
 
