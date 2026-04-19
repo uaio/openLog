@@ -38,7 +38,7 @@ openLog — H5 移动端调试工具
   --cors-origin <origins>    设置允许的 CORS 来源（逗号分隔，也可用 OPENLOG_CORS_ORIGIN）
   --persist                  启用 SQLite 持久化存储
   --db-path <path>           SQLite 数据库路径（默认 ~/.openlog/data.db）
-  --retention-days <days>    数据保留天数（默认 7 天）
+  --retention-days <days>    数据保留天数（默认 1 天）
   --for <tool>               指定 AI 工具 (claude/cursor/windsurf)
   -h, --help                 显示帮助信息
   -v, --version              显示版本号

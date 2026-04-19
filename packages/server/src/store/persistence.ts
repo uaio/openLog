@@ -10,7 +10,7 @@ export interface PersistenceOptions {
 
 const DEFAULT_DB_DIR = join(homedir(), '.openlog');
 const DEFAULT_DB_PATH = join(DEFAULT_DB_DIR, 'data.db');
-const DEFAULT_RETENTION_DAYS = 7;
+const DEFAULT_RETENTION_DAYS = 1;
 
 export class Persistence {
   private db: Database.Database;
