@@ -64,7 +64,10 @@ export class NetworkStore {
 
     // If memory is empty but we have persistence, try loading from db
     if ((!requests || requests.length === 0) && this.db) {
-      requests = this.db.loadNetworkRequests(deviceId, options?.limit || this.maxRequestsPerDevice) as NetworkRequest[];
+      requests = this.db.loadNetworkRequests(
+        deviceId,
+        options?.limit || this.maxRequestsPerDevice,
+      ) as NetworkRequest[];
       if (requests.length > 0) {
         this.requests.set(deviceId, requests);
       }

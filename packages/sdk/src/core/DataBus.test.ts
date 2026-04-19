@@ -60,7 +60,9 @@ describe('DataBus', () => {
 
   it('should isolate listener errors (fault tolerance)', () => {
     const bus = new DataBus();
-    const badHandler = vi.fn(() => { throw new Error('boom'); });
+    const badHandler = vi.fn(() => {
+      throw new Error('boom');
+    });
     const goodHandler = vi.fn();
     bus.on('console', badHandler);
     bus.on('console', goodHandler);

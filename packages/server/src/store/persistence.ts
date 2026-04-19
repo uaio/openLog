@@ -141,7 +141,9 @@ export class Persistence {
   }
 
   touchDevice(deviceId: string): void {
-    this.db.prepare('UPDATE devices SET last_seen = ? WHERE device_id = ?').run(Date.now(), deviceId);
+    this.db
+      .prepare('UPDATE devices SET last_seen = ? WHERE device_id = ?')
+      .run(Date.now(), deviceId);
   }
 
   loadDevices(): Array<{
@@ -154,9 +156,9 @@ export class Persistence {
     firstSeen: number;
     lastSeen: number;
   }> {
-    const rows = this.db
-      .prepare('SELECT * FROM devices ORDER BY last_seen DESC')
-      .all() as Array<Record<string, unknown>>;
+    const rows = this.db.prepare('SELECT * FROM devices ORDER BY last_seen DESC').all() as Array<
+      Record<string, unknown>
+    >;
     return rows.map((r) => ({
       deviceId: r.device_id as string,
       projectId: r.project_id as string,
@@ -186,7 +188,14 @@ export class Persistence {
         'INSERT INTO logs (device_id, tab_id, timestamp, level, message, stack) VALUES (?, ?, ?, ?, ?, ?)',
       );
     }
-    this.insertLogStmt.run(log.deviceId, log.tabId, log.timestamp, log.level, log.message, log.stack || null);
+    this.insertLogStmt.run(
+      log.deviceId,
+      log.tabId,
+      log.timestamp,
+      log.level,
+      log.message,
+      log.stack || null,
+    );
   }
 
   insertLogsBatch(
@@ -205,13 +214,23 @@ export class Persistence {
     );
     const batch = this.db.transaction((items: typeof logs) => {
       for (const log of items) {
-        insert.run(log.deviceId, log.tabId, log.timestamp, log.level, log.message, log.stack || null);
+        insert.run(
+          log.deviceId,
+          log.tabId,
+          log.timestamp,
+          log.level,
+          log.message,
+          log.stack || null,
+        );
       }
     });
     batch(logs);
   }
 
-  loadLogs(deviceId: string, limit: number = 200): Array<{
+  loadLogs(
+    deviceId: string,
+    limit: number = 200,
+  ): Array<{
     deviceId: string;
     tabId: string;
     timestamp: number;
@@ -283,7 +302,10 @@ export class Persistence {
       );
   }
 
-  loadNetworkRequests(deviceId: string, limit: number = 100): Array<{
+  loadNetworkRequests(
+    deviceId: string,
+    limit: number = 100,
+  ): Array<{
     id: string;
     deviceId: string;
     tabId: string;
@@ -313,7 +335,9 @@ export class Persistence {
           requestHeaders = undefined;
         }
         try {
-          responseHeaders = r.response_headers ? JSON.parse(r.response_headers as string) : undefined;
+          responseHeaders = r.response_headers
+            ? JSON.parse(r.response_headers as string)
+            : undefined;
         } catch {
           responseHeaders = undefined;
         }
@@ -368,7 +392,10 @@ export class Persistence {
       );
   }
 
-  loadPerfSessions(deviceId: string, limit: number = 20): Array<{
+  loadPerfSessions(
+    deviceId: string,
+    limit: number = 20,
+  ): Array<{
     sessionId: string;
     deviceId: string;
     tabId: string;

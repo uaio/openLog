@@ -114,12 +114,23 @@ function App() {
           </p>
         </div>
         <div style={styles.statusBadge}>
-          <span style={{
-            ...styles.statusDot,
-            backgroundColor: wsState === 'connected' ? '#52c41a' : wsState === 'connecting' ? '#faad14' : '#ff4d4f',
-          }} />
+          <span
+            style={{
+              ...styles.statusDot,
+              backgroundColor:
+                wsState === 'connected'
+                  ? '#52c41a'
+                  : wsState === 'connecting'
+                    ? '#faad14'
+                    : '#ff4d4f',
+            }}
+          />
           <span style={styles.statusText}>
-            {wsState === 'connected' ? 'Connected' : wsState === 'connecting' ? 'Connecting...' : 'Disconnected'}
+            {wsState === 'connected'
+              ? 'Connected'
+              : wsState === 'connecting'
+                ? 'Connecting...'
+                : 'Disconnected'}
           </span>
         </div>
       </div>

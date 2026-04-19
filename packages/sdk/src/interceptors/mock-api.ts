@@ -67,8 +67,13 @@ export class MockAPI {
 
     // Store URL/method on XHR instance via open patch
     const origOpen = this.originalXHROpen;
-    XMLHttpRequest.prototype.open = function (method: string, url: string | URL, ...rest: unknown[]) {
-      (this as unknown as Record<string, string>).__mockUrl = typeof url === 'string' ? url : url.href;
+    XMLHttpRequest.prototype.open = function (
+      method: string,
+      url: string | URL,
+      ...rest: unknown[]
+    ) {
+      (this as unknown as Record<string, string>).__mockUrl =
+        typeof url === 'string' ? url : url.href;
       (this as unknown as Record<string, string>).__mockMethod = method;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (origOpen as any).call(this, method, url, ...rest);
@@ -82,11 +87,31 @@ export class MockAPI {
 
       if (matched) {
         // Simulate a mock response
-        Object.defineProperty(this, 'status', { value: matched.status, writable: false, configurable: true });
-        Object.defineProperty(this, 'statusText', { value: 'OK', writable: false, configurable: true });
-        Object.defineProperty(this, 'responseText', { value: matched.body, writable: false, configurable: true });
-        Object.defineProperty(this, 'response', { value: matched.body, writable: false, configurable: true });
-        Object.defineProperty(this, 'readyState', { value: 4, writable: false, configurable: true });
+        Object.defineProperty(this, 'status', {
+          value: matched.status,
+          writable: false,
+          configurable: true,
+        });
+        Object.defineProperty(this, 'statusText', {
+          value: 'OK',
+          writable: false,
+          configurable: true,
+        });
+        Object.defineProperty(this, 'responseText', {
+          value: matched.body,
+          writable: false,
+          configurable: true,
+        });
+        Object.defineProperty(this, 'response', {
+          value: matched.body,
+          writable: false,
+          configurable: true,
+        });
+        Object.defineProperty(this, 'readyState', {
+          value: 4,
+          writable: false,
+          configurable: true,
+        });
 
         const headerStr = Object.entries({ 'Content-Type': 'application/json', ...matched.headers })
           .map(([k, v]) => `${k}: ${v}`)

@@ -203,7 +203,9 @@ export function PerfRunPanel({ deviceId }: PerfRunPanelProps) {
             ⏱ {elapsed}s
           </span>
         )}
-        {polling && <span style={{ fontSize: 12, color: '#888' }}>⏳ {t.perfRunPanel.running}</span>}
+        {polling && (
+          <span style={{ fontSize: 12, color: '#888' }}>⏳ {t.perfRunPanel.running}</span>
+        )}
         <div style={{ flex: 1 }} />
         {!running ? (
           <button

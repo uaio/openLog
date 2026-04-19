@@ -156,7 +156,12 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
             </div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 'bold', color: STATUS_COLOR[data.status] }}>
-                {data.status === 'healthy' ? t.healthPanel.healthy : data.status === 'warning' ? t.healthPanel.warning : t.healthPanel.critical} · {data.score}pts
+                {data.status === 'healthy'
+                  ? t.healthPanel.healthy
+                  : data.status === 'warning'
+                    ? t.healthPanel.warning
+                    : t.healthPanel.critical}{' '}
+                · {data.score}pts
               </div>
               <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
                 {t.healthPanel.updatedAt}: {new Date(data.timestamp).toLocaleTimeString()}
@@ -257,7 +262,9 @@ export function HealthPanel({ deviceId }: HealthPanelProps) {
       )}
 
       {!data && !loading && !error && (
-        <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>{t.healthPanel.clickRefresh}</div>
+        <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>
+          {t.healthPanel.clickRefresh}
+        </div>
       )}
     </div>
   );

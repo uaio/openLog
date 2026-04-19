@@ -121,7 +121,11 @@ export function LogPanel({ deviceId, tabId }: LogPanelProps) {
       clearLogs();
     } catch (error) {
       console.error('[LogPanel] clear history failed:', error);
-      alert(t.logPanel.clearHistoryFailed + '：' + (error instanceof Error ? error.message : t.common.unknownError));
+      alert(
+        t.logPanel.clearHistoryFailed +
+          '：' +
+          (error instanceof Error ? error.message : t.common.unknownError),
+      );
     } finally {
       setClearingHistory(false);
     }
