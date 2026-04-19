@@ -115,7 +115,6 @@ export function LogPanel({ deviceId }: LogPanelProps) {
 
     try {
       const result = await api.deleteLogs(deviceId);
-      console.log('[LogPanel] 清空历史日志成功:', result);
       clearLogs();
     } catch (error) {
       console.error('[LogPanel] 清空历史日志失败:', error);

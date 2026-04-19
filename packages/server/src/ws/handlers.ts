@@ -185,10 +185,8 @@ export function broadcastToViewers(envelope: any): void {
 }
 
 export function registerPCClient(ws: WebSocket): void {
-  console.log('[Server] 注册 PC 客户端，当前总数:', pcClients.size + 1);
   pcClients.add(ws);
   ws.on('close', () => {
-    console.log('[Server] PC 客户端断开，剩余:', pcClients.size - 1);
     pcClients.delete(ws);
   });
 }

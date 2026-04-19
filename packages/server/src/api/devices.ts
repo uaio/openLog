@@ -77,12 +77,9 @@ export function createDeviceRoutes(
     deleteLogs: (req: Request, res: Response) => {
       const { deviceId } = req.params;
 
-      console.log(`[Server] 收到删除日志请求，设备 ID: ${deviceId}`);
-
       // 检查设备是否存在
       const device = deviceStore.get(deviceId);
       if (!device) {
-        console.log(`[Server] 设备不存在: ${deviceId}`);
         return res.status(404).json({ error: 'Device not found' });
       }
 
@@ -90,12 +87,8 @@ export function createDeviceRoutes(
       const logsBefore = logStore.get(deviceId);
       const count = logsBefore ? logsBefore.length : 0;
 
-      console.log(`[Server] 准备删除 ${count} 条日志`);
-
       // 清除日志
       logStore.clear(deviceId);
-
-      console.log(`[Server] 已清除设备 ${deviceId} 的 ${count} 条日志`);
 
       res.json({
         success: true,

@@ -19,12 +19,10 @@ export function useLogs(deviceId?: string, maxLogs = 500) {
     }
 
     const loadHistoricalLogs = async () => {
-      console.log('[useLogs] 加载设备历史日志:', deviceId);
       setLoading(true);
 
       try {
         const historicalLogs = await api.getLogs(deviceId, maxLogs);
-        console.log('[useLogs] 历史日志加载完成，数量:', historicalLogs.length);
         // 反转顺序，让最新的日志在最上面
         setLogs(historicalLogs.reverse());
         setHasMore(historicalLogs.length >= maxLogs);
