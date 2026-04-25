@@ -1,6 +1,6 @@
 {
   "name": "@openlogs/demo",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "openLog demo & test pages",
   "scripts": {

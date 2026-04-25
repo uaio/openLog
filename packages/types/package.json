@@ -1,8 +1,14 @@
 {
   "name": "@openlogs/types",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Shared TypeScript type definitions for openLog (Envelope format, events, protocol)",
-  "keywords": ["openlog", "types", "typescript", "mobile-debugging", "logging"],
+  "keywords": [
+    "openlog",
+    "types",
+    "typescript",
+    "mobile-debugging",
+    "logging"
+  ],
   "author": "openLog Contributors",
   "license": "MIT",
   "repository": {
@@ -20,8 +26,12 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",

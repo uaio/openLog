@@ -1,8 +1,16 @@
 {
   "name": "@openlogs/cli",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "CLI for openLog — start server, configure AI tools, one-command setup",
-  "keywords": ["openlog", "cli", "mobile-debugging", "mcp", "claude", "cursor", "devtools"],
+  "keywords": [
+    "openlog",
+    "cli",
+    "mobile-debugging",
+    "mcp",
+    "claude",
+    "cursor",
+    "devtools"
+  ],
   "author": "openLog Contributors",
   "license": "MIT",
   "repository": {

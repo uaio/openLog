@@ -1,8 +1,17 @@
 {
   "name": "@openlogs/sdk",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Mobile H5 SDK for openLog — real-time console, network, storage, DOM, performance collection",
-  "keywords": ["openlog", "sdk", "mobile-debugging", "h5", "console", "network", "performance", "eruda"],
+  "keywords": [
+    "openlog",
+    "sdk",
+    "mobile-debugging",
+    "h5",
+    "console",
+    "network",
+    "performance",
+    "eruda"
+  ],
   "author": "openLog Contributors",
   "license": "MIT",
   "repository": {
@@ -22,8 +31,12 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build --config build/vite.config.ts",

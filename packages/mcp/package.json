@@ -1,8 +1,16 @@
 {
   "name": "@openlogs/mcp",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "MCP (Model Context Protocol) server for openLog — 30+ AI-callable debugging tools",
-  "keywords": ["openlog", "mcp", "ai", "claude", "cursor", "model-context-protocol", "debugging"],
+  "keywords": [
+    "openlog",
+    "mcp",
+    "ai",
+    "claude",
+    "cursor",
+    "model-context-protocol",
+    "debugging"
+  ],
   "author": "openLog Contributors",
   "license": "MIT",
   "repository": {

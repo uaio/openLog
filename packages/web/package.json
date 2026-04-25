@@ -1,9 +1,15 @@
 {
   "name": "@openlogs/web",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "PC debug panel for openLog — React-based real-time monitoring dashboard",
-  "keywords": ["openlog", "web", "debug-panel", "react", "dashboard"],
+  "keywords": [
+    "openlog",
+    "web",
+    "debug-panel",
+    "react",
+    "dashboard"
+  ],
   "author": "openLog Contributors",
   "license": "MIT",
   "repository": {
