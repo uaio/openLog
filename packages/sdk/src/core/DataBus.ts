@@ -3,9 +3,12 @@ import type {
   NetworkRequestEntry,
   StorageSnapshot,
   DOMSnapshot,
-  PerformanceReport,
+  PerformancePayload,
   ScreenshotData,
   PerfRunSession,
+  ErrorPayload,
+  LifecyclePayload,
+  CustomPayload,
 } from '../types/index.js';
 
 /** DataBus 上的 console 事件包含 args，供本地展示层（Eruda）使用 */
@@ -19,9 +22,12 @@ export type DataBusEventMap = {
   network: Omit<NetworkRequestEntry, 'deviceId' | 'tabId'>;
   storage: Omit<StorageSnapshot, 'deviceId' | 'tabId'>;
   dom: Omit<DOMSnapshot, 'deviceId' | 'tabId'>;
-  performance: Omit<PerformanceReport, 'deviceId' | 'tabId'>;
-  screenshot: ScreenshotData;
+  performance: PerformancePayload;
+  screenshot: Omit<ScreenshotData, 'deviceId' | 'tabId'>;
   perf_run: PerfRunSession;
+  error: ErrorPayload;
+  lifecycle: LifecyclePayload;
+  custom: CustomPayload;
 };
 
 type Listener<T> = (data: T) => void;

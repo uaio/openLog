@@ -4,7 +4,8 @@ import type {
   NetworkRequestEntry,
   StorageSnapshot,
   DOMSnapshot,
-  PerformanceReport,
+  PerformancePayload,
+  ScreenshotData,
 } from '../types/index.js';
 import type { PlatformAdapter } from '../platform/types.js';
 import type { DataBus } from '../core/DataBus.js';
@@ -290,12 +291,12 @@ export class Reporter {
     this.sendEnvelope('dom', snapshot);
   }
 
-  reportPerformance(report: Omit<PerformanceReport, 'deviceId' | 'tabId'>): void {
+  reportPerformance(report: PerformancePayload): void {
     if (!this.remoteEnabled || !this.transport) return;
     this.sendEnvelope('performance', report);
   }
 
-  reportScreenshot(data: import('../types/index.js').ScreenshotData): void {
+  reportScreenshot(data: Omit<ScreenshotData, 'deviceId' | 'tabId'>): void {
     if (!this.remoteEnabled || !this.transport) return;
     this.sendEnvelope('screenshot', data);
   }

@@ -1,10 +1,9 @@
 import type {
   PerfRunScore,
   PerfScoreItem,
-  PerformanceReport,
+  PerformancePayload,
   LongTask,
   ResourceTiming,
-  PerformanceSample,
 } from '../types/index.js';
 
 function lerp(a: number, b: number, t: number): number {
@@ -15,7 +14,7 @@ function clamp(v: number): number {
   return Math.max(0, Math.min(100, v));
 }
 
-function scoreFPS(samples: PerformanceSample[]): { score: number; value: number } {
+function scoreFPS(samples: PerformancePayload['samples']): { score: number; value: number } {
   if (!samples.length) return { score: 100, value: -1 };
   const avg = samples.reduce((s, x) => s + x.fps, 0) / samples.length;
   let score: number;
@@ -84,7 +83,7 @@ function rating(score: number): 'good' | 'needs-improvement' | 'poor' {
 }
 
 export function scorePerfRun(
-  snapshot: Omit<PerformanceReport, 'deviceId' | 'tabId'>,
+  snapshot: PerformancePayload,
 ): PerfRunScore {
   const vitalsMap = new Map(snapshot.vitals.map((v) => [v.name, v.value]));
 

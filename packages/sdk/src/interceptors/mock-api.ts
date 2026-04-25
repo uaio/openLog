@@ -1,11 +1,4 @@
-export interface MockRule {
-  id: string;
-  pattern: string;
-  method?: string;
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-}
+import type { MockRule } from '../types/index.js';
 
 export class MockAPI {
   private rules: MockRule[] = [];

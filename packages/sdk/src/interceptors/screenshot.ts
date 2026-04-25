@@ -1,14 +1,5 @@
 import type { DataBus } from '../core/DataBus.js';
-
-/** 截图上报数据 */
-export interface ScreenshotData {
-  timestamp: number;
-  dataUrl: string; // base64 PNG
-  width: number;
-  height: number;
-  url: string;
-  title: string;
-}
+import type { ScreenshotData } from '../types/index.js';
 
 /**
  * 截图采集器

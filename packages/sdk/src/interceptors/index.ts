@@ -6,7 +6,9 @@ export {
   PerformanceCollector,
   type PerformanceSample,
   type WebVital,
-  type PerformanceReport,
+  type LongTask,
+  type ResourceTiming,
+  type InteractionTiming,
 } from './performance.js';
 export { DataBus, type DataBusEventMap, type DataBusConsoleEntry } from '../core/DataBus.js';
 export { ErudaPlugin } from '../plugins/ErudaPlugin.js';

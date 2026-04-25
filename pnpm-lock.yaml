@@ -286,6 +286,9 @@ importers:
       '@openlogs/eruda':
         specifier: workspace:*
         version: link:../eruda
+      '@openlogs/types':
+        specifier: workspace:*
+        version: link:../types
       vite:
         specifier: ^5.0.0
         version: 5.4.21(@types/node@20.19.37)(sass@1.98.0)(terser@5.46.1)

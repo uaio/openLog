@@ -16,7 +16,7 @@ import { MockAPI } from './interceptors/mock-api.js';
 import type { PlatformAdapter } from './platform/types.js';
 import type { RemoteConfig, ErudaConfig, NetworkInterceptorConfig } from './types/index.js';
 import type { ThrottlePreset } from './interceptors/network-throttle.js';
-import type { MockRule } from './interceptors/mock-api.js';
+import type { MockRule } from './types/index.js';
 import type { PerfRunSession } from './types/index.js';
 import { serializeArgs, cleanStackTrace } from './core/utils/serialize.js';
 

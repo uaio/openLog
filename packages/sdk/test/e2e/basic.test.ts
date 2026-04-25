@@ -279,11 +279,11 @@ describe('OpenLog E2E', () => {
       testConsole.destroy();
     });
 
-    it('should accept default plugins configuration', () => {
+    it('should accept network configuration', () => {
       const testConsole = new OpenLog({
         projectId: 'test-project',
         server: 'ws://localhost:8080',
-        defaultPlugins: ['logger', 'network']
+        network: { enabled: true, ignoreUrls: ['/health'] }
       });
 
       expect(testConsole).toBeDefined();

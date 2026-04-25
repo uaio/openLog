@@ -6,7 +6,7 @@
 // ── Console ─────────────────────────────────────────────────────────────────
 
 export interface ConsolePayload {
-  level: 'log' | 'warn' | 'error' | 'info';
+  level: 'log' | 'warn' | 'error' | 'info' | 'debug';
   /** 原始参数列表（已序列化为字符串，保留富文本） */
   args: string[];
   /** 合并后的可读消息（args.join(' ')，方便搜索过滤） */

@@ -1,16 +1,15 @@
 import type {
-  PerformanceSample,
+  PerformancePayload,
   WebVital,
-  PerformanceReport,
   LongTask,
   ResourceTiming,
   InteractionTiming,
 } from '../types/index.js';
+import type { PerformanceSample as SDKPerformanceSample } from '../types/index.js';
 import type { DataBus } from '../core/DataBus.js';
 
 // Re-export for backward compatibility
-export type { PerformanceSample, WebVital };
-export type { PerformanceReport };
+export type { SDKPerformanceSample as PerformanceSample, WebVital, LongTask, ResourceTiming, InteractionTiming };
 
 declare global {
   interface Performance {
@@ -35,7 +34,7 @@ const MAX_INTERACTIONS = 100; // 最多保留 100 次交互
 
 export class PerformanceCollector {
   private bus: DataBus;
-  private samples: PerformanceSample[] = [];
+  private samples: SDKPerformanceSample[] = [];
   private vitals: WebVital[] = [];
   private longTasks: LongTask[] = [];
   private resources: ResourceTiming[] = [];
@@ -188,8 +187,8 @@ export class PerformanceCollector {
       this.fpsFrames = 0;
       this.fpsLastTick = now;
 
-      const sample: PerformanceSample = {
-        timestamp: Date.now(),
+      const sample: SDKPerformanceSample = {
+        ts: Date.now(),
         fps: Math.min(fps, 120),
       };
 
@@ -206,7 +205,7 @@ export class PerformanceCollector {
   }
 
   private flush() {
-    const report: Omit<PerformanceReport, 'deviceId' | 'tabId'> = {
+    const report: PerformancePayload = {
       vitals: [...this.vitals],
       samples: [...this.samples],
       longTasks: [...this.longTasks],
@@ -216,7 +215,7 @@ export class PerformanceCollector {
     this.bus.emit('performance', report);
   }
 
-  getSnapshot(): Omit<import('../types/index.js').PerformanceReport, 'deviceId' | 'tabId'> {
+  getSnapshot(): PerformancePayload {
     return {
       vitals: [...this.vitals],
       samples: [...this.samples],
