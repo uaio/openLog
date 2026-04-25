@@ -283,7 +283,7 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1
     devDependencies:
-      eruda:
+      '@openlog/eruda':
         specifier: workspace:*
         version: link:../eruda
       vite:

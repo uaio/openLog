@@ -27,27 +27,45 @@ jobs:
       - name: Remove sourcemaps from dist
         run: find packages/*/dist -name '*.map' -delete
 
+      - name: Check if version already published
+        id: version-check
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./packages/types/package.json').version")
+          if npm view @openlog/types@$VERSION version 2>/dev/null; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "Version $VERSION already exists on npm, skipping publish"
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish @openlog/types
+        if: steps.version-check.outputs.published != 'true'
         run: pnpm --filter @openlog/types publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @openlog/sdk
+        if: steps.version-check.outputs.published != 'true'
         run: pnpm --filter @openlog/sdk publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @openlog/server
+        if: steps.version-check.outputs.published != 'true'
         run: pnpm --filter @openlog/server publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @openlog/mcp
+        if: steps.version-check.outputs.published != 'true'
         run: pnpm --filter @openlog/mcp publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @openlog/cli
+        if: steps.version-check.outputs.published != 'true'
         run: pnpm --filter @openlog/cli publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

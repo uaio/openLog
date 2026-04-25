@@ -1,5 +1,6 @@
 {
-  "name": "eruda",
+  "name": "@openlog/eruda",
+  "private": true,
   "version": "3.4.3",
   "description": "Console for Mobile Browsers",
   "main": "dist/eruda.js",

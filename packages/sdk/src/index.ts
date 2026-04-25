@@ -202,7 +202,7 @@ export class OpenLog {
   private async initEruda(config?: ErudaConfig): Promise<void> {
     try {
       // 动态导入 eruda UMD 模块
-      const erudaModule = await import('eruda');
+      const erudaModule = await import('@openlog/eruda');
       // @ts-ignore - eruda is UMD module, default export is the eruda object
       this.eruda = erudaModule.default || erudaModule;
 

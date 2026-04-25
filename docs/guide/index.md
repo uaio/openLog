@@ -28,7 +28,7 @@ openLog is a real-time mobile H5 debugging tool that helps developers monitor co
 | `@openlog/web` | PC debug panel (React) served by the server |
 | `@openlog/mcp` | MCP server for AI-powered debugging |
 | `@openlog/cli` | CLI tool to start the server (`npx @openlog/cli`) and configure AI tools |
-| `eruda` | Bundled Eruda build used internally by the SDK for local panel |
+| `@openlog/eruda` | Bundled Eruda build used internally by the SDK (private) |
 | `@openlog/demo` | Demo & test pages for development |
 
 ## Features
