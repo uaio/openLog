@@ -117,7 +117,7 @@ function checkSdkPresent(projectDir: string, entryFile: string | null): boolean 
   if (existsSync(pkgPath)) {
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
     const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
-    if (allDeps['@openlogs/sdk'] || allDeps['openlog']) return true;
+    if (allDeps['@openlogs/sdk']) return true;
   }
 
   // Check entry file for OpenLog references

@@ -33,12 +33,12 @@ pnpm dev
 
 ```
 packages/
-├── types/      # Shared TypeScript types (@openlog/types)
-├── sdk/        # Mobile SDK (@openlog/sdk)
-├── server/     # Node.js WebSocket + REST server (@openlog/server)
-├── web/        # PC debug panel (React, @openlog/web)
-├── mcp/        # MCP AI toolset (@openlog/mcp)
-├── cli/        # CLI entry point (@openlog/cli)
+├── types/      # Shared TypeScript types (@openlogs/types)
+├── sdk/        # Mobile SDK (@openlogs/sdk)
+├── server/     # Node.js WebSocket + REST server (@openlogs/server)
+├── web/        # PC debug panel (React, @openlogs/web)
+├── mcp/        # MCP AI toolset (@openlogs/mcp)
+├── cli/        # CLI entry point (@openlogs/cli)
 ├── eruda/      # Forked Eruda for on-device panel
 └── demo/       # Demo app for testing
 ```
@@ -68,9 +68,9 @@ pnpm demo    # Starts at http://localhost:5274
 **Terminal 3 — (Optional) Watch mode for active development:**
 ```bash
 # Watch a specific package:
-pnpm --filter @openlog/server dev   # Recompile server on change
-pnpm --filter @openlog/sdk dev      # Recompile SDK on change
-pnpm --filter @openlog/web dev      # Web panel with HMR
+pnpm --filter @openlogs/server dev   # Recompile server on change
+pnpm --filter @openlogs/sdk dev      # Recompile SDK on change
+pnpm --filter @openlogs/web dev      # Web panel with HMR
 ```
 
 ### Verification Steps
@@ -79,17 +79,17 @@ pnpm --filter @openlog/web dev      # Web panel with HMR
 2. Open the demo page at `http://localhost:5274`
 3. The demo device should appear in the PC panel's device list
 4. Interact with the demo page — logs, network requests, and performance data stream in real-time
-5. Test MCP tools by running `npx @openlog/mcp` in a separate terminal
+5. Test MCP tools by running `npx @openlogs/mcp` in a separate terminal
 
 ### Package-specific Development
 
 | Package | Dev Command | Notes |
 |---------|-------------|-------|
-| `@openlog/server` | `pnpm --filter @openlog/server dev` | TypeScript watch mode |
-| `@openlog/sdk` | `pnpm --filter @openlog/sdk dev` | Vite build watch |
-| `@openlog/web` | `pnpm --filter @openlog/web dev` | Vite HMR (port 5173) |
-| `@openlog/cli` | `pnpm --filter @openlog/cli dev` | TypeScript watch mode |
-| `@openlog/mcp` | Rebuild after changes | No watch mode |
+| `@openlogs/server` | `pnpm --filter @openlogs/server dev` | TypeScript watch mode |
+| `@openlogs/sdk` | `pnpm --filter @openlogs/sdk dev` | Vite build watch |
+| `@openlogs/web` | `pnpm --filter @openlogs/web dev` | Vite HMR (port 5173) |
+| `@openlogs/cli` | `pnpm --filter @openlogs/cli dev` | TypeScript watch mode |
+| `@openlogs/mcp` | Rebuild after changes | No watch mode |
 | `docs` | `pnpm docs:dev` | VitePress dev server |
 
 ### Running the Full Build
@@ -146,10 +146,10 @@ Scope should be the package name: `sdk`, `server`, `mcp`, `cli`, `web`, `types`.
 pnpm test
 
 # Run tests for a specific package
-pnpm --filter @openlog/server test
-pnpm --filter @openlog/mcp test
-pnpm --filter @openlog/cli test
-pnpm --filter @openlog/sdk test
+pnpm --filter @openlogs/server test
+pnpm --filter @openlogs/mcp test
+pnpm --filter @openlogs/cli test
+pnpm --filter @openlogs/sdk test
 ```
 
 ## Code Style

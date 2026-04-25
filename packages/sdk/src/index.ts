@@ -606,7 +606,7 @@ export { BrowserAdapter } from './platform/browser/index.js';
 
 // ─────────────────────────────────────────────────────────────
 // CDN / IIFE 友好 API
-// 用法：<script src="https://unpkg.com/openlog/dist/openlog.iife.js"></script>
+// 用法：<script src="https://unpkg.com/@openlogs/sdk/dist/openlog.iife.js"></script>
 //       OpenLog.init({ projectId: 'my-app', lang: 'zh', port: 38291 })
 // ─────────────────────────────────────────────────────────────
 

@@ -23,7 +23,7 @@ export async function initOpenLog() {
   // 动态加载 SDK（CDN）
   return new Promise<void>((resolve) => {
     const script = document.createElement('script');
-    script.src = 'https://unpkg.com/openlog@latest/dist/openlog.iife.js';
+    script.src = 'https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js';
     script.onload = () => {
       if (window.OpenLog) {
         window.__openlog__ = new window.OpenLog({
