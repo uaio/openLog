@@ -19,6 +19,22 @@ jobs:
           node-version: 22
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
+      - name: Sync versions from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "Publishing version $VERSION (from tag $GITHUB_REF_NAME)"
+          node -e "
+          const fs = require('fs');
+          const version = process.argv[1];
+          ['types', 'sdk', 'server', 'mcp', 'cli'].forEach(pkg => {
+            const path = 'packages/' + pkg + '/package.json';
+            const json = JSON.parse(fs.readFileSync(path, 'utf8'));
+            json.version = version;
+            fs.writeFileSync(path, JSON.stringify(json, null, 2) + '\n');
+            console.log('Updated ' + pkg + ' to ' + version);
+          });
+          " "$VERSION"
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @openlog/types --filter @openlog/server --filter @openlog/sdk run build
       - run: pnpm --filter @openlog/web run build
