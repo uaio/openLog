@@ -79,13 +79,13 @@ if (subcommand === 'init') {
   const { start } = await import('@openlogs/server/cli');
   const retentionDaysStr = args.values['retention-days'];
   await start({
-    port: validatePort(args.values.port),
+    port: validatePort(args.values.port) ?? (process.env.OPENLOG_PORT ? parseInt(process.env.OPENLOG_PORT, 10) : undefined),
     host: args.values.host,
     webDistPath,
-    apiKey: args.values['api-key'],
-    corsOrigin: args.values['cors-origin'],
-    persist: args.values.persist || false,
-    dbPath: args.values['db-path'],
-    retentionDays: retentionDaysStr ? parseInt(retentionDaysStr, 10) : undefined,
+    apiKey: args.values['api-key'] ?? process.env.OPENLOG_API_KEY,
+    corsOrigin: args.values['cors-origin'] ?? process.env.OPENLOG_CORS_ORIGIN,
+    persist: args.values.persist ?? (process.env.OPENLOG_PERSIST === 'true'),
+    dbPath: args.values['db-path'] ?? process.env.OPENLOG_DB_PATH,
+    retentionDays: retentionDaysStr ? parseInt(retentionDaysStr, 10) : (process.env.OPENLOG_RETENTION ? parseInt(process.env.OPENLOG_RETENTION, 10) : undefined),
   });
 }

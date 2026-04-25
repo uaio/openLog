@@ -4,15 +4,16 @@ export interface Locale {
     console: string;
     network: string;
     storage: string;
+    dom: string;
     perf: string;
     health: string;
     analysis: string;
     settings: string;
     mock: string;
-    dom: string;
   };
   // Common
   common: {
+    title: string;
     loading: string;
     noData: string;
     refresh: string;

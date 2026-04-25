@@ -147,12 +147,12 @@ const report = logger.getPerfReport();
 
 ```typescript
 logger.setNetworkThrottle('3g');
-logger.setNetworkThrottle('4g');
+logger.setNetworkThrottle('2g');
 logger.setNetworkThrottle('offline');
 logger.setNetworkThrottle('none');
 ```
 
-可用预设：`'none'` | `'3g'` | `'4g'` | `'offline'`
+可用预设：`'none'` | `'3g'` | `'2g'` | `'offline'`
 
 ### `addMock(urlPattern, response)`
 

@@ -5,7 +5,7 @@ const en: Locale = {
     console: 'Console',
     network: 'Network',
     storage: 'Storage',
-    perf: 'Perf',
+    perf: 'Performance',
     health: 'Health',
     analysis: 'Analysis',
     settings: 'Settings',
@@ -13,6 +13,7 @@ const en: Locale = {
     dom: 'DOM',
   },
   common: {
+    title: 'openLog Web Viewer',
     loading: 'Loading...',
     noData: 'No data',
     refresh: 'Refresh',

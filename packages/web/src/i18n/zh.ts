@@ -5,7 +5,7 @@ const zh: Locale = {
     console: '控制台',
     network: '网络',
     storage: '存储',
-    perf: '跑分',
+    perf: '性能',
     health: '健康',
     analysis: '智能分析',
     settings: '设置',
@@ -13,6 +13,7 @@ const zh: Locale = {
     dom: 'DOM',
   },
   common: {
+    title: 'openLog Web 调试面板',
     loading: '加载中...',
     noData: '暂无数据',
     refresh: '刷新',

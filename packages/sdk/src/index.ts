@@ -47,7 +47,6 @@ interface OriginalConsole {
 }
 
 export interface OpenLogOptions extends RemoteConfig {
-  defaultPlugins?: string[];
   /** 心跳间隔（毫秒），默认 30000 */
   heartbeatInterval?: number;
   /** Eruda 调试面板配置 */
@@ -99,6 +98,8 @@ export class OpenLog {
   private lastPerfRunSession: PerfRunSession | null = null;
   private networkThrottle: NetworkThrottle | null = null;
   private mockApi: MockAPI | null = null;
+  private visibilityHandler: (() => void) | null = null;
+  private beforeUnloadHandler: (() => void) | null = null;
 
   constructor(options: OpenLogOptions) {
     if (!options.projectId) {
@@ -197,6 +198,23 @@ export class OpenLog {
     if (options.eruda?.enabled !== false) {
       this.initEruda(options.eruda);
     }
+
+    // ⑦ Lifecycle 事件
+    this.dataBus.emit('lifecycle', {
+      event: 'connect',
+      url: typeof location !== 'undefined' ? location.href : undefined,
+    });
+
+    this.visibilityHandler = () => {
+      const event = document.visibilityState === 'visible' ? 'page_show' : 'page_hide';
+      this.dataBus.emit('lifecycle', { event, url: location.href });
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+
+    this.beforeUnloadHandler = () => {
+      this.dataBus.emit('lifecycle', { event: 'page_unload', url: location.href });
+    };
+    window.addEventListener('beforeunload', this.beforeUnloadHandler);
   }
 
   private async initEruda(config?: ErudaConfig): Promise<void> {
@@ -249,7 +267,7 @@ export class OpenLog {
 
     // 创建通用的 console 拦截处理函数
     const createInterceptor = (
-      level: 'log' | 'warn' | 'error' | 'info',
+      level: 'log' | 'warn' | 'error' | 'info' | 'debug',
       originalFn: typeof console.log,
       captureStack = false,
     ) => {
@@ -278,8 +296,7 @@ export class OpenLog {
     console.warn = createInterceptor('warn', this.originalConsole.warn);
     console.error = createInterceptor('error', this.originalConsole.error, true);
     console.info = createInterceptor('info', this.originalConsole.info);
-    // debug maps to 'log' level, trace maps to 'warn' with stack
-    console.debug = createInterceptor('log', this.originalConsole.debug);
+    console.debug = createInterceptor('debug', this.originalConsole.debug);
     console.trace = createInterceptor('warn', this.originalConsole.trace, true);
   }
 
@@ -507,7 +524,25 @@ export class OpenLog {
     return this.reporter.isRemoteEnabled();
   }
 
+  /** 上报自定义事件 */
+  report(name: string, data: unknown): void {
+    this.dataBus.emit('custom', { name, data });
+  }
+
   destroy(): void {
+    // Lifecycle disconnect 事件
+    this.dataBus.emit('lifecycle', { event: 'disconnect' });
+
+    // 清理 lifecycle 监听
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = null;
+    }
+    if (this.beforeUnloadHandler) {
+      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+      this.beforeUnloadHandler = null;
+    }
+
     // 清除心跳定时器
     if (this.heartbeatTimerId !== null) {
       this.platform.timer.clearInterval(this.heartbeatTimerId);

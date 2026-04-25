@@ -36,7 +36,7 @@ export class ErrorInterceptor {
     // 使用 addEventListener('error') 而非替换 window.onerror
     // capture: true 确保能捕获到 iframe / 子资源加载错误
     this.errorHandler = (event: ErrorEvent) => {
-      if (this.reporting) return; // 防止 callback 自身抛错引发循环
+      if (this.reporting) return;
       const error = event.error;
       const stack = error?.stack
         ? cleanStackTrace(error.stack)
@@ -44,11 +44,23 @@ export class ErrorInterceptor {
           ? `    at ${event.filename}:${event.lineno}:${event.colno}`
           : undefined;
 
-      this.safeReport({
+      const consoleEntry = {
         timestamp: Date.now(),
-        level: 'error',
+        level: 'error' as const,
         message: `[Uncaught Error] ${event.message}`,
         stack,
+      };
+
+      this.safeReport(consoleEntry);
+
+      // 独立 error 事件（含丰富上下文）
+      this.bus.emit('error', {
+        source: 'uncaught',
+        message: event.message,
+        stack,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
       });
     };
 
@@ -67,6 +79,13 @@ export class ErrorInterceptor {
       }
 
       this.safeReport({ timestamp: Date.now(), level: 'error', message, stack });
+
+      this.bus.emit('error', {
+        source: 'unhandledrejection',
+        message,
+        stack,
+        reason: String(reason),
+      });
     };
 
     window.addEventListener('error', this.errorHandler, true);

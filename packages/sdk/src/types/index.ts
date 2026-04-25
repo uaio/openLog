@@ -14,7 +14,7 @@ export interface ConsoleLogEntry {
   deviceId: string;
   tabId: string;
   timestamp: number;
-  level: 'log' | 'warn' | 'error' | 'info';
+  level: 'log' | 'warn' | 'error' | 'info' | 'debug';
   message: string;
   stack?: string;
 }

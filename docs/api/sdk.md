@@ -156,12 +156,12 @@ Simulates network conditions.
 
 ```typescript
 logger.setNetworkThrottle('3g');    // Slow 3G
-logger.setNetworkThrottle('4g');    // Fast 4G
+logger.setNetworkThrottle('2g');    // 2G
 logger.setNetworkThrottle('offline'); // No network
 logger.setNetworkThrottle('none');  // Disable throttling
 ```
 
-Available presets: `'none'` | `'3g'` | `'4g'` | `'offline'`
+Available presets: `'none'` | `'3g'` | `'2g'` | `'offline'`
 
 ### `addMock(urlPattern, response)`
 

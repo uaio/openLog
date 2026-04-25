@@ -15,53 +15,53 @@ GET /api/devices
 ### 日志
 
 ```
-GET /api/logs?deviceId=<id>&limit=<n>
-DELETE /api/logs?deviceId=<id>
+GET /api/devices/:deviceId/logs?limit=<n>
+DELETE /api/devices/:deviceId/logs
 ```
 
 ### 网络请求
 
 ```
-GET /api/network?deviceId=<id>&limit=<n>
+GET /api/devices/:deviceId/network?limit=<n>
 ```
 
 ### 性能
 
 ```
-GET /api/performance?deviceId=<id>
-GET /api/perf-runs?deviceId=<id>
+GET /api/devices/:deviceId/performance
+GET /api/devices/:deviceId/perf-run
 ```
 
 ### 存储
 
 ```
-GET /api/storage?deviceId=<id>
+GET /api/devices/:deviceId/storage
 ```
 
 ### DOM
 
 ```
-GET /api/dom?deviceId=<id>
+GET /api/devices/:deviceId/dom
 ```
 
 ### 截图
 
 ```
-GET /api/screenshots?deviceId=<id>
+GET /api/devices/:deviceId/screenshot
 ```
 
 ### 健康检查
 
 ```
-GET /api/health?deviceId=<id>
+GET /api/devices/:deviceId/health
 ```
 
 ### 模拟规则
 
 ```
-GET /api/mock-rules?deviceId=<id>
-POST /api/mock-rules
-DELETE /api/mock-rules/:id
+GET /api/devices/:deviceId/mocks
+POST /api/devices/:deviceId/mocks
+DELETE /api/devices/:deviceId/mocks/:mockId
 ```
 
 ## WebSocket 协议

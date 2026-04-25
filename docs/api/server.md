@@ -15,53 +15,53 @@ Returns list of connected devices with metadata.
 ### Logs
 
 ```
-GET /api/logs?deviceId=<id>&limit=<n>
-DELETE /api/logs?deviceId=<id>
+GET /api/devices/:deviceId/logs?limit=<n>
+DELETE /api/devices/:deviceId/logs
 ```
 
 ### Network Requests
 
 ```
-GET /api/network?deviceId=<id>&limit=<n>
+GET /api/devices/:deviceId/network?limit=<n>
 ```
 
 ### Performance
 
 ```
-GET /api/performance?deviceId=<id>
-GET /api/perf-runs?deviceId=<id>
+GET /api/devices/:deviceId/performance
+GET /api/devices/:deviceId/perf-run
 ```
 
 ### Storage
 
 ```
-GET /api/storage?deviceId=<id>
+GET /api/devices/:deviceId/storage
 ```
 
 ### DOM
 
 ```
-GET /api/dom?deviceId=<id>
+GET /api/devices/:deviceId/dom
 ```
 
 ### Screenshots
 
 ```
-GET /api/screenshots?deviceId=<id>
+GET /api/devices/:deviceId/screenshot
 ```
 
 ### Health
 
 ```
-GET /api/health?deviceId=<id>
+GET /api/devices/:deviceId/health
 ```
 
 ### Mock Rules
 
 ```
-GET /api/mock-rules?deviceId=<id>
-POST /api/mock-rules
-DELETE /api/mock-rules/:id
+GET /api/devices/:deviceId/mocks
+POST /api/devices/:deviceId/mocks
+DELETE /api/devices/:deviceId/mocks/:mockId
 ```
 
 ## WebSocket Protocol

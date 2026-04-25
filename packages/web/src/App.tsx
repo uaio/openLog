@@ -60,13 +60,13 @@ function App() {
     },
     {
       id: 'element',
-      label: 'Element',
+      label: t.tabs.dom,
       icon: '🌲',
       content: <DOMPanel deviceId={selectedDevice?.deviceId} />,
     },
     {
       id: 'performance',
-      label: 'Performance',
+      label: t.tabs.perf,
       icon: '📊',
       content: <PerformancePanel deviceId={selectedDevice?.deviceId} />,
     },
@@ -106,7 +106,7 @@ function App() {
     <div style={styles.container}>
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <h1 style={styles.title}>openLog Web Viewer</h1>
+          <h1 style={styles.title}>{t.common.title}</h1>
           <p style={styles.subtitle}>
             {selectedDevice
               ? `${selectedDevice.ua.slice(0, 50)}${selectedDevice.ua.length > 50 ? '...' : ''}`
@@ -127,10 +127,10 @@ function App() {
           />
           <span style={styles.statusText}>
             {wsState === 'connected'
-              ? 'Connected'
+              ? t.common.connected
               : wsState === 'connecting'
-                ? 'Connecting...'
-                : 'Disconnected'}
+                ? t.common.connecting
+                : t.common.disconnected}
           </span>
         </div>
       </div>
