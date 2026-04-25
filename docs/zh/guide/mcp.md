@@ -5,7 +5,7 @@ openLog 包含一个 Model Context Protocol（MCP）服务器，使 AI 助手能
 ## 设置
 
 ```bash
-npx @openlog/mcp
+npx @openlogs/mcp
 ```
 
 或者添加到你的 MCP 客户端配置中：
@@ -15,7 +15,7 @@ npx @openlog/mcp
   "mcpServers": {
     "openlog": {
       "command": "npx",
-      "args": ["@openlog/mcp"]
+      "args": ["@openlogs/mcp"]
     }
   }
 }

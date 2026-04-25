@@ -1,4 +1,4 @@
-import type { Device } from '@openlog/server';
+import type { Device } from '@openlogs/server';
 import { API_BASE_URL } from '../config';
 import { sharedDeviceSelector } from '../lib/device-selector.js';
 

@@ -26,10 +26,10 @@ if (args.values.help) {
 openLog — H5 移动端调试工具
 
 用法:
-  npx @openlog/cli              启动监控服务（PC 面板 + WebSocket）
-  npx @openlog/cli init         自动配置 AI 工具 MCP（Claude/Cursor/Windsurf）
-  npx @openlog/cli -p <port>    指定端口（默认 38291）
-  npx @openlog/cli init --for=claude  指定 AI 工具
+  npx @openlogs/cli              启动监控服务（PC 面板 + WebSocket）
+  npx @openlogs/cli init         自动配置 AI 工具 MCP（Claude/Cursor/Windsurf）
+  npx @openlogs/cli -p <port>    指定端口（默认 38291）
+  npx @openlogs/cli init --for=claude  指定 AI 工具
 
 选项:
   -p, --port <port>          指定端口号
@@ -73,10 +73,10 @@ const __dirname = dirname(__filename);
 const webDistPath = join(__dirname, '..', 'public');
 
 if (subcommand === 'init') {
-  const { init } = await import('@openlog/server/cli/init');
+  const { init } = await import('@openlogs/server/cli/init');
   await init({ forTool: args.values.for });
 } else {
-  const { start } = await import('@openlog/server/cli');
+  const { start } = await import('@openlogs/server/cli');
   const retentionDaysStr = args.values['retention-days'];
   await start({
     port: validatePort(args.values.port),

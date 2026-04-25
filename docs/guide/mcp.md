@@ -5,7 +5,7 @@ openLog includes a Model Context Protocol (MCP) server that enables AI assistant
 ## Setup
 
 ```bash
-npx @openlog/mcp
+npx @openlogs/mcp
 ```
 
 Or add to your MCP client configuration:
@@ -15,7 +15,7 @@ Or add to your MCP client configuration:
   "mcpServers": {
     "openlog": {
       "command": "npx",
-      "args": ["@openlog/mcp"]
+      "args": ["@openlogs/mcp"]
     }
   }
 }

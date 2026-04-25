@@ -7,14 +7,14 @@ openLog 是一款实时移动端 H5 调试工具，帮助开发者通过 Web 仪
 ```
 ┌─────────────┐     WebSocket      ┌──────────────┐     HTTP      ┌───────────┐
 │  SDK (H5)   │ ──────────────────▶│   Server     │◀────────────▶ │  Web UI   │
-│  @openlog/sdk│                    │  @openlog/server│             │           │
+│  @openlogs/sdk│                    │  @openlogs/server│             │           │
 └─────────────┘                    └──────────────┘              └───────────┘
                                           │
                                     MCP Protocol
                                           │
                                    ┌──────▼──────┐
                                    │  MCP Server  │
-                                   │  @openlog/mcp│
+                                   │  @openlogs/mcp│
                                    └─────────────┘
 ```
 
@@ -22,14 +22,14 @@ openLog 是一款实时移动端 H5 调试工具，帮助开发者通过 Web 仪
 
 | 包名 | 描述 |
 |------|------|
-| `@openlog/types` | 共享 TypeScript 类型定义（单一事实来源） |
-| `@openlog/sdk` | 注入到 H5 页面的客户端 SDK |
-| `@openlog/server` | 用于数据采集的 WebSocket + HTTP 服务器 |
-| `@openlog/web` | 由服务器托管的 PC 端调试面板 (React) |
-| `@openlog/mcp` | 用于 AI 驱动调试的 MCP 服务器 |
-| `@openlog/cli` | 启动服务器 (`npx @openlog/cli`) 和配置 AI 工具的 CLI 工具 |
-| `@openlog/eruda` | SDK 内部使用的 Eruda 构建包，用于本地面板 |
-| `@openlog/demo` | 用于开发和测试的演示页面 |
+| `@openlogs/types` | 共享 TypeScript 类型定义（单一事实来源） |
+| `@openlogs/sdk` | 注入到 H5 页面的客户端 SDK |
+| `@openlogs/server` | 用于数据采集的 WebSocket + HTTP 服务器 |
+| `@openlogs/web` | 由服务器托管的 PC 端调试面板 (React) |
+| `@openlogs/mcp` | 用于 AI 驱动调试的 MCP 服务器 |
+| `@openlogs/cli` | 启动服务器 (`npx @openlogs/cli`) 和配置 AI 工具的 CLI 工具 |
+| `@openlogs/eruda` | SDK 内部使用的 Eruda 构建包，用于本地面板 |
+| `@openlogs/demo` | 用于开发和测试的演示页面 |
 
 ## 功能特性
 

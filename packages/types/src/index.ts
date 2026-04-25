@@ -1,5 +1,5 @@
 /**
- * @openlog/types — openLog 统一数据标准
+ * @openlogs/types — openLog 统一数据标准
  *
  * 这是 openLog 生态的唯一类型来源（Single Source of Truth）。
  * 所有包（sdk、server、web、mcp）均引用此包，不再各自定义类型。

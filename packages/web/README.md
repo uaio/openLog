@@ -1,4 +1,4 @@
-# @openlog/web
+# @openlogs/web
 
 > PC debug panel for openLog — React-based real-time monitoring dashboard.
 
@@ -37,12 +37,12 @@ src/
 
 ```bash
 # From monorepo root
-pnpm --filter @openlog/web dev      # Vite dev server
-pnpm --filter @openlog/web build    # Production build
-pnpm --filter @openlog/web preview  # Preview production build
+pnpm --filter @openlogs/web dev      # Vite dev server
+pnpm --filter @openlogs/web build    # Production build
+pnpm --filter @openlogs/web preview  # Preview production build
 ```
 
-> **Note:** This package is not published to npm. The CLI (`@openlog/cli`) bundles the built output into its `public/` directory for distribution.
+> **Note:** This package is not published to npm. The CLI (`@openlogs/cli`) bundles the built output into its `public/` directory for distribution.
 
 ## Tech Stack
 

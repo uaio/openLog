@@ -3,13 +3,13 @@
 ## 安装
 
 ```bash
-npm install @openlog/sdk
+npm install @openlogs/sdk
 ```
 
 或通过 CDN：
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk/dist/openlog.iife.js"></script>
 ```
 
 ## 初始化
@@ -17,7 +17,7 @@ npm install @openlog/sdk
 ### ES Module
 
 ```typescript
-import { OpenLog } from '@openlog/sdk';
+import { OpenLog } from '@openlogs/sdk';
 
 const logger = new OpenLog({
   projectId: 'my-app',

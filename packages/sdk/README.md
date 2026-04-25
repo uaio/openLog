@@ -1,11 +1,11 @@
-# @openlog/sdk
+# @openlogs/sdk
 
 > Mobile H5 SDK for openLog — real-time collection of console logs, network requests, storage, DOM, performance, errors, and screenshots.
 
 ## Installation
 
 ```bash
-npm install @openlog/sdk
+npm install @openlogs/sdk
 ```
 
 ## Quick Start
@@ -13,7 +13,7 @@ npm install @openlog/sdk
 ### CDN (IIFE)
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     projectId: 'my-app',
@@ -26,7 +26,7 @@ npm install @openlog/sdk
 ### ES Module
 
 ```javascript
-import OpenLog from '@openlog/sdk';
+import OpenLog from '@openlogs/sdk';
 
 new OpenLog({
   projectId: 'my-app',
@@ -101,9 +101,9 @@ OpenLog SDK
 
 ```bash
 # From monorepo root
-pnpm --filter @openlog/sdk dev    # Watch mode
-pnpm --filter @openlog/sdk build  # Production build
-pnpm --filter @openlog/sdk test   # Run tests
+pnpm --filter @openlogs/sdk dev    # Watch mode
+pnpm --filter @openlogs/sdk build  # Production build
+pnpm --filter @openlogs/sdk test   # Run tests
 ```
 
 ## License

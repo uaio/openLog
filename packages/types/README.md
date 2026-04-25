@@ -1,4 +1,4 @@
-# @openlog/types
+# @openlogs/types
 
 > Shared TypeScript type definitions for the openLog ecosystem.
 
@@ -9,14 +9,14 @@ This package defines the unified **Envelope** data format used across all openLo
 ## Installation
 
 ```bash
-npm install @openlog/types
+npm install @openlogs/types
 ```
 
 ## Usage
 
 ```typescript
-import type { Envelope, ConsoleEventData, NetworkEventData } from '@openlog/types';
-import { EVENT_TYPES, PLATFORMS } from '@openlog/types';
+import type { Envelope, ConsoleEventData, NetworkEventData } from '@openlogs/types';
+import { EVENT_TYPES, PLATFORMS } from '@openlogs/types';
 ```
 
 ## Key Exports

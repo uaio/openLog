@@ -5,7 +5,7 @@
 The fastest way to start openLog:
 
 ```bash
-npx @openlog/cli
+npx @openlogs/cli
 ```
 
 This starts the server on port 38291 and opens the web dashboard.
@@ -17,7 +17,7 @@ Add the SDK to your H5 page:
 ### Via CDN (IIFE)
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     server: 'ws://localhost:38291',
@@ -29,11 +29,11 @@ Add the SDK to your H5 page:
 ### Via npm
 
 ```bash
-npm install @openlog/sdk
+npm install @openlogs/sdk
 ```
 
 ```typescript
-import OpenLog from '@openlog/sdk';
+import OpenLog from '@openlogs/sdk';
 
 new OpenLog({
   server: 'ws://localhost:38291',
@@ -44,7 +44,7 @@ new OpenLog({
 ## CLI Options
 
 ```bash
-npx @openlog/cli [options]
+npx @openlogs/cli [options]
 
 Options:
   -p, --port <number>       Server port (default: 38291)

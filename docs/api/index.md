@@ -5,7 +5,7 @@
 Initialize the openLog SDK.
 
 ```typescript
-import OpenLog from '@openlog/sdk';
+import OpenLog from '@openlogs/sdk';
 
 const logger = new OpenLog({
   server: 'ws://localhost:38291',
@@ -33,7 +33,7 @@ interface OpenLogInstance {
 Internal event bus used by collectors. Available for advanced use:
 
 ```typescript
-import { DataBus } from '@openlog/sdk/core/DataBus';
+import { DataBus } from '@openlogs/sdk/core/DataBus';
 
 const bus = new DataBus();
 

@@ -1,5 +1,5 @@
 {
-  "name": "@openlog/server",
+  "name": "@openlogs/server",
   "version": "0.1.1",
   "description": "Node.js WebSocket + REST API server for openLog — real-time device communication hub",
   "keywords": [
@@ -48,7 +48,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@openlog/types": "workspace:*",
+    "@openlogs/types": "workspace:*",
     "better-sqlite3": "^12.9.0",
     "cors": "^2.8.6",
     "express": "^4.18.0",

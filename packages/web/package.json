@@ -1,5 +1,5 @@
 {
-  "name": "@openlog/web",
+  "name": "@openlogs/web",
   "version": "0.1.0",
   "private": true,
   "description": "PC debug panel for openLog — React-based real-time monitoring dashboard",

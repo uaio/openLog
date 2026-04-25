@@ -1,5 +1,5 @@
 {
-  "name": "@openlog/cli",
+  "name": "@openlogs/cli",
   "version": "0.1.1",
   "description": "CLI for openLog — start server, configure AI tools, one-command setup",
   "keywords": ["openlog", "cli", "mobile-debugging", "mcp", "claude", "cursor", "devtools"],
@@ -32,8 +32,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@openlog/mcp": "workspace:*",
-    "@openlog/server": "workspace:*"
+    "@openlogs/mcp": "workspace:*",
+    "@openlogs/server": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

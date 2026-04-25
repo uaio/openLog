@@ -41,10 +41,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@openlog/mcp':
+      '@openlogs/mcp':
         specifier: workspace:*
         version: link:../mcp
-      '@openlog/server':
+      '@openlogs/server':
         specifier: workspace:*
         version: link:../server
     devDependencies:
@@ -251,10 +251,10 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@3.25.76)
-      '@openlog/server':
+      '@openlogs/server':
         specifier: workspace:*
         version: link:../server
-      '@openlog/types':
+      '@openlogs/types':
         specifier: workspace:*
         version: link:../types
       open:
@@ -283,7 +283,7 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1
     devDependencies:
-      '@openlog/eruda':
+      '@openlogs/eruda':
         specifier: workspace:*
         version: link:../eruda
       vite:
@@ -301,7 +301,7 @@ importers:
 
   packages/server:
     dependencies:
-      '@openlog/types':
+      '@openlogs/types':
         specifier: workspace:*
         version: link:../types
       better-sqlite3:

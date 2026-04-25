@@ -1,11 +1,11 @@
-# @openlog/server
+# @openlogs/server
 
 > Node.js WebSocket + REST API server for openLog — the real-time communication hub between mobile devices, PC panel, and AI tools.
 
 ## Installation
 
 ```bash
-npm install @openlog/server
+npm install @openlogs/server
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ npm install @openlog/server
 ### Programmatic
 
 ```typescript
-import { createServer } from '@openlog/server';
+import { createServer } from '@openlogs/server';
 
 const server = createServer({ port: 38291 });
 // Server is now running with WebSocket + REST API
@@ -22,8 +22,8 @@ const server = createServer({ port: 38291 });
 ### Via CLI
 
 ```bash
-npx @openlog/cli           # Starts server with auto-detected LAN IPs
-npx @openlog/cli -p 8080   # Custom port
+npx @openlogs/cli           # Starts server with auto-detected LAN IPs
+npx @openlogs/cli -p 8080   # Custom port
 ```
 
 ## REST API
@@ -74,9 +74,9 @@ Express HTTP Server
 ## Development
 
 ```bash
-pnpm --filter @openlog/server dev    # Watch mode
-pnpm --filter @openlog/server build  # Build
-pnpm --filter @openlog/server test   # Run tests
+pnpm --filter @openlogs/server dev    # Watch mode
+pnpm --filter @openlogs/server build  # Build
+pnpm --filter @openlogs/server test   # Run tests
 ```
 
 ## License

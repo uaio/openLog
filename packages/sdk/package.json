@@ -1,5 +1,5 @@
 {
-  "name": "@openlog/sdk",
+  "name": "@openlogs/sdk",
   "version": "0.1.1",
   "description": "Mobile H5 SDK for openLog — real-time console, network, storage, DOM, performance collection",
   "keywords": ["openlog", "sdk", "mobile-debugging", "h5", "console", "network", "performance", "eruda"],
@@ -30,7 +30,7 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "@openlog/eruda": "workspace:*",
+    "@openlogs/eruda": "workspace:*",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.7.0",
     "vitest": "^1.6.0",

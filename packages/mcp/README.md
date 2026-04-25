@@ -1,11 +1,11 @@
-# @openlog/mcp
+# @openlogs/mcp
 
 > MCP (Model Context Protocol) server for openLog — 30+ AI-callable tools for real-device debugging.
 
 ## Installation
 
 ```bash
-npm install @openlog/mcp
+npm install @openlogs/mcp
 ```
 
 ## Setup
@@ -13,7 +13,7 @@ npm install @openlog/mcp
 ### Auto-detection (Recommended)
 
 ```bash
-npx @openlog/cli init
+npx @openlogs/cli init
 # Auto-detects Claude Code / Cursor / Windsurf and writes MCP config
 ```
 
@@ -26,7 +26,7 @@ Add to your MCP config:
   "mcpServers": {
     "openlog": {
       "command": "npx",
-      "args": ["-y", "@openlog/cli", "--mcp"]
+      "args": ["-y", "@openlogs/cli", "--mcp"]
     }
   }
 }
@@ -101,9 +101,9 @@ Add to your MCP config:
 ## Development
 
 ```bash
-pnpm --filter @openlog/mcp dev    # Watch mode
-pnpm --filter @openlog/mcp build  # Build
-pnpm --filter @openlog/mcp test   # Run tests
+pnpm --filter @openlogs/mcp dev    # Watch mode
+pnpm --filter @openlogs/mcp build  # Build
+pnpm --filter @openlogs/mcp test   # Run tests
 ```
 
 ## License

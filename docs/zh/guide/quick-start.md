@@ -5,7 +5,7 @@
 启动 openLog 最快的方式：
 
 ```bash
-npx @openlog/cli
+npx @openlogs/cli
 ```
 
 这将在 38291 端口启动服务器并打开 Web 仪表板。
@@ -17,7 +17,7 @@ npx @openlog/cli
 ### 通过 CDN (IIFE)
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     server: 'ws://localhost:38291',
@@ -29,11 +29,11 @@ npx @openlog/cli
 ### 通过 npm
 
 ```bash
-npm install @openlog/sdk
+npm install @openlogs/sdk
 ```
 
 ```typescript
-import OpenLog from '@openlog/sdk';
+import OpenLog from '@openlogs/sdk';
 
 new OpenLog({
   server: 'ws://localhost:38291',
@@ -44,7 +44,7 @@ new OpenLog({
 ## CLI 选项
 
 ```bash
-npx @openlog/cli [options]
+npx @openlogs/cli [options]
 
 Options:
   -p, --port <number>       服务器端口（默认：38291）

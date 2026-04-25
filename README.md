@@ -16,8 +16,8 @@ openLog has three usage modes — pick what fits, they're independent:
 | Mode | Best For | How to Use |
 |------|----------|------------|
 | **SDK Only** | Local debugging, no network needed | Add SDK, Eruda panel opens on device |
-| **SDK + PC Panel** | Remote monitoring, team collaboration | `npx @openlog/cli` to start server |
-| **SDK + Claude Code** | AI-assisted development, auto-verification | Then run `npx @openlog/cli init` for MCP config |
+| **SDK + PC Panel** | Remote monitoring, team collaboration | `npx @openlogs/cli` to start server |
+| **SDK + Claude Code** | AI-assisted development, auto-verification | Then run `npx @openlogs/cli init` for MCP config |
 
 > 📖 **[Complete Debug Flow Guide](./docs/debug-flow-guide.md)** — Step-by-step setup and usage for each mode.
 > 🤖 **[AI Development Skill (SOP)](./docs/ai-dev-skill.md)** — Node verification SOP for CLAUDE.md / Cursor Rules.
@@ -74,23 +74,23 @@ stop_monitor          list_monitors
 ### 1. Start the Server (Zero Install)
 
 ```bash
-npx @openlog/cli
+npx @openlogs/cli
 # Terminal prints all LAN IPs and SDK snippet — just copy and use
-# Custom port: npx @openlog/cli -p 8080
-# Public/cloud deployment: npx @openlog/cli --host myapp.example.com
+# Custom port: npx @openlogs/cli -p 8080
+# Public/cloud deployment: npx @openlogs/cli --host myapp.example.com
 ```
 
 ### 2. Configure AI Tools (Auto-detection)
 
 ```bash
-npx @openlog/cli init
+npx @openlogs/cli init
 # Auto-detects installed AI tools (Claude Code / Cursor / Windsurf)
 # Writes MCP config + Claude Code slash commands in one step
 
 # Specify tool:
-npx @openlog/cli init --for=claude
-npx @openlog/cli init --for=cursor
-npx @openlog/cli init --for=windsurf
+npx @openlogs/cli init --for=claude
+npx @openlogs/cli init --for=cursor
+npx @openlogs/cli init --for=windsurf
 ```
 
 For Claude Code, `init` also writes `~/.claude/commands/openlog/` — available immediately:
@@ -109,7 +109,7 @@ For Claude Code, `init` also writes `~/.claude/commands/openlog/` — available 
 
 ```html
 <!-- CDN (recommended) — server prints this snippet on startup -->
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     projectId: 'my-app',
@@ -126,11 +126,11 @@ For Claude Code, `init` also writes `~/.claude/commands/openlog/` — available 
 
 ```bash
 # npm install
-npm install @openlog/sdk
+npm install @openlogs/sdk
 ```
 
 ```javascript
-import OpenLog from '@openlog/sdk'
+import OpenLog from '@openlogs/sdk'
 new OpenLog({ projectId: 'my-app', server: 'ws://192.168.x.x:38291', lang: 'en' })
 ```
 
@@ -275,7 +275,7 @@ You                      Claude Code (AI)              Real Phone
 No server needed — the lightest option. SDK initializes and opens the built-in Eruda debug panel directly on the phone.
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({ projectId: 'my-app', lang: 'en' })
   // Debug entry appears at bottom-left of the page
@@ -291,8 +291,8 @@ Best for: quick debugging, no network available, purely local development.
 Start the server, phone data streams to the PC visualization panel in real-time. Supports multiple devices simultaneously.
 
 ```bash
-npx @openlog/cli          # Start, auto-prints LAN IPs and SDK code
-npx @openlog/cli -p 8080  # Custom port
+npx @openlogs/cli          # Start, auto-prints LAN IPs and SDK code
+npx @openlogs/cli -p 8080  # Custom port
 ```
 
 Open `http://localhost:38291` in your PC browser, select a device to start monitoring.
@@ -306,7 +306,7 @@ Best for: remote debugging, API integration testing, performance analysis, team 
 On top of Mode A, configure MCP so Claude Code connects to the real-time data stream. AI can auto-detect and inject SDK, verify development milestones, analyze errors, and execute remote operations. **No need to open the PC panel** — Claude IS your debug panel.
 
 ```bash
-npx @openlog/cli init     # Auto-detect and configure Claude Code / Cursor / Windsurf
+npx @openlogs/cli init     # Auto-detect and configure Claude Code / Cursor / Windsurf
 ```
 
 After restarting your AI tool, type `/openlog:start` in Claude Code to begin AI-assisted development.
@@ -320,12 +320,12 @@ Best for: AI Agent development, automatic milestone verification, AI-driven debu
 ```
 openLog/
 ├── packages/
-│   ├── types/      # Unified data standard (@openlog/types) ← single source of truth
+│   ├── types/      # Unified data standard (@openlogs/types) ← single source of truth
 │   ├── sdk/        # Mobile SDK (data collection + Eruda integration)
 │   ├── server/     # Node.js server (WebSocket + REST API)
 │   ├── web/        # PC debug panel (React)
 │   ├── mcp/        # MCP Server (AI toolset)
-│   ├── cli/        # CLI tool (@openlog/cli) — npx entry, server lifecycle & AI tool config
+│   ├── cli/        # CLI tool (@openlogs/cli) — npx entry, server lifecycle & AI tool config
 │   ├── eruda/      # Bundled Eruda build (used internally by SDK for local panel)
 │   └── demo/       # Demo & test pages for development
 ```
@@ -531,9 +531,9 @@ const report = await logger.stopPerfRun();
 
 ### Near-term (Implemented)
 - [x] Web H5 SDK + PC monitoring panel + MCP toolset
-- [x] `@openlog/types` unified data standard (Envelope v1)
+- [x] `@openlogs/types` unified data standard (Envelope v1)
 - [x] `POST /api/ingest` external data ingestion API
-- [x] `npx @openlog/cli init` one-click AI tool configuration + Claude Code slash commands
+- [x] `npx @openlogs/cli init` one-click AI tool configuration + Claude Code slash commands
 - [x] `@openlog[checkpoint]` development-time instrumentation + `get_checkpoints` verification
 - [x] `/openlog:clean` auto-cleanup of debug logs after verification
 - [x] `start_openlog` / `stop_openlog` explicit lifecycle management
@@ -565,10 +565,10 @@ pnpm test       # Run tests (requires build first)
 pnpm dev        # Dev mode (watch)
 
 # Run tests for a specific package:
-pnpm --filter @openlog/server test
-pnpm --filter @openlog/mcp test
-pnpm --filter @openlog/cli test
-pnpm --filter @openlog/sdk test
+pnpm --filter @openlogs/server test
+pnpm --filter @openlogs/mcp test
+pnpm --filter @openlogs/cli test
+pnpm --filter @openlogs/sdk test
 ```
 
 ---

@@ -1,4 +1,4 @@
-# @openlog/cli
+# @openlogs/cli
 
 > CLI for openLog — start the server, configure AI tools, one-command setup.
 
@@ -6,10 +6,10 @@
 
 ```bash
 # Use directly with npx (zero install)
-npx @openlog/cli
+npx @openlogs/cli
 
 # Or install globally
-npm install -g @openlog/cli
+npm install -g @openlogs/cli
 ```
 
 ## Commands
@@ -64,9 +64,9 @@ After running `openlog init`, these commands are available in Claude Code:
 ## Development
 
 ```bash
-pnpm --filter @openlog/cli dev    # Watch mode
-pnpm --filter @openlog/cli build  # Build
-pnpm --filter @openlog/cli test   # Run tests
+pnpm --filter @openlogs/cli dev    # Watch mode
+pnpm --filter @openlogs/cli build  # Build
+pnpm --filter @openlogs/cli test   # Run tests
 ```
 
 ## License

@@ -31,7 +31,7 @@ function getAllIpv4(): { name: string; address: string }[] {
 function getMcpEntry(port: number) {
   return {
     command: 'npx',
-    args: ['-y', '@openlog/mcp'],
+    args: ['-y', '@openlogs/mcp'],
     env: {
       OPENLOG_API_BASE_URL: `http://localhost:${port}`,
     },
@@ -118,7 +118,7 @@ const CLAUDE_COMMANDS: Record<string, string> = {
    - 如果 \`sdkStatus.detected\` 为 true：SDK 已就绪，跳到步骤 4
    - 如果 \`sdkStatus.detected\` 为 false：根据 \`sdkStatus.framework\` 执行注入：
      - HTML 项目：调用 \`ensure_sdk(mode="inject")\` 自动注入 CDN script 标签
-     - npm 项目（React/Vue/Next.js 等）：执行 \`npm install @openlog/sdk\`，然后将 \`sdkStatus.injectionCode\` 中的代码插入到 \`sdkStatus.entryFile\` 指向的入口文件中
+     - npm 项目（React/Vue/Next.js 等）：执行 \`npm install @openlogs/sdk\`，然后将 \`sdkStatus.injectionCode\` 中的代码插入到 \`sdkStatus.entryFile\` 指向的入口文件中
 3. 向用户展示 \`sdkStatus.serverAddresses\` 中的局域网地址，提示用户在手机浏览器中打开 H5 页面
 4. 等待 10 秒后调用 \`list_devices\` 检查设备是否已连接
    - 有设备在线：输出设备信息，提示"openLog 已就绪，可以开始开发"
@@ -250,7 +250,7 @@ export async function init(options: InitOptions = {}) {
 ${networkIpLines}
 
   <!-- CDN + 连接远程监控（server 替换为上方手机可达的地址）-->
-  <script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+  <script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
   <script>
     OpenLog.init({
       projectId: 'my-app',
@@ -265,12 +265,12 @@ ${networkIpLines}
   </script>
 
   <!-- 选项 C：npm -->
-  import OpenLog from '@openlog/sdk'
+  import OpenLog from '@openlogs/sdk'
   new OpenLog({ projectId: 'my-app', server: 'ws://${primaryIp}:${port}', lang: 'zh' })
 
 🖥️  启动 PC 监控面板：
-  npx @openlog/cli             打开 http://localhost:${port}
-  npx @openlog/cli -p 8080     自定义端口
+  npx @openlogs/cli             打开 http://localhost:${port}
+  npx @openlogs/cli -p 8080     自定义端口
 ─────────────────────────────────────────────────
 `);
 }
@@ -297,15 +297,15 @@ function printManualConfig(mcpEntry: object, port: number) {
   Windsurf     →  ~/.codeium/windsurf/mcp_config.json
 
 指定工具：
-  npx @openlog/cli init --for=claude
-  npx @openlog/cli init --for=cursor
-  npx @openlog/cli init --for=windsurf
+  npx @openlogs/cli init --for=claude
+  npx @openlogs/cli init --for=cursor
+  npx @openlogs/cli init --for=windsurf
 
 可用局域网地址（手机与电脑不在同一 WiFi？选对应网卡）：
 ${networkIpLines}
 
 SDK 接入（粘贴到 H5 页面，server 替换为手机可达的地址）：
-  <script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+  <script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
   <script>OpenLog.init({ projectId: 'my-app', server: 'ws://${primaryIp}:${port}', lang: 'zh' })</script>
 `);
 }

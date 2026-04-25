@@ -31,9 +31,9 @@ jobs:
           node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @openlog/types --filter @openlog/server --filter @openlog/sdk run build
-      - run: pnpm --filter @openlog/web run build
-      - run: pnpm --filter @openlog/mcp --filter @openlog/cli run build
+      - run: pnpm --filter @openlogs/types --filter @openlogs/server --filter @openlogs/sdk run build
+      - run: pnpm --filter @openlogs/web run build
+      - run: pnpm --filter @openlogs/mcp --filter @openlogs/cli run build
 
   test:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
           node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @openlog/types --filter @openlog/server --filter @openlog/sdk run build
-      - run: pnpm --filter @openlog/web run build
-      - run: pnpm --filter @openlog/mcp --filter @openlog/cli run build
-      - run: pnpm --filter @openlog/server --filter @openlog/mcp --filter @openlog/cli --filter @openlog/sdk test
+      - run: pnpm --filter @openlogs/types --filter @openlogs/server --filter @openlogs/sdk run build
+      - run: pnpm --filter @openlogs/web run build
+      - run: pnpm --filter @openlogs/mcp --filter @openlogs/cli run build
+      - run: pnpm --filter @openlogs/server --filter @openlogs/mcp --filter @openlogs/cli --filter @openlogs/sdk test

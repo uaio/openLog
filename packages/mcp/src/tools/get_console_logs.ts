@@ -1,4 +1,4 @@
-import type { ConsoleLog } from '@openlog/server';
+import type { ConsoleLog } from '@openlogs/server';
 import { API_BASE_URL } from '../config';
 
 export const getConsoleLogs = {

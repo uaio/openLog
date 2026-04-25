@@ -203,7 +203,7 @@ ${
 ├─────────────────────────────────────────────────────┤
 │  SDK 接入（复制以下代码到 H5 页面）                   │
 │                                                     │
-│  <script src="https://unpkg.com/@openlog/sdk@latest  │
+│  <script src="https://unpkg.com/@openlogs/sdk@latest  │
 │    /dist/openlog.iife.js"></script>                 │
 │  <script>                                           │
 │    OpenLog.init({                                   │
@@ -220,9 +220,9 @@ ${
 }
 ├─────────────────────────────────────────────────────┤
 │  MCP 配置（AI 工具接入）                             │
-│    运行: npx @openlog/cli init  自动写入 MCP 配置     │
+│    运行: npx @openlogs/cli init  自动写入 MCP 配置     │
 └─────────────────────────────────────────────────────┘
-  按 Ctrl+C 停止   端口: ${port}   (切换端口: npx @openlog/cli -p <port>)
+  按 Ctrl+C 停止   端口: ${port}   (切换端口: npx @openlogs/cli -p <port>)
 `);
 
       resolve();

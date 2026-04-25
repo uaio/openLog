@@ -7,14 +7,14 @@ openLog is a real-time mobile H5 debugging tool that helps developers monitor co
 ```
 ┌─────────────┐     WebSocket      ┌──────────────┐     HTTP      ┌───────────┐
 │  SDK (H5)   │ ──────────────────▶│   Server     │◀────────────▶ │  Web UI   │
-│  @openlog/sdk│                    │  @openlog/server│             │           │
+│  @openlogs/sdk│                    │  @openlogs/server│             │           │
 └─────────────┘                    └──────────────┘              └───────────┘
                                           │
                                     MCP Protocol
                                           │
                                    ┌──────▼──────┐
                                    │  MCP Server  │
-                                   │  @openlog/mcp│
+                                   │  @openlogs/mcp│
                                    └─────────────┘
 ```
 
@@ -22,14 +22,14 @@ openLog is a real-time mobile H5 debugging tool that helps developers monitor co
 
 | Package | Description |
 |---------|-------------|
-| `@openlog/types` | Shared TypeScript type definitions (single source of truth) |
-| `@openlog/sdk` | Client SDK injected into H5 pages |
-| `@openlog/server` | WebSocket + HTTP server for data collection |
-| `@openlog/web` | PC debug panel (React) served by the server |
-| `@openlog/mcp` | MCP server for AI-powered debugging |
-| `@openlog/cli` | CLI tool to start the server (`npx @openlog/cli`) and configure AI tools |
-| `@openlog/eruda` | Bundled Eruda build used internally by the SDK (private) |
-| `@openlog/demo` | Demo & test pages for development |
+| `@openlogs/types` | Shared TypeScript type definitions (single source of truth) |
+| `@openlogs/sdk` | Client SDK injected into H5 pages |
+| `@openlogs/server` | WebSocket + HTTP server for data collection |
+| `@openlogs/web` | PC debug panel (React) served by the server |
+| `@openlogs/mcp` | MCP server for AI-powered debugging |
+| `@openlogs/cli` | CLI tool to start the server (`npx @openlogs/cli`) and configure AI tools |
+| `@openlogs/eruda` | Bundled Eruda build used internally by the SDK (private) |
+| `@openlogs/demo` | Demo & test pages for development |
 
 ## Features
 

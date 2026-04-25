@@ -10,7 +10,7 @@
 ┌───────────────┬──────────────────────┬────────────────────┬───────────────────────────────┐
 │               │  Mode A: SDK Only    │  Mode B: SDK + PC  │  Mode C: SDK + Claude Code    │
 ├───────────────┼──────────────────────┼────────────────────┼───────────────────────────────┤
-│  Setup needed │  One <script> tag    │  npx @openlog/cli  │  npx @openlog/cli init        │
+│  Setup needed │  One <script> tag    │  npx @openlogs/cli  │  npx @openlogs/cli init        │
 │  Debug panel  │  Eruda on phone      │  PC browser panel  │  Claude Code reads data       │
 │  Network req  │  None                │  Same LAN          │  Same LAN                     │
 │  Best for     │  Quick log checking  │  Remote monitoring  │  AI auto-verification         │
@@ -31,7 +31,7 @@ A debug floating button appears at the bottom-left of the phone page. Tap it to 
 Add this to your H5 page's `<head>` or at the end of `<body>`:
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({ projectId: 'my-app', lang: 'en' })
 </script>
@@ -68,7 +68,7 @@ All logs, network requests, storage, and performance data from the phone **sync 
 #### Step 1: Start the Server on Your PC (Zero Install)
 
 ```bash
-npx @openlog/cli
+npx @openlogs/cli
 ```
 
 After startup, the terminal prints:
@@ -84,7 +84,7 @@ After startup, the terminal prints:
 │                 SDK server: 'ws://192.168.1.5:38291' │
 ├─────────────────────────────────────────┤
 │  SDK Integration:                        │
-│  <script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+│  <script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 │  <script>                                │
 │    OpenLog.init({                        │
 │      projectId: 'my-app',               │
@@ -102,7 +102,7 @@ After startup, the terminal prints:
 Paste the code from the terminal into your H5 page:
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     projectId: 'my-app',
@@ -116,10 +116,10 @@ Paste the code from the terminal into your H5 page:
 
 > You can also use npm:
 > ```bash
-> npm install @openlog/sdk
+> npm install @openlogs/sdk
 > ```
 > ```javascript
-> import OpenLog from '@openlog/sdk'
+> import OpenLog from '@openlogs/sdk'
 > new OpenLog({ projectId: 'my-app', server: 'ws://192.168.1.5:38291', lang: 'en' })
 > ```
 
@@ -130,7 +130,7 @@ Visit `http://localhost:38291` (or the address shown in terminal) in your browse
 ### Usage Flow
 
 ```
-1. PC: npx @openlog/cli                → Server starts
+1. PC: npx @openlogs/cli                → Server starts
 2. H5 page: paste SDK code             → SDK connects to server
 3. Phone: open H5 page                 → Device appears in PC panel sidebar
 4. PC: select device                   → See real-time logs/network/storage/performance
@@ -159,7 +159,7 @@ Visit `http://localhost:38291` (or the address shown in terminal) in your browse
 A: Make sure they're on the same LAN. The terminal prints all network interface addresses — pick the one your phone can reach.
 
 **Q: Change port?**
-A: `npx @openlog/cli -p 8080`
+A: `npx @openlogs/cli -p 8080`
 
 ---
 
@@ -174,7 +174,7 @@ Claude Code reads your phone's logs, network requests, and screenshots directly 
 #### Step 1: Configure MCP (One-time setup)
 
 ```bash
-npx @openlog/cli init
+npx @openlogs/cli init
 ```
 
 This command will:
@@ -182,7 +182,7 @@ This command will:
 - **Auto-write** the MCP configuration file
 - For Claude Code, also installs 7 **slash commands**
 
-> You can also specify: `npx @openlog/cli init --for=claude`
+> You can also specify: `npx @openlogs/cli init --for=claude`
 
 **Then restart Claude Code.**
 
@@ -329,4 +329,4 @@ Claude: calls health_check() → health score 45/100
    - Same server, same data on both sides
 
 4. **Default port is 38291**
-   - Port taken? `npx @openlog/cli -p 8080` to use a different one
+   - Port taken? `npx @openlogs/cli -p 8080` to use a different one

@@ -18,7 +18,7 @@ export default defineConfig({
       }
     },
     rollupOptions: {
-      external: ['@openlog/eruda'],
+      external: ['@openlogs/eruda'],
       input: {
         index: './src/index.ts'
       },

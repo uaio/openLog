@@ -1,5 +1,5 @@
 {
-  "name": "@openlog/mcp",
+  "name": "@openlogs/mcp",
   "version": "0.1.1",
   "description": "MCP (Model Context Protocol) server for openLog — 30+ AI-callable debugging tools",
   "keywords": ["openlog", "mcp", "ai", "claude", "cursor", "model-context-protocol", "debugging"],
@@ -38,8 +38,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@openlog/server": "workspace:*",
-    "@openlog/types": "workspace:*",
+    "@openlogs/server": "workspace:*",
+    "@openlogs/types": "workspace:*",
     "open": "^10.0.0",
     "ws": "^8.16.0"
   },

@@ -117,7 +117,7 @@ function checkSdkPresent(projectDir: string, entryFile: string | null): boolean 
   if (existsSync(pkgPath)) {
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
     const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
-    if (allDeps['@openlog/sdk'] || allDeps['openlog']) return true;
+    if (allDeps['@openlogs/sdk'] || allDeps['openlog']) return true;
   }
 
   // Check entry file for OpenLog references
@@ -143,7 +143,7 @@ function checkSdkPresent(projectDir: string, entryFile: string | null): boolean 
 }
 
 function generateCdnSnippet(wsAddress: string): string {
-  return `<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+  return `<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     projectId: '${getProjectId()}',
@@ -154,7 +154,7 @@ function generateCdnSnippet(wsAddress: string): string {
 }
 
 function generateNpmSnippet(wsAddress: string): string {
-  return `import OpenLog from '@openlog/sdk'
+  return `import OpenLog from '@openlogs/sdk'
 
 OpenLog.init({
   projectId: '${getProjectId()}',
@@ -316,7 +316,7 @@ function buildInstructions(
     case 'svelte':
     case 'angular':
       lines.push(`\nStep 1: Install the SDK`);
-      lines.push(`  npm install @openlog/sdk`);
+      lines.push(`  npm install @openlogs/sdk`);
       lines.push(`\nStep 2: Add the following to ${entryFile || 'your entry file'}:`);
       lines.push(generateNpmSnippet(wsAddress));
       if (isAuto)
@@ -325,12 +325,12 @@ function buildInstructions(
 
     case 'next':
       lines.push(`\nStep 1: Install the SDK`);
-      lines.push(`  npm install @openlog/sdk`);
+      lines.push(`  npm install @openlogs/sdk`);
       lines.push(
         `\nStep 2: For Next.js, add the SDK in your root layout (${entryFile || 'app/layout.tsx'}):`,
       );
       lines.push(
-        `  - Import dynamically: const OpenLog = dynamic(() => import('@openlog/sdk'), { ssr: false })`,
+        `  - Import dynamically: const OpenLog = dynamic(() => import('@openlogs/sdk'), { ssr: false })`,
       );
       lines.push(`  - Or use a client component wrapper to call OpenLog.init()`);
       lines.push(generateNpmSnippet(wsAddress));
@@ -338,7 +338,7 @@ function buildInstructions(
 
     case 'nuxt':
       lines.push(`\nStep 1: Install the SDK`);
-      lines.push(`  npm install @openlog/sdk`);
+      lines.push(`  npm install @openlogs/sdk`);
       lines.push(`\nStep 2: Create a Nuxt plugin at plugins/openlog.client.ts:`);
       lines.push(
         `  export default defineNuxtPlugin(() => {\n    ${generateNpmSnippet(wsAddress).replace(/\n/g, '\n    ')}\n  })`,
@@ -349,7 +349,7 @@ function buildInstructions(
       lines.push(`\nOption A (CDN — simplest):`);
       lines.push(generateCdnSnippet(wsAddress));
       lines.push(`\nOption B (npm):`);
-      lines.push(`  npm install @openlog/sdk`);
+      lines.push(`  npm install @openlogs/sdk`);
       lines.push(generateNpmSnippet(wsAddress));
   }
 

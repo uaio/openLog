@@ -3,9 +3,9 @@
 ## Installation
 
 ```bash
-npm install -g @openlog/cli
+npm install -g @openlogs/cli
 # or use directly
-npx @openlog/cli
+npx @openlogs/cli
 ```
 
 ## Commands

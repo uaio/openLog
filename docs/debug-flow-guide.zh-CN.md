@@ -10,7 +10,7 @@
 ┌───────────────┬──────────────────────┬────────────────────┬───────────────────────────────┐
 │               │  模式 A: 仅 SDK      │  模式 B: SDK + PC  │  模式 C: SDK + Claude Code    │
 ├───────────────┼──────────────────────┼────────────────────┼───────────────────────────────┤
-│  需要安装     │  一行 <script>       │  npx @openlog/cli       │  npx @openlog/cli init             │
+│  需要安装     │  一行 <script>       │  npx @openlogs/cli       │  npx @openlogs/cli init             │
 │  调试面板     │  手机上 Eruda 浮球    │  电脑浏览器 PC 面板 │  Claude Code 直接读取数据      │
 │  网络要求     │  无                  │  手机电脑同局域网   │  同左                         │
 │  适合场景     │  快速看日志/报错      │  远程监控/团队协作   │  AI 自动验证/排错             │
@@ -31,7 +31,7 @@
 在你的 H5 页面 `<head>` 或 `<body>` 末尾加一行：
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({ projectId: 'my-app', lang: 'zh' })
 </script>
@@ -68,7 +68,7 @@
 #### 第一步：电脑上启动服务（零安装）
 
 ```bash
-npx @openlog/cli
+npx @openlogs/cli
 ```
 
 启动后终端会打印：
@@ -84,7 +84,7 @@ npx @openlog/cli
 │                 SDK server: 'ws://192.168.1.5:38291' │
 ├─────────────────────────────────────────┤
 │  SDK 接入：                              │
-│  <script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+│  <script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 │  <script>                                │
 │    OpenLog.init({                        │
 │      projectId: 'my-app',               │
@@ -102,7 +102,7 @@ npx @openlog/cli
 把终端打印的代码粘贴到你的 H5 页面：
 
 ```html
-<script src="https://unpkg.com/@openlog/sdk@latest/dist/openlog.iife.js"></script>
+<script src="https://unpkg.com/@openlogs/sdk@latest/dist/openlog.iife.js"></script>
 <script>
   OpenLog.init({
     projectId: 'my-app',
@@ -116,10 +116,10 @@ npx @openlog/cli
 
 > 也可以用 npm 方式：
 > ```bash
-> npm install @openlog/sdk
+> npm install @openlogs/sdk
 > ```
 > ```javascript
-> import OpenLog from '@openlog/sdk'
+> import OpenLog from '@openlogs/sdk'
 > new OpenLog({ projectId: 'my-app', server: 'ws://192.168.1.5:38291', lang: 'zh' })
 > ```
 
@@ -130,7 +130,7 @@ npx @openlog/cli
 ### 使用流程
 
 ```
-1. 电脑：npx @openlog/cli                    → 服务启动
+1. 电脑：npx @openlogs/cli                    → 服务启动
 2. H5 页面：粘贴 SDK 代码                → SDK 连接服务
 3. 手机：打开 H5 页面                    → 设备出现在 PC 面板左侧
 4. 电脑：选中设备                        → 看到实时日志/网络/存储/性能
@@ -159,7 +159,7 @@ npx @openlog/cli
 A: 确保它们在同一局域网。终端打印了所有网卡地址，选手机能访问到的那个。
 
 **Q: 换端口？**
-A: `npx @openlog/cli -p 8080`
+A: `npx @openlogs/cli -p 8080`
 
 ---
 
@@ -174,7 +174,7 @@ Claude Code 通过 MCP 直接读取手机上的日志、网络请求、截图，
 #### 第一步：配置 MCP（一次性，以后不用再做）
 
 ```bash
-npx @openlog/cli init
+npx @openlogs/cli init
 ```
 
 这条命令会：
@@ -182,7 +182,7 @@ npx @openlog/cli init
 - **自动写入** MCP 配置文件
 - 如果是 Claude Code，还会安装 7 个 **slash commands**
 
-> 也可以指定：`npx @openlog/cli init --for=claude`
+> 也可以指定：`npx @openlogs/cli init --for=claude`
 
 **然后重启 Claude Code。**
 
@@ -329,4 +329,4 @@ Claude: 调 health_check() → 健康分 45/100
    - 服务是同一个，两边看到的数据一样
 
 4. **端口默认 38291**
-   - 被占用？`npx @openlog/cli -p 8080` 换一个
+   - 被占用？`npx @openlogs/cli -p 8080` 换一个
